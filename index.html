@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSM Analytics — AI &amp; Data Science Consultancy</title>
+  <meta name="description" content="MSM Analytics helps businesses adopt AI, automation, and data-driven decision-making through practical, hands-on consulting.">
+
+  <!-- Tells the browser this page implements its OWN dark theme on
+       purpose. Without this, some browsers apply their own automatic
+       "dark mode" or contrast adjustments to pages that don't declare
+       a color-scheme, which can silently recolor text (most visibly on
+       headings) and produce exactly the low-contrast, washed-out look
+       we don't want — even though our CSS colors are unambiguous. -->
+  <meta name="color-scheme" content="light">
+
+  <!-- Simple inline SVG favicon (no external file needed yet, avoids a
+       404 in the console). Swap for a real brand favicon later. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><text x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <!-- Load order matters: reset first (neutralize browser defaults),
+       then variables (design tokens), then base/layout styles, then
+       responsive overrides last so they can win when needed. -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Skip link: first focusable element on the page. Invisible until a
+       keyboard user tabs to it, then lets them jump straight to <main>. -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ======================================================================
+       HEADER / NAVBAR — built in Step 1
+       ====================================================================== -->
+  <header class="navbar" id="navbar">
+    <div class="container navbar__inner">
+
+      <a href="#hero" class="navbar__logo">
+        MSM<span>Analytics</span>
+      </a>
+
+      <!-- Collapses into a dropdown on mobile, becomes a static row at
+           768px+ (see responsive.css). id is targeted by aria-controls
+           on the toggle button below. -->
+      <nav class="navbar__nav" id="navbar-nav">
+        <ul class="navbar__links">
+          <li><a href="#services">Services</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#work">Case Studies</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="navbar__actions">
+        <!-- TODO: replace href with real Calendly URL once available -->
+        <a href="#contact" class="btn btn--primary btn--sm navbar__cta">Book a Strategy Call</a>
+
+        <button
+          type="button"
+          class="navbar__toggle"
+          id="navbar-toggle"
+          aria-expanded="false"
+          aria-controls="navbar-nav"
+          aria-label="Toggle navigation menu"
+        >
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ====================================================================
+         HERO — built in Step 2
+         ==================================================================== -->
+    <section id="hero" class="hero">
+      <div class="container hero__inner">
+
+        <div class="hero__content reveal">
+          <span class="section-heading__eyebrow">AI &amp; Data Science Consultancy</span>
+          <h1 class="hero__title">Turn scattered data into decisions your team can act on.</h1>
+          <p class="hero__subtitle">
+            MSM Analytics helps growing businesses cut through data chaos with
+            practical AI strategy, analytics, and automation — no hype,
+            just systems your team will actually use.
+          </p>
+          <div class="hero__actions">
+            <!-- TODO: replace href with real Calendly URL once available -->
+            <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
+            <a href="#services" class="btn btn--secondary">Explore Services</a>
+          </div>
+        </div>
+
+        <!-- Purely decorative — hidden from assistive tech entirely rather
+             than given alt text, since it conveys no information a screen
+             reader user needs (the same content is already in the text
+             next to it). -->
+        <div class="hero__graphic reveal" aria-hidden="true">
+          <svg viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
+            <!-- Card frame -->
+            <rect x="16" y="16" width="448" height="388" rx="20"
+                  style="fill:var(--color-bg-elevated); stroke:var(--color-border); stroke-width:1" />
+
+            <!-- Window "header" dots + divider -->
+            <circle cx="44" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
+            <circle cx="64" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
+            <circle cx="84" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
+            <text x="444" y="53" text-anchor="end" font-size="14" font-weight="600"
+                  style="fill:var(--color-text-muted)">AI Insights</text>
+            <line x1="16" y1="72" x2="464" y2="72" style="stroke:var(--color-border); stroke-width:1" />
+
+            <!-- Bar chart: an ascending growth trend, most recent bar fully highlighted -->
+            <rect x="56"  y="282" width="32" height="70"  rx="4" style="fill:var(--color-accent)" opacity="0.3" />
+            <rect x="108" y="262" width="32" height="90"  rx="4" style="fill:var(--color-accent)" opacity="0.45" />
+            <rect x="160" y="237" width="32" height="115" rx="4" style="fill:var(--color-accent)" opacity="0.6" />
+            <rect x="212" y="212" width="32" height="140" rx="4" style="fill:var(--color-accent)" opacity="0.8" />
+            <rect x="264" y="187" width="32" height="165" rx="4" style="fill:var(--color-accent)" opacity="1" />
+
+            <!-- Trend line with data-point nodes, echoing an AI/forecast readout -->
+            <polyline points="300,220 336,170 372,200 408,130 444,160"
+                      style="fill:none; stroke:var(--color-accent-secondary); stroke-width:3"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="300" cy="220" r="5" style="fill:var(--color-accent-secondary)" />
+            <circle cx="336" cy="170" r="5" style="fill:var(--color-accent-secondary)" />
+            <circle cx="372" cy="200" r="5" style="fill:var(--color-accent-secondary)" />
+            <circle cx="408" cy="130" r="5" style="fill:var(--color-accent-secondary)" />
+            <circle cx="444" cy="160" r="5" style="fill:var(--color-accent-secondary)" />
+            <circle cx="444" cy="160" r="10" style="fill:none; stroke:var(--color-accent-secondary); stroke-width:2" opacity="0.35" />
+          </svg>
+
+          <div class="hero__badge">
+            <span class="hero__badge-value">+42%</span>
+            <span class="hero__badge-label">Faster decisions</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         PROBLEM (Before / After) — built in Step 3
+         ==================================================================== -->
+    <section id="problem" class="problem section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">The Problem</span>
+          <h2>Still running the business on gut feel and spreadsheets?</h2>
+          <p>Most teams aren't short on data — they're short on a system that turns it into action.</p>
+        </div>
+
+        <div class="problem__grid grid-2 reveal-group">
+
+          <article class="problem__card card problem__card--before reveal">
+            <h3>Without a data &amp; AI strategy</h3>
+            <ul class="problem__list">
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Data scattered across spreadsheets, inboxes, and disconnected tools</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Manual reporting that eats hours every single week</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Decisions made on gut feel, because the evidence is too scattered to trust</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span>Repetitive tasks quietly draining your team's best hours</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="problem__card card problem__card--after reveal">
+            <h3>With MSM Analytics</h3>
+            <ul class="problem__list">
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span>One clear view of the metrics that actually move the business</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span>Automated reporting and workflows that run themselves</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span>Decisions backed by evidence, not guesswork</span>
+              </li>
+              <li>
+                <span class="problem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span>Your team focused on high-value work, not busywork</span>
+              </li>
+            </ul>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BENEFITS — built in Step 4
+         ==================================================================== -->
+    <section id="benefits" class="benefits section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">Why It Matters</span>
+          <h2>Built for teams that need clarity, not more dashboards</h2>
+          <p>The outcomes our clients actually feel week to week.</p>
+        </div>
+
+        <div class="grid-4 reveal-group">
+
+          <article class="card reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>
+            </span>
+            <h3>Faster Decisions</h3>
+            <p>Go from question to answer in hours, not weeks, with reporting built around how your team actually works.</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 7l6 6 4-4 6 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 16h6v-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Reduced Costs</h3>
+            <p>Automate the manual busywork that quietly costs more in hours than any tool subscription ever will.</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M3 13.5l9 5 9-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <h3>Scalable Systems</h3>
+            <p>Build data and AI foundations that grow with you, instead of breaking the moment you scale.</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 12v-3M10 12V7M13 12v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <h3>Data Clarity</h3>
+            <p>Turn scattered numbers into a single source of truth your whole team actually trusts.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SERVICES — built in Step 5
+         ==================================================================== -->
+    <section id="services" class="services section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">Services</span>
+          <h2>Three ways we help you put data &amp; AI to work</h2>
+          <p>Start wherever you are — a fuzzy hunch or a fully scoped project.</p>
+        </div>
+
+        <div class="grid-3 reveal-group">
+
+          <article class="card card--service reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>
+            </span>
+            <h3>AI Strategy &amp; Audit</h3>
+            <p>A clear-eyed assessment of where AI and automation can actually move the needle in your business — no jargon, no over-promising.</p>
+            <ul class="card--service__features">
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Current-state data &amp; workflow audit</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Opportunity prioritization by ROI</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>90-day implementation roadmap</li>
+            </ul>
+            <a href="#contact" class="card--service__link">
+              Learn more
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="card card--service reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+            </span>
+            <h3>Data Science &amp; Analytics Solutions</h3>
+            <p>Turn raw data into dashboards, models, and reports your team will actually open — built on infrastructure that scales with you.</p>
+            <ul class="card--service__features">
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom dashboards &amp; reporting</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Predictive &amp; statistical modeling</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Data pipeline &amp; warehouse setup</li>
+            </ul>
+            <a href="#contact" class="card--service__link">
+              Learn more
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="card card--service reveal">
+            <span class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 3v3M12 18v3M21 12h-3M6 12H3M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M18.4 18.4l-2.1-2.1M7.7 7.7 5.6 5.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <h3>AI/ML Implementation &amp; Automation</h3>
+            <p>From proof of concept to production — we build and ship the AI-powered workflows that remove your team's most repetitive work.</p>
+            <ul class="card--service__features">
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Workflow &amp; process automation</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Custom AI/ML model deployment</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Integration with your existing tools</li>
+            </ul>
+            <a href="#contact" class="card--service__link">
+              Learn more
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+        </div>
+
+        <div class="services__cta reveal">
+          <!-- TODO: replace href with real Calendly URL once available -->
+          <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         HOW IT WORKS — built in Step 6
+         ==================================================================== -->
+    <section id="how-it-works" class="how-it-works section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">How It Works</span>
+          <h2>A simple, low-risk way to get started</h2>
+          <p>Three steps from first conversation to a system your team actually runs on.</p>
+        </div>
+
+        <ol class="how-it-works__list reveal-group">
+
+          <li class="how-it-works__step reveal">
+            <span class="step-number" aria-hidden="true">01</span>
+            <div class="how-it-works__step-content">
+              <h3>Discovery</h3>
+              <p>We start with a working session to understand your data, tools, and biggest bottlenecks — no assumptions, no generic templates.</p>
+            </div>
+          </li>
+
+          <li class="how-it-works__step reveal">
+            <span class="step-number" aria-hidden="true">02</span>
+            <div class="how-it-works__step-content">
+              <h3>Prioritization &amp; Strategy</h3>
+              <p>We map every opportunity against effort and impact, then hand you a clear roadmap of what to tackle first, second, and later.</p>
+            </div>
+          </li>
+
+          <li class="how-it-works__step reveal">
+            <span class="step-number" aria-hidden="true">03</span>
+            <div class="how-it-works__step-content">
+              <h3>Implementation</h3>
+              <p>We build, test, and ship the systems — dashboards, models, automations — then train your team to run with them.</p>
+            </div>
+          </li>
+
+        </ol>
+
+        <div class="how-it-works__cta reveal">
+          <!-- TODO: replace href with real Calendly URL once available -->
+          <a href="#contact" class="btn btn--primary">Start with a Strategy Call</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         CASE STUDIES — real client engagements
+         ==================================================================== -->
+    <section id="work" class="work section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">Case Studies</span>
+          <h2>Real problems we've helped clients solve</h2>
+          <p>A sample of recent engagements — from BI dashboards to production-scale predictive models.</p>
+        </div>
+
+        <div class="grid-3 reveal-group">
+
+          <article class="card card--work reveal">
+            <span class="card--work__client">MSIG</span>
+            <h3>Interactive Competitive Analysis Dashboard</h3>
+            <p>Built a Power BI dashboard that lets MSIG's team explore competitors, clusters, and product performance interactively. Dynamic slicers and auto-surfaced comparisons replaced hours of manual filtering with a self-serve, app-like tool.</p>
+          </article>
+
+          <article class="card card--work reveal">
+            <span class="card--work__client">QuantivRisk</span>
+            <h3>Probabilistic Accident-Cause Analysis</h3>
+            <p>Developed a Bayesian model for QuantivRisk that scores the probability each candidate factor — like excessive speed — contributed to a vehicle accident, using pre-accident telemetry. Gives analysts an explainable breakdown instead of a single black-box prediction.</p>
+          </article>
+
+          <article class="card card--work reveal">
+            <span class="card--work__client">Zywave</span>
+            <h3>Multi-State Insurance Premium Prediction</h3>
+            <p>Built a segmented premium-prediction system for Zywave — three state-specific models plus one general model — to capture regional pricing patterns a single nationwide model would average away, achieving 19–30% MAPE across all four. We also bring hands-on AWS expertise, including training and deploying models like this through SageMaker.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         ABOUT — built in Step 7
+         ==================================================================== -->
+    <section id="about" class="about section">
+      <div class="container about__inner reveal-group">
+
+        <!-- TODO: replace with a real <img src="..." alt="..."> of the team
+             once photography is available. -->
+        <div class="about__photo reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          <span class="about__photo-label">Team Photo</span>
+        </div>
+
+        <div class="about__content reveal">
+          <span class="section-heading__eyebrow">About</span>
+          <h2>Practical AI expertise, without the jargon</h2>
+          <p>
+            MSM Analytics was founded on a simple idea: most businesses don't need
+            more dashboards or more AI hype — they need a team that can translate
+            messy data and emerging technology into decisions their people can
+            actually act on.
+          </p>
+          <p>
+            <strong>Our mission is simple:</strong> make AI and data science
+            genuinely useful for teams without a data science department —
+            practical, explainable, and built around how you already work.
+          </p>
+
+          <blockquote class="testimonial">
+            <p>MSM Analytics didn't just build us a dashboard — they changed how our whole team makes decisions. We finally trust the numbers.</p>
+            <footer class="testimonial__footer">
+              <cite>Jordan Lee</cite>, Operations Director at Placeholder Co.
+            </footer>
+          </blockquote>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         FAQ — built in Step 8
+         ==================================================================== -->
+    <section id="faq" class="faq section">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="section-heading__eyebrow">FAQ</span>
+          <h2>Common questions before you book a call</h2>
+          <p>Can't find your question here? Ask it directly on the call — there's no such thing as a dumb one.</p>
+        </div>
+
+        <div class="faq__list" id="faq-list">
+
+          <div class="faq__item reveal">
+            <h3 class="faq__question">
+              <button type="button" class="faq__trigger" aria-expanded="false" aria-controls="faq-panel-1" id="faq-header-1">
+                <span>We don't have a dedicated data team — can you still help us?</span>
+                <span class="faq__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </h3>
+            <div class="faq__panel" id="faq-panel-1" role="region" aria-labelledby="faq-header-1">
+              <div class="faq__panel-inner">
+                <p>Yes — most of our clients don't have one either. We work with the data and tools you already have, and we're deliberate about building systems your existing team can actually maintain without hiring a data scientist.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq__item reveal">
+            <h3 class="faq__question">
+              <button type="button" class="faq__trigger" aria-expanded="false" aria-controls="faq-panel-2" id="faq-header-2">
+                <span>How is this different from just hiring a freelance developer?</span>
+                <span class="faq__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </h3>
+            <div class="faq__panel" id="faq-panel-2" role="region" aria-labelledby="faq-header-2">
+              <div class="faq__panel-inner">
+                <p>A freelancer builds what you ask for. We start by figuring out what's actually worth building — through a structured audit and prioritization process — so you're not paying to automate the wrong thing.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq__item reveal">
+            <h3 class="faq__question">
+              <button type="button" class="faq__trigger" aria-expanded="false" aria-controls="faq-panel-3" id="faq-header-3">
+                <span>How long does a typical engagement take?</span>
+                <span class="faq__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </h3>
+            <div class="faq__panel" id="faq-panel-3" role="region" aria-labelledby="faq-header-3">
+              <div class="faq__panel-inner">
+                <p>It depends on scope, but most projects move from discovery to a working system in 4–8 weeks. We'll give you a specific timeline after the initial strategy call, not before.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq__item reveal">
+            <h3 class="faq__question">
+              <button type="button" class="faq__trigger" aria-expanded="false" aria-controls="faq-panel-4" id="faq-header-4">
+                <span>What does the first strategy call actually involve?</span>
+                <span class="faq__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </h3>
+            <div class="faq__panel" id="faq-panel-4" role="region" aria-labelledby="faq-header-4">
+              <div class="faq__panel-inner">
+                <p>A focused conversation about where you're losing time or money to manual work, and an honest read on whether AI or automation is actually the right fix. No sales pitch, no obligation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq__item reveal">
+            <h3 class="faq__question">
+              <button type="button" class="faq__trigger" aria-expanded="false" aria-controls="faq-panel-5" id="faq-header-5">
+                <span>Do you build custom AI models, or use existing tools?</span>
+                <span class="faq__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </h3>
+            <div class="faq__panel" id="faq-panel-5" role="region" aria-labelledby="faq-header-5">
+              <div class="faq__panel-inner">
+                <p>Both — whichever gets you a reliable result faster. Sometimes that's wiring together tools you already pay for; sometimes it's a custom model. We'll always tell you which, and why.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         CONTACT — built in Step 9
+         ==================================================================== -->
+    <section id="contact" class="contact section">
+      <div class="container contact__inner reveal-group">
+
+        <div class="contact__intro reveal">
+          <span class="section-heading__eyebrow">Contact</span>
+          <h2>Let's find the fastest way AI can reduce friction in your business</h2>
+          <p>Book a free 30-minute strategy call, or send a message below and we'll get back to you within one business day.</p>
+
+          <ul class="contact__outcomes">
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Where you're losing the most time to manual work
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Which opportunities are actually worth prioritizing first
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              A clear next step — even if that step is "not yet"
+            </li>
+          </ul>
+
+          <!-- TODO: replace href with real Calendly URL once available -->
+          <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
+        </div>
+
+        <form class="contact__form card reveal" id="contact-form" novalidate>
+
+          <div class="form-field">
+            <label for="contact-name">Name</label>
+            <input
+              type="text" id="contact-name" name="name" class="form-field__input"
+              required autocomplete="name" aria-describedby="contact-name-error"
+              data-error-required="Please enter your name."
+            >
+            <p class="form-field__error" id="contact-name-error" role="alert"></p>
+          </div>
+
+          <div class="form-field">
+            <label for="contact-email">Email</label>
+            <input
+              type="email" id="contact-email" name="email" class="form-field__input"
+              required autocomplete="email" aria-describedby="contact-email-error"
+              data-error-required="Please enter your email address."
+              data-error-type="Please enter a valid email address."
+            >
+            <p class="form-field__error" id="contact-email-error" role="alert"></p>
+          </div>
+
+          <div class="contact__form-row">
+            <div class="form-field">
+              <label for="contact-job-title">Job Title <span class="form-field__optional">(optional)</span></label>
+              <input type="text" id="contact-job-title" name="jobTitle" class="form-field__input" autocomplete="organization-title">
+            </div>
+
+            <div class="form-field">
+              <label for="contact-company">Company <span class="form-field__optional">(optional)</span></label>
+              <input type="text" id="contact-company" name="company" class="form-field__input" autocomplete="organization">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="contact-message">Message</label>
+            <textarea
+              id="contact-message" name="message" class="form-field__input" rows="5"
+              required aria-describedby="contact-message-error"
+              data-error-required="Let us know a bit about what you're looking for."
+            ></textarea>
+            <p class="form-field__error" id="contact-message-error" role="alert"></p>
+          </div>
+
+          <button type="submit" class="btn btn--primary contact__submit">Send Message</button>
+
+          <p class="contact__success" id="contact-success" role="status" hidden>
+            Thanks — your message has been received. We'll get back to you within one business day.
+          </p>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       FOOTER — built in Step 10
+       ====================================================================== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+
+      <div class="footer__brand">
+        <a href="#hero" class="footer__logo">
+          MSM<span>Analytics</span>
+        </a>
+        <p class="footer__tagline">Practical AI and data science for businesses that want clarity, not more complexity.</p>
+
+        <div class="footer__meta">
+          <a href="mailto:hello@msmanalytics.com" class="footer__email">hello@msmanalytics.com</a>
+          <div class="footer__socials">
+            <!-- TODO: replace with real social profile URLs -->
+            <a href="#" class="footer__social-link" aria-label="MSM Analytics on LinkedIn">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/><path d="M7.5 11v6M11.5 17v-3.5c0-1.5 1-2.5 2.25-2.5s2.25 1 2.25 2.5V17" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="MSM Analytics on X">
+              <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <nav class="footer__nav" aria-label="Footer">
+        <h3 class="footer__nav-heading">Navigate</h3>
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#work">Case Studies</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="footer__bottom">
+      <div class="container">
+        <p>&copy; <span id="footer-year"></span> MSM Analytics. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script tag placed at the end of <body> so the DOM is already parsed
+       by the time this runs — no need for a DOMContentLoaded listener. -->
+  <script src="js/script.js"></script>
+</body>
+</html>

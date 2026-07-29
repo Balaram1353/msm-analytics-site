@@ -1,0 +1,116 @@
+/* ==========================================================================
+   RESET.CSS — Modern CSS Reset
+   ==========================================================================
+   Every browser ships its own default stylesheet (margins on <p>, bullets
+   on <ul>, weird font on <button>, etc.). Those defaults are inconsistent
+   across browsers and rarely what you want in a custom design, so we
+   neutralize them here — ONCE — before writing any real styles.
+
+   This is a trimmed-down version of the widely-used "modern CSS reset"
+   approach (popularized by Josh Comeau / Andy Bell), kept to just the
+   rules this project actually needs.
+   ========================================================================== */
+
+/* 1. Use border-box everywhere so `width`/`height` include padding and
+      border. Without this, adding padding to an element makes it grow
+      *larger* than the width you set — a classic beginner layout bug. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margins. Browsers apply inconsistent margins to
+      headings, paragraphs, lists, etc. We'll add margin back
+      intentionally via our spacing scale, not rely on browser defaults. */
+* {
+  margin: 0;
+}
+
+/* 3. Prevent iOS text-size adjustment on orientation change without
+      disabling zoom (keeps the page accessible/zoomable). */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 4. Smooth-scroll for anchor links (nav → #section), but ONLY if the
+      user hasn't requested reduced motion. Respecting this OS-level
+      accessibility setting is a best practice that's easy to forget. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 5. Sensible default line-height + font smoothing for readable body text. */
+body {
+  line-height: var(--line-height-base, 1.6);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* 6. Images/media are block-level and never overflow their container.
+      Without max-width: 100%, an image larger than its container will
+      cause horizontal scrolling — one of the most common responsive bugs. */
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Form elements don't inherit font styles by default in most browsers —
+      this makes <button>/<input>/<textarea> match the rest of the page. */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* 8. Buttons: remove default browser chrome so we fully control appearance
+      via our own .btn classes later. */
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: inherit;
+}
+
+/* 9. Links: remove the underline and inherit color by default. We'll add
+      underlines/color back deliberately for specific link styles
+      (e.g. body copy links) rather than fighting the browser default. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 10. Only strip list markers/padding on lists we've explicitly turned
+       into layout (i.e. given a class to, like nav menus or card grids).
+       A plain <ul> with no class (e.g. inside a paragraph of real content)
+       keeps its bullets — this avoids accidentally destroying list
+       semantics/appearance in places we didn't intend to. */
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+/* 11. Long words/URLs shouldn't cause horizontal overflow on narrow screens. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  overflow-wrap: break-word;
+}
+
+/* 12. Prevent textareas being resized wider than their container. */
+textarea {
+  resize: vertical;
+}

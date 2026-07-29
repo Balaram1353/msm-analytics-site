@@ -1,0 +1,209 @@
+/* ==========================================================================
+   RESPONSIVE.CSS — Media Query Overrides
+   ==========================================================================
+   All base CSS in style.css is written MOBILE-FIRST (single column,
+   smallest sizes). This file only ADDS enhancements as the viewport
+   grows, using min-width media queries — it never has to fight or
+   override complex desktop styles back down to mobile.
+
+   Breakpoints used throughout this project (kept as a comment here
+   since CSS custom properties can't be used inside @media conditions):
+     - 480px  → large phones
+     - 768px  → tablets
+     - 1024px → small laptops / landscape tablets
+     - 1280px → desktop
+
+   This file stays empty until Step 12 (the dedicated responsiveness
+   pass), where we'll test every section at each breakpoint and add
+   overrides here. Building sections mobile-first in style.css means
+   most things will already work by the time we get to this step —
+   Step 12 is about catching the exceptions, not building layouts
+   from scratch.
+   ========================================================================== */
+
+/* ===== NAVBAR — promote the mobile dropdown to a static horizontal row,
+   hide the hamburger, once there's enough width for it.
+
+   Uses its OWN breakpoint (900px) rather than the shared 768px "tablet"
+   breakpoint used elsewhere in this file. With 5 nav links of varying
+   length ("How It Works", "Case Studies") plus the logo and CTA button
+   all competing for space, 768px genuinely isn't wide enough — that
+   combination was measured wrapping and overlapping the logo at 768px
+   before this was raised to 900px. Other sections stay on the shared
+   768px tablet breakpoint since they don't have this constraint. ===== */
+@media (min-width: 900px) {
+  .navbar__nav {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    opacity: 1; /* base styles default this to 0 for the closed mobile
+                   dropdown state — desktop nav is never "opened" via
+                   .is-open, so without this override it would stay
+                   permanently invisible above this breakpoint. */
+    background-color: transparent;
+    border-bottom: none;
+  }
+
+  .navbar__links {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-6);
+    padding: 0;
+  }
+
+  .navbar__links li + li {
+    border-top: none;
+  }
+
+  .navbar__links a {
+    padding-block: var(--space-2);
+  }
+
+  /* Underline-on-hover only makes sense once links sit in a horizontal
+     row — on the mobile dropdown it would look wrong under a
+     full-width block link. */
+  .navbar__links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-accent);
+    transition: width var(--transition-base);
+  }
+
+  .navbar__links a:hover::after,
+  .navbar__links a.is-active::after {
+    width: 100%;
+  }
+
+  .navbar__toggle {
+    display: none;
+  }
+}
+
+/* ===== HERO — switch from stacked to a two-column (text | graphic)
+   layout once there's enough width for both to breathe. ===== */
+@media (min-width: 1024px) {
+  .hero {
+    padding-block: var(--space-16) var(--space-12);
+  }
+
+  .hero__inner {
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-12);
+  }
+}
+
+/* ===== GRID UTILITIES ===== */
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== HOW IT WORKS — switch the vertical timeline to a 3-column row.
+   Uses a DIFFERENT connecting-line technique than the mobile version:
+   here the three columns are guaranteed equal width (repeat(3, 1fr)),
+   so their centers sit at exactly 1/6, 3/6, and 5/6 of the container's
+   total width. One line, positioned with that math, replaces the three
+   separate short connectors used on mobile. ===== */
+@media (min-width: 1024px) {
+  .how-it-works__list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+    position: relative; /* anchors the ::before line below */
+  }
+
+  .how-it-works__step {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Turn off the mobile per-circle connector... */
+  .how-it-works__step .step-number::after {
+    display: none;
+  }
+
+  /* ...and draw one line spanning between the first and last column's
+     circle centers instead. z-index: 0 keeps it behind the circles. */
+  .how-it-works__list::before {
+    content: "";
+    position: absolute;
+    top: 28px; /* vertical center of the 56px circle */
+    left: calc(100% / 6);
+    right: calc(100% / 6);
+    height: 2px;
+    background-color: var(--color-border);
+    z-index: 0;
+  }
+
+  .step-number {
+    z-index: 1; /* sits above the connecting line */
+    margin-bottom: var(--space-5);
+  }
+}
+
+/* ===== ABOUT — asymmetric two-column layout: a narrower photo column
+   next to a wider content column. ===== */
+@media (min-width: 1024px) {
+  .about__inner {
+    grid-template-columns: 0.9fr 1.4fr;
+    gap: var(--space-12);
+  }
+}
+
+/* ===== CONTACT ===== */
+
+/* Job Title + Company side by side — this only needs the FORM COLUMN
+   itself to be wide enough for two fields, not the whole page, so it
+   can safely turn on earlier (480px) than the two-column section
+   split below (1024px). */
+@media (min-width: 480px) {
+  .contact__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .contact__inner {
+    grid-template-columns: 1fr 1.1fr;
+    gap: var(--space-12);
+  }
+}
+
+/* ===== FOOTER ===== */
+@media (min-width: 768px) {
+  .footer__inner {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}

@@ -1,0 +1,1315 @@
+/* ==========================================================================
+   STYLE.CSS — Base Styles & Layout Primitives
+   ==========================================================================
+   Loaded AFTER reset.css and variables.css, so every rule below can use
+   var(--token-name) and assume browser defaults are already neutralized.
+
+   This file has two jobs at this stage of the build:
+     1. Base element styles  — how body text/headings look by default.
+     2. Layout primitives    — reusable classes (.container, .section,
+        .grid-2/3/4) that every section we build from here on will use
+        instead of writing their own layout CSS from scratch.
+
+   As we build each section in later steps, that section's specific
+   styles get appended to this file under a clearly commented heading,
+   e.g. "/* ===== HERO ===== */".
+   ========================================================================== */
+
+/* --------------------------------------------------------------------
+   BASE ELEMENT STYLES
+   -------------------------------------------------------------------- */
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  /* Navbar is position: fixed (removed from normal document flow), so
+     without this the hero content would start underneath it. */
+  padding-top: var(--navbar-height);
+}
+
+/* Anchor-link scrolling (nav → #section) stops short by this many
+   pixels, so the target section's heading never ends up hidden behind
+   the fixed navbar. */
+html {
+  scroll-padding-top: var(--navbar-height);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em; /* tightens large headline text — a common
+                               polish detail on modern SaaS/consultancy
+                               sites, since default letter-spacing looks
+                               slightly loose at large sizes. */
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+p {
+  color: var(--color-text-muted);
+  line-height: var(--line-height-base);
+}
+
+/* Keyboard-focus visibility. Browsers show a default focus outline, but
+   it's frequently ugly/inconsistent — we replace it with one deliberate
+   style, and ONLY show it for keyboard focus (:focus-visible), not for
+   mouse clicks. This keeps the UI clean for mouse users while remaining
+   fully navigable for keyboard users, which is a core accessibility
+   requirement, not an optional nicety. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* --------------------------------------------------------------------
+   ACCESSIBILITY UTILITIES
+   -------------------------------------------------------------------- */
+
+/* Visually hides content while keeping it available to screen readers.
+   Used for text that's meaningful to assistive tech but redundant
+   on-screen (rare) — kept here as a reusable utility. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link: hidden off-screen until it receives keyboard focus (i.e. a
+   keyboard user presses Tab as the very first action on the page), at
+   which point it becomes visible and lets them jump straight to <main>,
+   bypassing the navbar. Without this, a keyboard/screen-reader user has
+   to tab through every nav link on every single page load. */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 1000;
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-accent);
+  color: #fff;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+/* --------------------------------------------------------------------
+   LAYOUT PRIMITIVES
+   -------------------------------------------------------------------- */
+
+/* .container centers content and caps its width so text/cards don't
+   stretch edge-to-edge on large monitors. Every section's inner content
+   sits inside one of these. */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+/* .section adds consistent vertical rhythm between page sections.
+   Generous spacing here is what makes a minimal layout read as
+   "premium" instead of "empty" — under-spacing is the most common
+   beginner mistake in this style of design. */
+.section {
+  padding-block: var(--space-12);
+}
+
+/* A shared heading block used at the top of most sections: an optional
+   small "eyebrow" label, a heading, and optional supporting text —
+   all center-aligned with a constrained width so paragraph lines don't
+   stretch too wide. */
+.section-heading {
+  max-width: 640px;
+  margin-inline: auto;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+.section-heading__eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  /* accent-hover (not the base accent) — at this small size, the base
+     accent blue falls short of AA text-contrast against white; the
+     darker shade reads as the same "brand blue" while staying legible. */
+  color: var(--color-accent-hover);
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-full);
+}
+
+.section-heading h2 {
+  margin-bottom: var(--space-3);
+}
+
+.section-heading p {
+  font-size: var(--font-size-lg);
+}
+
+/* Grid utilities: MOBILE-FIRST, so the default (no media query) is a
+   single column — the safest, simplest layout on a small screen.
+   responsive.css will widen these to 2 and 3/4 columns at larger
+   breakpoints in Step 12. Building it this way (small screen first,
+   enhance upward) is the professional-standard approach, versus
+   starting from a desktop layout and cramming it into mobile later. */
+.grid-2,
+.grid-3,
+.grid-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+/* --------------------------------------------------------------------
+   BUTTON COMPONENT
+   --------------------------------------------------------------------
+   Two variants, reused everywhere a CTA appears (navbar, hero, services,
+   process, contact). Building this once as a component — instead of
+   styling each button individually per section — is what makes every
+   CTA on the site feel consistent, and means a single edit here updates
+   every button on the page at once.
+   -------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.btn--primary {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-2px);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-bg-elevated);
+  border-color: var(--color-accent);
+}
+
+.btn--sm {
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+/* --------------------------------------------------------------------
+   SCROLL REVEAL
+   --------------------------------------------------------------------
+   Any element with class="reveal" starts hidden/offset, then animates
+   in once script.js's IntersectionObserver marks it .is-visible as it
+   enters the viewport. Wrapped in a prefers-reduced-motion query so
+   users who've asked their OS for less motion get the content
+   instantly, with no animation at all — script.js also checks this
+   same setting before ever animating, so the two stay in sync.
+   -------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity var(--transition-slow) ease, transform var(--transition-slow) ease;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Staggered entrance for grid children: apply .reveal-group to a grid
+     container (e.g. a .grid-4 of cards) and each direct child animates
+     in slightly after the previous one, instead of all four appearing
+     at once. Pure CSS — script.js's observer logic is unaware this is
+     even happening; it just adds .is-visible to each card as normal,
+     and the transition-delay below staggers when that becomes visible. */
+  .reveal-group > *:nth-child(1) { transition-delay: 0ms; }
+  .reveal-group > *:nth-child(2) { transition-delay: 80ms; }
+  .reveal-group > *:nth-child(3) { transition-delay: 160ms; }
+  .reveal-group > *:nth-child(4) { transition-delay: 240ms; }
+}
+
+/* ===== NAVBAR ===== */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-navbar);
+  height: var(--navbar-height);
+  display: flex;
+  align-items: center;
+  background-color: rgba(248, 250, 252, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  /* A permanent hairline border — not just added on scroll — so the bar
+     reads as a distinct, elevated surface even at the very top of the
+     page, where it would otherwise sit directly on a near-white hero
+     background with almost nothing to visually separate the two. */
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+/* Browsers without backdrop-filter support (a small minority, but
+   real) would otherwise show a very transparent bar with no blur to
+   compensate — this swaps in a solid background instead so the navbar
+   still reads clearly against whatever scrolls underneath it. */
+@supports not (backdrop-filter: blur(1px)) {
+  .navbar {
+    background-color: var(--color-bg-elevated);
+  }
+}
+
+/* Added by script.js once the user scrolls past a small threshold —
+   a more opaque backdrop + a soft shadow, so the bar visibly "lifts"
+   above content once there's something to scroll underneath it. */
+.navbar.is-scrolled {
+  background-color: rgba(248, 250, 252, 0.92);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative; /* anchors the absolutely-positioned mobile dropdown */
+}
+
+.navbar__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.navbar__logo span {
+  color: var(--color-accent);
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* --- Mobile nav panel (base/mobile styles — overridden at 768px in
+       responsive.css to become a static horizontal row) --- */
+.navbar__nav {
+  position: absolute;
+  top: calc(var(--navbar-height) - 1px);
+  left: calc(var(--container-padding) * -1);
+  right: calc(var(--container-padding) * -1);
+  background-color: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  /* Height and opacity animate at different speeds on purpose: the
+     panel finishes expanding slightly before it finishes fading in,
+     which reads as a more deliberate motion than both properties
+     landing at exactly the same instant. */
+  transition: max-height var(--transition-slow) ease, opacity var(--transition-base) ease;
+}
+
+.navbar__nav.is-open {
+  max-height: 320px;
+  opacity: 1;
+}
+
+.navbar__links {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--container-padding) var(--space-4);
+}
+
+.navbar__links li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.navbar__links a {
+  position: relative;
+  display: block;
+  padding-block: var(--space-3);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.navbar__links a:hover {
+  color: var(--color-text);
+}
+
+/* Applied by script.js's scroll-spy to whichever link matches the
+   section currently in view — gives the visitor a sense of "where am
+   I" as they scroll, instead of the nav staying static the whole way
+   down the page. */
+.navbar__links a.is-active {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.navbar__toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.navbar__toggle-bar {
+  width: 22px;
+  height: 2px;
+  background-color: var(--color-text);
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+
+/* Morphs the three bars into an "X" when script.js adds .is-active. */
+.navbar__toggle.is-active .navbar__toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.navbar__toggle.is-active .navbar__toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__toggle.is-active .navbar__toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Locks background scrolling while the mobile menu is open — toggled
+   on <body> by script.js. */
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* ===== HERO ===== */
+
+.hero {
+  padding-block: var(--space-10) var(--space-8);
+  /* Clips the blurred glow (below) if it ever bleeds past the edge of
+     the viewport, without affecting the floating badge, which overlaps
+     the graphic but stays within the section's own box. */
+  overflow-x: hidden;
+}
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: var(--space-10);
+}
+
+.hero__content .section-heading__eyebrow {
+  margin-bottom: var(--space-4);
+}
+
+.hero__title {
+  margin-bottom: var(--space-5);
+  max-width: 18ch; /* keeps the large headline from stretching into one
+                       long line on wide screens — wraps to 2-3 lines
+                       instead, which is easier to scan. */
+}
+
+.hero__subtitle {
+  max-width: 52ch;
+  margin-bottom: var(--space-6);
+  font-size: var(--font-size-lg);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.hero__graphic {
+  position: relative;
+  min-width: 0; /* see the CONTACT section for why grid items need this */
+}
+
+/* Same fix as .hero__graphic above — this is the OTHER hero__inner
+   grid item (the text column). Added here as its own rule since it
+   didn't otherwise need a base style block yet. */
+.hero__content {
+  min-width: 0;
+}
+
+/* Soft, blurred two-tone glow behind the card — a common "premium tech
+   product" visual cue. Pure CSS (radial-gradient + blur), no image
+   asset needed. Sits behind the SVG via z-index: -1. Lower opacity
+   than a dark-theme version would use — a light background needs much
+   less "glow" before a color wash starts to look like a smudge rather
+   than a deliberate accent. */
+.hero__graphic::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--color-accent) 0%, transparent 60%),
+    radial-gradient(circle at 75% 70%, var(--color-accent-secondary) 0%, transparent 60%);
+  filter: blur(70px);
+  opacity: 0.16;
+  z-index: -1;
+}
+
+.hero__graphic svg {
+  width: 100%;
+  height: auto;
+  /* Matches the shadow language used by .card elsewhere on the page,
+     so the dashboard mockup reads as "elevated" the same way any
+     other card does. Uses --shadow-drop-lg (not --shadow-lg) because
+     this is a filter, not a box-shadow — see the token's definition
+     in variables.css for why that distinction matters. */
+  filter: drop-shadow(var(--shadow-drop-lg));
+}
+
+.hero__badge {
+  position: absolute;
+  bottom: -1.25rem;
+  left: -1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* This element visually "floats" on top of the graphic behind it —
+     on a light background, a shadow is what actually sells that
+     floating effect (a border alone reads as flat/pasted-on). */
+  box-shadow: var(--shadow-lg);
+}
+
+.hero__badge-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--color-accent-secondary);
+}
+
+.hero__badge-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------
+   CARD COMPONENT
+   --------------------------------------------------------------------
+   Base surface used by the Problem, Benefits, and Services sections.
+   On a light background, elevation is communicated with a real drop
+   shadow (impossible to see on a dark background, where "more black"
+   just disappears) plus a hairline border to keep the edge crisp at
+   1x pixel density where shadows alone can look soft/blurry.
+   -------------------------------------------------------------------- */
+.card {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  /* Grid/flex items default to min-width: auto, which means their
+     minimum size is based on their content's natural (unwrapped) width
+     — NOT the width of the track they've been given. A card sitting in
+     a multi-column grid should always be allowed to shrink to fit its
+     column; this override is what makes that guaranteed rather than
+     accidental. See the CONTACT section below for the specific real
+     bug this pattern was written to fix. */
+  min-width: 0;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+/* ===== PROBLEM (Before / After) ===== */
+
+.problem__card--before {
+  /* Deliberately flatter than the default .card — no shadow, no hover
+     lift, blends toward the page background — to read as the "less
+     appealing" state next to the highlighted "after" card. */
+  background-color: var(--color-bg);
+  box-shadow: none;
+}
+
+.problem__card--before:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.problem__card--after {
+  border-color: var(--color-accent);
+}
+
+.problem__card h3 {
+  margin-bottom: var(--space-5);
+}
+
+.problem__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+}
+
+.problem__list li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.problem__list li span:last-child {
+  color: var(--color-text-muted);
+}
+
+.problem__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.problem__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* "Before" icons stay muted/gray — no alarming red — keeping the whole
+   site to its one disciplined accent color. "After" icons use the same
+   teal used by the hero's "+42%" badge, so "positive outcome" reads
+   consistently sitewide. */
+.problem__card--before .problem__icon {
+  color: var(--color-text-muted);
+}
+
+.problem__card--after .problem__icon {
+  color: var(--color-accent-secondary);
+}
+
+/* --------------------------------------------------------------------
+   ICON BADGE COMPONENT
+   --------------------------------------------------------------------
+   A small colored square holding an icon — used at the top of Benefit
+   and Service cards, and in the How It Works steps. Built once here,
+   reused as-is (or with a size modifier) in later sections.
+   -------------------------------------------------------------------- */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.icon-badge svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ===== BENEFITS ===== */
+
+.benefits .card h3 {
+  margin-bottom: var(--space-2);
+}
+
+/* ===== SERVICES ===== */
+
+/* The "taller/detailed" card variant: flex column + height: 100% means
+   every card in the row matches the height of the tallest one (grid
+   items stretch to fill their row by default), and margin-top: auto on
+   the last child (.card--service__link) pins it to the bottom of the
+   card no matter how much text sits above it. This flex-column +
+   margin-top:auto combo is a pattern you'll reach for constantly for
+   "footer stays at the bottom of a variable-height card" layouts. */
+.card--service {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card--service h3 {
+  margin-bottom: var(--space-3);
+}
+
+.card--service > p {
+  margin-bottom: var(--space-5);
+}
+
+.card--service__features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.card--service__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.card--service__features svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--color-accent);
+}
+
+.card--service__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto; /* pushes the link to the bottom of the flex column */
+  padding-top: var(--space-4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-hover); /* same small-text contrast reasoning as the eyebrow */
+}
+
+.card--service__link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.card--service__link:hover svg {
+  transform: translateX(4px);
+}
+
+.services__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-10);
+}
+
+/* ===== HOW IT WORKS ===== */
+
+/* Base (mobile) layout: a vertical timeline — circle + content side by
+   side per step, stacked in a column. Desktop overrides this to a
+   3-column row in responsive.css. */
+.how-it-works__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.how-it-works__step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.step-number {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  color: #ffffff;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+/* Mobile connector: a short line, exactly as long as the list's own
+   gap, dropped from the bottom of each circle (except the last one).
+   Because its length matches --space-8 exactly — the same value used
+   for the list's `gap` — it always reaches precisely to the top of the
+   next circle, regardless of how tall the step above or below it is. */
+.how-it-works__step:not(:last-child) .step-number::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: var(--space-8);
+  background-color: var(--color-border);
+}
+
+.how-it-works__step-content h3 {
+  margin-bottom: var(--space-2);
+}
+
+.how-it-works__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-10);
+}
+
+/* ===== CASE STUDIES ===== */
+
+.card--work__client {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-hover);
+}
+
+.card--work h3 {
+  margin-bottom: var(--space-3);
+}
+
+/* ===== ABOUT ===== */
+
+.about__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.about__photo {
+  min-width: 0; /* see the CONTACT section for why grid items need this */
+  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+}
+
+.about__photo svg {
+  width: 64px;
+  height: 64px;
+}
+
+.about__photo-label {
+  font-size: var(--font-size-sm);
+}
+
+.about__content {
+  min-width: 0; /* see the CONTACT section for why grid items need this */
+}
+
+.about__content .section-heading__eyebrow {
+  margin-bottom: var(--space-4);
+}
+
+.about__content h2 {
+  margin-bottom: var(--space-5);
+  max-width: 20ch;
+}
+
+.about__content > p {
+  max-width: 60ch;
+  margin-bottom: var(--space-5);
+}
+
+.about__content > p strong {
+  color: var(--color-text);
+}
+
+.testimonial {
+  margin-top: var(--space-8);
+  padding-left: var(--space-6);
+  border-left: 3px solid var(--color-accent);
+}
+
+.testimonial p {
+  max-width: 55ch;
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-lg);
+  font-style: italic;
+  color: var(--color-text);
+}
+
+/* The decorative giant quotation mark. line-height: 0 keeps it from
+   pushing the paragraph's own line spacing taller than intended, and
+   vertical-align nudges it down so it visually sits in line with the
+   quote text instead of floating above it. */
+.testimonial p::before {
+  content: "\201C";
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-size: 3rem;
+  line-height: 0;
+  vertical-align: -0.6rem;
+  font-style: normal;
+  color: var(--color-accent);
+  opacity: 0.5;
+}
+
+.testimonial__footer {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: normal; /* <cite> and <footer> default to italic in most
+                          browsers — we already used italics for the
+                          quote itself, so this keeps the attribution
+                          line visually distinct rather than doubled up. */
+}
+
+.testimonial__footer cite {
+  font-style: normal;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* ===== FAQ ACCORDION ===== */
+
+.faq__list {
+  max-width: 800px;
+  margin-inline: auto;
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faq__question {
+  /* Resets the default heading margin/size — this <h3> exists for
+     document outline/semantics, not to look like a heading. Its
+     visual appearance is entirely delegated to the button inside it. */
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.faq__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  padding-block: var(--space-5);
+  text-align: left;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  transition: color var(--transition-fast);
+}
+
+.faq__trigger:hover {
+  color: var(--color-accent-hover);
+}
+
+.faq__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.faq__icon svg {
+  width: 100%;
+  height: 100%;
+  transition: transform var(--transition-base);
+}
+
+/* Rotates the chevron to point up when the panel is open. */
+.faq__item.is-open .faq__icon svg {
+  transform: rotate(180deg);
+}
+
+/* --------------------------------------------------------------------
+   THE HEIGHT-ANIMATION TRICK
+   --------------------------------------------------------------------
+   .faq__panel is a CSS grid with exactly one row, whose height is
+   defined in the "fr" (fraction) unit rather than px — starting at
+   0fr (zero height). Animating "0fr" to "1fr" is something the browser
+   CAN smoothly interpolate, unlike animating "height: 0" to
+   "height: auto" (which CSS transitions have never been able to do,
+   because "auto" isn't a single numeric value to animate toward).
+
+   .faq__panel-inner then needs overflow: hidden, because while the
+   grid ROW is shrinking to zero height, the actual <p> content inside
+   would otherwise still render at its full natural height and just
+   visually spill out of the shrunken row.
+   -------------------------------------------------------------------- */
+.faq__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-slow) ease;
+}
+
+.faq__panel-inner {
+  overflow: hidden;
+}
+
+.faq__item.is-open .faq__panel {
+  grid-template-rows: 1fr;
+}
+
+.faq__panel-inner p {
+  max-width: 65ch;
+  padding-bottom: var(--space-5);
+}
+
+/* ===== CONTACT ===== */
+
+.contact__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+  align-items: start;
+}
+
+/* --------------------------------------------------------------------
+   THE min-width: 0 FIX — found during the responsiveness pass
+   --------------------------------------------------------------------
+   Real bug, caught by measuring (not eyeballing) at narrow widths:
+   .contact__outcomes below is `display: flex; flex-direction: column`.
+   A column-direction flex container computes ITS OWN width from its
+   children's natural, UNWRAPPED text width — before each <li>'s own
+   `max-width: 42ch` (further down) ever gets applied. The result: the
+   list quietly demanded ~578px of width on a ~500px screen, and
+   because grid items default to `min-width: auto` (their minimum
+   allowed size is "whatever my content needs," not "whatever track
+   I've been given"), .contact__intro just... went along with it,
+   pushing the whole page into horizontal overflow.
+
+   min-width: 0 overrides that default, telling the grid item "you are
+   allowed to be narrower than your content's natural size" — which is
+   what lets everything downstream actually wrap and shrink to fit.
+   This is a genuinely common, easy-to-miss CSS pitfall, not a mistake
+   specific to this page — worth remembering as a default reflex any
+   time a grid/flex item holds text that might not fit.
+   -------------------------------------------------------------------- */
+.contact__intro {
+  min-width: 0;
+}
+
+.contact__intro .section-heading__eyebrow {
+  margin-bottom: var(--space-4);
+}
+
+.contact__intro h2 {
+  margin-bottom: var(--space-4);
+  max-width: 22ch;
+}
+
+.contact__intro > p {
+  max-width: 48ch;
+  margin-bottom: var(--space-6);
+}
+
+.contact__outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.contact__outcomes li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: 42ch;
+  color: var(--color-text-muted);
+}
+
+.contact__outcomes svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  color: var(--color-accent);
+}
+
+/* --------------------------------------------------------------------
+   THE FORM
+   -------------------------------------------------------------------- */
+
+.contact__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  /* .form-field is a grid item when it's Job Title or Company (inside
+     .contact__form-row's 2-column grid) — same min-width:auto issue
+     documented in the CONTACT section above, just one level deeper. */
+  min-width: 0;
+}
+
+.form-field label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.form-field__optional {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
+.form-field__input {
+  /* <input> elements carry their own browser-default intrinsic width
+     (historically based on the HTML `size` attribute, ~20 characters)
+     and, unlike plain text, do NOT shrink to wrap the way a paragraph
+     would — without this, an input can refuse to shrink below that
+     built-in default even when its container is narrower, which is
+     exactly what was happening to Job Title/Company at narrow widths. */
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-field__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* A form-specific focus treatment (border + soft glow) instead of the
+   site-wide outline used elsewhere — outline: none here is only safe
+   because we're substituting an equally visible replacement, not
+   removing focus indication altogether. */
+.form-field__input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+/* Added by script.js after a field fails validation. */
+.form-field__input.is-invalid {
+  border-color: var(--color-error);
+}
+
+.form-field__input.is-invalid:focus-visible {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+textarea.form-field__input {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Reserves a consistent line of space for the error message whether or
+   not one is currently showing, so a field failing validation doesn't
+   shove every field below it down the page the moment an error appears. */
+.form-field__error {
+  min-height: 1.2em;
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+}
+
+.contact__submit {
+  margin-top: var(--space-2);
+}
+
+.contact__success {
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background-color: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== FOOTER ===== */
+
+.footer {
+  margin-top: var(--space-16);
+  border-top: 1px solid var(--color-border);
+  /* A step darker than the page background (which itself is a step
+     darker than card white) — gives the footer a "floor" feeling,
+     visually grounding the bottom of the page rather than blending
+     into the section above it. */
+  background-color: var(--color-bg-elevated-2);
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+  padding-block: var(--space-12);
+}
+
+/* Both direct grid items — same min-width:0 reasoning documented in
+   full in the CONTACT section. Neither has caused a measurable
+   overflow (short link text, nothing unwrappable), but every other
+   grid item on the page has this guard, and an inconsistent exception
+   here would just be a bug waiting for someone to add longer copy. */
+.footer__brand,
+.footer__nav {
+  min-width: 0;
+}
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.footer__logo span {
+  color: var(--color-accent);
+}
+
+.footer__tagline {
+  max-width: 36ch;
+  margin-bottom: var(--space-6);
+}
+
+.footer__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.footer__email {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  transition: color var(--transition-fast);
+}
+
+.footer__email:hover {
+  color: var(--color-accent-hover);
+}
+
+.footer__socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast), border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.footer__social-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.footer__social-link:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+.footer__nav-heading {
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.footer__nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__nav a {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.footer__nav a:hover {
+  color: var(--color-accent-hover);
+}
+
+.footer__bottom {
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-5);
+}
+
+.footer__bottom p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
