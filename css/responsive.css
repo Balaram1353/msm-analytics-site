@@ -103,6 +103,39 @@
   }
 }
 
+/* ===== PROBLEM (transformation list) — rows go from stacked
+   before/arrow/after to a single horizontal line, and the column
+   labels above the list become visible now that there's a genuine
+   2-column layout for them to label. ===== */
+@media (min-width: 768px) {
+  .transform__labels {
+    display: grid;
+    grid-template-columns: 1fr 28px 1fr;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6) 0;
+  }
+
+  .transform__label--after {
+    grid-column: 3; /* only 2 label elements exist for a 3-column grid
+                        (there's no label over the arrow column), so this
+                        must be pinned explicitly or auto-placement would
+                        put it in column 2, under the arrow. */
+    text-align: right;
+  }
+
+  .transform__row {
+    grid-template-columns: 1fr 28px 1fr;
+  }
+
+  .transform__arrow {
+    transform: none;
+  }
+
+  .transform__after {
+    text-align: right;
+  }
+}
+
 @media (min-width: 640px) {
   .grid-4 {
     grid-template-columns: repeat(2, 1fr);

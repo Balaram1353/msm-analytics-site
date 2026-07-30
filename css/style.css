@@ -796,66 +796,77 @@ body.no-scroll {
   transform: translateY(-4px);
 }
 
-/* ===== PROBLEM (Before / After) ===== */
+/* ===== PROBLEM (Before / After) =====
+   A single "transformation" list — each row pairs the old way with the
+   new way side by side — instead of two parallel bulleted cards. This
+   is deliberately a different structural pattern from the card grids
+   used everywhere else on the page (Benefits/Services/Case Studies),
+   so the page doesn't read as the same component reskinned five times. */
 
-.problem__card--before {
-  /* Deliberately flatter than the default .card — no shadow, no hover
-     lift, blends toward the page background — to read as the "less
-     appealing" state next to the highlighted "after" card. */
-  background-color: var(--color-bg);
-  box-shadow: none;
+.transform {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-.problem__card--before:hover {
-  transform: none;
-  box-shadow: none;
+.transform__labels {
+  display: none; /* shown at the tablet+ breakpoint once rows go 2-column */
 }
 
-.problem__card--after {
-  border-color: var(--color-accent);
+.transform__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-text-muted);
 }
 
-.problem__card h3 {
-  margin-bottom: var(--space-5);
+.transform__label--after {
+  color: var(--color-accent-hover);
 }
 
-.problem__list li {
-  display: flex;
-  align-items: flex-start;
+.transform__row {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--space-3);
-  padding-block: var(--space-3);
+  padding: var(--space-5) var(--space-6);
+  align-items: center;
 }
 
-.problem__list li + li {
+.transform__row + .transform__row {
   border-top: 1px solid var(--color-border);
 }
 
-.problem__list li span:last-child {
+.transform__before {
   color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-border-strong);
+  text-decoration-thickness: 1.5px;
 }
 
-.problem__icon {
+.transform__after {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.transform__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  transform: rotate(90deg); /* points down on the stacked mobile layout */
 }
 
-.problem__icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* "Before" icons stay muted/gray — no alarming red — keeping the whole
-   site to its one disciplined accent color. "After" icons use the same
-   teal used by the hero's "+42%" badge, so "positive outcome" reads
-   consistently sitewide. */
-.problem__card--before .problem__icon {
-  color: var(--color-text-muted);
-}
-
-.problem__card--after .problem__icon {
-  color: var(--color-accent-secondary);
+.transform__arrow svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* --------------------------------------------------------------------
@@ -898,13 +909,33 @@ body.no-scroll {
    margin-top:auto combo is a pattern you'll reach for constantly for
    "footer stays at the bottom of a variable-height card" layouts. */
 .card--service {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* A thin top accent bar (added via ::before) is this card type's
+     visual signature — Benefits cards stay plain, Case Studies cards
+     get a different signature below — so the three grids don't read
+     as one card component reused three times. */
+  border-top: 3px solid var(--color-accent);
+}
+
+/* Large faint index number in the corner — a common "process/services
+   list" convention that reinforces these are a considered, ordered set
+   of offerings rather than four interchangeable benefit blurbs. */
+.card--service__index {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-6);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-border-strong);
 }
 
 .card--service h3 {
   margin-bottom: var(--space-3);
+  padding-right: var(--space-8); /* keeps the heading from running under the index number */
 }
 
 .card--service > p {
@@ -1018,16 +1049,28 @@ body.no-scroll {
   margin-top: var(--space-10);
 }
 
-/* ===== CASE STUDIES ===== */
+/* ===== CASE STUDIES =====
+   A third distinct card signature: a left accent border (rather than
+   Services' top border) in the secondary teal (rather than Services'
+   blue), plus the client name as a tinted tag instead of plain
+   uppercase text — reads as a "case file" rather than a benefit blurb
+   or a service listing, even though it's built on the same base .card. */
+
+.card--work {
+  border-left: 3px solid var(--color-accent-secondary);
+}
 
 .card--work__client {
-  display: block;
-  margin-bottom: var(--space-2);
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  padding: var(--space-1) var(--space-3);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-accent-hover);
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-accent-secondary);
+  background-color: rgba(13, 148, 136, 0.1);
+  border-radius: var(--radius-full);
 }
 
 .card--work h3 {
