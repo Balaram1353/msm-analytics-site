@@ -886,6 +886,16 @@ body.no-scroll {
   border-radius: var(--radius-md);
   background-color: var(--color-accent-soft);
   color: var(--color-accent);
+  transition: background-color var(--transition-base), transform var(--transition-base);
+}
+
+/* Small second-order motion on top of the card's own hover lift — the
+   badge fills in solid and nudges up slightly, giving cards a bit more
+   life than a flat lift+shadow with an inert icon sitting on top. */
+.card:hover .icon-badge {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .icon-badge svg {
