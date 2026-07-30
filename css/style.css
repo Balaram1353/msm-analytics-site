@@ -1043,27 +1043,72 @@ body.no-scroll {
   align-items: start;
 }
 
-.about__photo {
+.about__proof {
   min-width: 0; /* see the CONTACT section for why grid items need this */
-  aspect-ratio: 4 / 5;
+}
+
+.about__proof-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+  height: 100%;
+  padding: var(--space-6);
   background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.about__proof-eyebrow {
+  margin-bottom: var(--space-5);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
   color: var(--color-text-muted);
 }
 
-.about__photo svg {
-  width: 64px;
-  height: 64px;
+.about__proof-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.about__photo-label {
+.about__proof-value {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-h3);
+  color: var(--color-accent-hover);
+}
+
+.about__proof-label {
   font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.about__proof-divider {
+  margin-block: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.about__proof-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-hover);
+}
+
+.about__proof-link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.about__proof-link:hover svg {
+  transform: translateX(3px);
 }
 
 .about__content {
@@ -1088,50 +1133,6 @@ body.no-scroll {
   color: var(--color-text);
 }
 
-.testimonial {
-  margin-top: var(--space-8);
-  padding-left: var(--space-6);
-  border-left: 3px solid var(--color-accent);
-}
-
-.testimonial p {
-  max-width: 55ch;
-  margin-bottom: var(--space-4);
-  font-size: var(--font-size-lg);
-  font-style: italic;
-  color: var(--color-text);
-}
-
-/* The decorative giant quotation mark. line-height: 0 keeps it from
-   pushing the paragraph's own line spacing taller than intended, and
-   vertical-align nudges it down so it visually sits in line with the
-   quote text instead of floating above it. */
-.testimonial p::before {
-  content: "\201C";
-  display: inline-block;
-  margin-right: var(--space-2);
-  font-size: 3rem;
-  line-height: 0;
-  vertical-align: -0.6rem;
-  font-style: normal;
-  color: var(--color-accent);
-  opacity: 0.5;
-}
-
-.testimonial__footer {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  font-style: normal; /* <cite> and <footer> default to italic in most
-                          browsers — we already used italics for the
-                          quote itself, so this keeps the attribution
-                          line visually distinct rather than doubled up. */
-}
-
-.testimonial__footer cite {
-  font-style: normal;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
 
 /* ===== FAQ ACCORDION ===== */
 

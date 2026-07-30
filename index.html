@@ -482,11 +482,31 @@
     <section id="about" class="about section section--tint">
       <div class="container about__inner reveal-group">
 
-        <!-- TODO: replace with a real <img src="..." alt="..."> of the team
-             once photography is available. -->
-        <div class="about__photo reveal">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-          <span class="about__photo-label">Team Photo</span>
+        <!-- Real proof points instead of a placeholder team photo — an
+             empty "photo coming soon" box undermines credibility more
+             than not having a photo at all. Numbers are grounded in the
+             actual case studies below, not invented. -->
+        <div class="about__proof reveal">
+          <div class="about__proof-card">
+            <span class="about__proof-eyebrow">By the numbers</span>
+
+            <div class="about__proof-stat">
+              <span class="about__proof-value">3</span>
+              <span class="about__proof-label">Industries served — insurance, risk &amp; analytics</span>
+            </div>
+            <div class="about__proof-divider"></div>
+
+            <div class="about__proof-stat">
+              <span class="about__proof-value">19&ndash;30%</span>
+              <span class="about__proof-label">Prediction error (MAPE) on production models</span>
+            </div>
+            <div class="about__proof-divider"></div>
+
+            <div class="about__proof-stat">
+              <span class="about__proof-value">100%</span>
+              <span class="about__proof-label">Explainable outputs — never a black box</span>
+            </div>
+          </div>
         </div>
 
         <div class="about__content reveal">
@@ -503,13 +523,10 @@
             genuinely useful for teams without a data science department —
             practical, explainable, and built around how you already work.
           </p>
-
-          <blockquote class="testimonial">
-            <p>MSM Analytics didn't just build us a dashboard — they changed how our whole team makes decisions. We finally trust the numbers.</p>
-            <footer class="testimonial__footer">
-              <cite>Jordan Lee</cite>, Operations Director at Placeholder Co.
-            </footer>
-          </blockquote>
+          <a href="#work" class="about__proof-link">
+            See how this looks in practice — real client engagements
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
 
       </div>
