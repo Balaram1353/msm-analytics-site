@@ -104,43 +104,59 @@
         <!-- Purely decorative — hidden from assistive tech entirely rather
              than given alt text, since it conveys no information a screen
              reader user needs (the same content is already in the text
-             next to it). -->
+             next to it). A layered composition of "product UI" cards
+             (rather than a single flat illustration) reads as a real
+             system doing real work, not a generic stock chart. -->
         <div class="hero__graphic reveal" aria-hidden="true">
-          <svg viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
-            <!-- Card frame -->
-            <rect x="16" y="16" width="448" height="388" rx="20"
-                  style="fill:var(--color-bg-elevated); stroke:var(--color-border); stroke-width:1" />
+          <div class="hero-visual">
+            <div class="hero-visual__grid"></div>
 
-            <!-- Window "header" dots + divider -->
-            <circle cx="44" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
-            <circle cx="64" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
-            <circle cx="84" cy="48" r="5" style="fill:var(--color-text-muted)" opacity="0.5" />
-            <text x="444" y="53" text-anchor="end" font-size="14" font-weight="600"
-                  style="fill:var(--color-text-muted)">AI Insights</text>
-            <line x1="16" y1="72" x2="464" y2="72" style="stroke:var(--color-border); stroke-width:1" />
+            <div class="hero-visual__card hero-visual__card--main">
+              <div class="hero-visual__card-header">
+                <span class="hero-visual__live-dot"></span>
+                <span>Revenue trend</span>
+                <span class="hero-visual__pill">Live</span>
+              </div>
 
-            <!-- Bar chart: an ascending growth trend, most recent bar fully highlighted -->
-            <rect x="56"  y="282" width="32" height="70"  rx="4" style="fill:var(--color-accent)" opacity="0.3" />
-            <rect x="108" y="262" width="32" height="90"  rx="4" style="fill:var(--color-accent)" opacity="0.45" />
-            <rect x="160" y="237" width="32" height="115" rx="4" style="fill:var(--color-accent)" opacity="0.6" />
-            <rect x="212" y="212" width="32" height="140" rx="4" style="fill:var(--color-accent)" opacity="0.8" />
-            <rect x="264" y="187" width="32" height="165" rx="4" style="fill:var(--color-accent)" opacity="1" />
+              <svg class="hero-visual__chart" viewBox="0 0 320 130" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="heroChartFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32" />
+                    <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0,102 C36,88 58,54 92,58 C126,62 144,34 178,36 C212,38 228,16 262,14 C284,13 302,24 320,6 L320,130 L0,130 Z"
+                      fill="url(#heroChartFill)" />
+                <path d="M0,102 C36,88 58,54 92,58 C126,62 144,34 178,36 C212,38 228,16 262,14 C284,13 302,24 320,6"
+                      fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="320" cy="6" r="4.5" fill="var(--color-accent)" />
+              </svg>
 
-            <!-- Trend line with data-point nodes, echoing an AI/forecast readout -->
-            <polyline points="300,220 336,170 372,200 408,130 444,160"
-                      style="fill:none; stroke:var(--color-accent-secondary); stroke-width:3"
-                      stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="300" cy="220" r="5" style="fill:var(--color-accent-secondary)" />
-            <circle cx="336" cy="170" r="5" style="fill:var(--color-accent-secondary)" />
-            <circle cx="372" cy="200" r="5" style="fill:var(--color-accent-secondary)" />
-            <circle cx="408" cy="130" r="5" style="fill:var(--color-accent-secondary)" />
-            <circle cx="444" cy="160" r="5" style="fill:var(--color-accent-secondary)" />
-            <circle cx="444" cy="160" r="10" style="fill:none; stroke:var(--color-accent-secondary); stroke-width:2" opacity="0.35" />
-          </svg>
+              <div class="hero-visual__stat">
+                <span class="hero-visual__stat-value">+42%</span>
+                <span class="hero-visual__stat-label">faster decisions, average across clients</span>
+              </div>
+            </div>
 
-          <div class="hero__badge">
-            <span class="hero__badge-value">+42%</span>
-            <span class="hero__badge-label">Faster decisions</span>
+            <div class="hero-visual__card hero-visual__card--float-top">
+              <span class="hero-visual__float-icon">
+                <svg viewBox="0 0 20 20"><path d="M10 3v14M4 9l6-6 6 6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="hero-visual__float-text">
+                <span class="hero-visual__float-title">Forecast confidence</span>
+                <span class="hero-visual__float-value">94%</span>
+              </span>
+            </div>
+
+            <div class="hero-visual__card hero-visual__card--float-bottom">
+              <span class="hero-visual__float-icon">
+                <svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="hero-visual__float-text">
+                <span class="hero-visual__float-title">Weekly report</span>
+                <span class="hero-visual__float-value">Auto-generated &middot; 2m ago</span>
+              </span>
+            </div>
           </div>
         </div>
 
