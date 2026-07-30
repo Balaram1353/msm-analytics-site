@@ -125,12 +125,33 @@
                     <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0" />
                   </linearGradient>
                 </defs>
+
+                <!-- Baseline gridlines — the single biggest cue that turns
+                     a decorative squiggle into something that reads as a
+                     real chart rendering real data. -->
+                <line x1="0" y1="24" x2="320" y2="24" class="hero-visual__chart-grid" />
+                <line x1="0" y1="63" x2="320" y2="63" class="hero-visual__chart-grid" />
+                <line x1="0" y1="102" x2="320" y2="102" class="hero-visual__chart-grid" />
+
                 <path d="M0,102 C36,88 58,54 92,58 C126,62 144,34 178,36 C212,38 228,16 262,14 C284,13 302,24 320,6 L320,130 L0,130 Z"
                       fill="url(#heroChartFill)" />
                 <path d="M0,102 C36,88 58,54 92,58 C126,62 144,34 178,36 C212,38 228,16 262,14 C284,13 302,24 320,6"
-                      fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" />
+                      fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- Real data-point markers along the line, not just a lone
+                     dot at the end — this is what makes it look plotted
+                     from actual values rather than drawn as a flourish. -->
+                <circle cx="0" cy="102" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="92" cy="58" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="178" cy="36" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="262" cy="14" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="320" cy="6" r="9" class="hero-visual__chart-point-ring" />
                 <circle cx="320" cy="6" r="4.5" fill="var(--color-accent)" />
               </svg>
+
+              <div class="hero-visual__chart-axis">
+                <span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+              </div>
 
               <div class="hero-visual__stat">
                 <span class="hero-visual__stat-value">+42%</span>
