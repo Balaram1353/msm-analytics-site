@@ -124,7 +124,13 @@
 
   --font-size-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
   --font-size-h2: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);
-  --font-size-h1: clamp(2.5rem, 1.7rem + 3.6vw, 4.25rem);
+  /* Tuned for the H1's real context: it lives in a ~55%-width column next
+     to the hero visual, not the full viewport, so a large vw coefficient
+     hits the max size WAY too early on ordinary laptop widths (~1280px)
+     and overwhelms that column. Lower coefficient + higher max lets it
+     stay reasonable at common widths but still go genuinely large on
+     wide desktop monitors. */
+  --font-size-h1: clamp(2.25rem, 1.5rem + 2.4vw, 4rem);
 
   --line-height-tight: 1.1;
   --line-height-snug: 1.3;

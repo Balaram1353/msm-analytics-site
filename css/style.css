@@ -684,6 +684,15 @@ body.no-scroll {
   height: 18px;
 }
 
+/* A second, deliberate touch of the secondary accent (teal) on the other
+   floating card — two flat blue chips read as repetitive; alternating
+   the two brand accents across them adds a little color richness while
+   staying inside the same two-color system (not introducing a new hue). */
+.hero-visual__float-icon--teal {
+  background-color: rgba(13, 148, 136, 0.12);
+  color: var(--color-accent-secondary);
+}
+
 .hero-visual__float-text {
   display: flex;
   flex-direction: column;
