@@ -1,2 +1,7 @@
 .DS_Store
 Thumbs.db
+
+# Claude Code tooling — local agent/skill config, not site source
+.agents/
+.claude/
+skills-lock.json
