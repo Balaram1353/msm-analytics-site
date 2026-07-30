@@ -41,24 +41,25 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
-  letter-spacing: -0.02em; /* tightens large headline text — a common
-                               polish detail on modern SaaS/consultancy
-                               sites, since default letter-spacing looks
-                               slightly loose at large sizes. */
 }
 
 h1 {
   font-size: var(--font-size-h1);
+  letter-spacing: var(--tracking-h1);
 }
 
 h2 {
   font-size: var(--font-size-h2);
+  letter-spacing: var(--tracking-h2);
 }
 
 h3 {
   font-size: var(--font-size-h3);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--tracking-h3);
 }
 
 p {
@@ -141,6 +142,39 @@ p {
   padding-block: var(--space-12);
 }
 
+/* Section background variants — used to break the page into alternating
+   bands (flat / tinted / inverted) instead of one flat canvas from hero
+   to footer. Applied selectively per-section in the HTML, not to every
+   section, so each band change still reads as a deliberate beat rather
+   than a busy stripe pattern. */
+.section--tint {
+  background-color: var(--color-bg-tint);
+}
+
+.section--inverted {
+  background-color: var(--color-bg-inverted);
+  color: var(--color-text-inverted);
+}
+
+.section--inverted h2,
+.section--inverted h3 {
+  color: var(--color-text-inverted);
+}
+
+.section--inverted p {
+  color: var(--color-text-inverted-muted);
+}
+
+.section--inverted .section-heading__eyebrow {
+  color: var(--color-text-inverted);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.section--inverted .card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: var(--color-border-inverted);
+}
+
 /* A shared heading block used at the top of most sections: an optional
    small "eyebrow" label, a heading, and optional supporting text —
    all center-aligned with a constrained width so paragraph lines don't
@@ -159,7 +193,7 @@ p {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-eyebrow);
   /* accent-hover (not the base accent) — at this small size, the base
      accent blue falls short of AA text-contrast against white; the
      darker shade reads as the same "brand blue" while staying legible. */

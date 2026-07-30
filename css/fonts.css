@@ -1,0 +1,24 @@
+/* ==========================================================================
+   FONTS.CSS — Self-hosted variable fonts
+   ==========================================================================
+   Space Grotesk (headings) + Inter (body/UI) — both self-hosted as variable
+   woff2 files so the whole weight range (400-700 for Inter, 500-700 for
+   Space Grotesk) comes from a single file per family, no external request
+   at runtime, and no render-blocking third-party font host.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../assets/fonts/inter-variable.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/space-grotesk-variable.woff2') format('woff2');
+  font-weight: 500 700;
+  font-style: normal;
+  font-display: swap;
+}
