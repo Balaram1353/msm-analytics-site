@@ -55,12 +55,21 @@
                                         contrast ratio against white, not just
                                         the minimum AA requirement */
 
-  --color-accent: #3b82f6;          /* primary accent — buttons, icons, borders */
-  --color-accent-hover: #2563eb;    /* darker shade — hover/active states, and
-                                        also used for small accent-colored TEXT
-                                        (eyebrows, links), since the base accent
-                                        is a touch too light for AA text contrast
-                                        on a white background at small sizes */
+  --color-accent: #3b82f6;          /* primary accent — icons, borders, decorative
+                                        fills. NOT for text (see below) and NOT
+                                        as a background behind WHITE text — white
+                                        on this blue is only ~3.6:1, which fails
+                                        AA for normal-size text. */
+  --color-accent-hover: #2563eb;    /* darker shade — used both for small
+                                        accent-colored TEXT on white (eyebrows,
+                                        links) AND as the actual default
+                                        background for solid buttons/badges that
+                                        carry white text (~5.2:1, passes AA) —
+                                        the base --color-accent is too light for
+                                        either of those text-contrast cases. */
+  --color-accent-active: #1d4ed8;   /* one step darker still — hover/active state
+                                        for solid accent buttons whose resting
+                                        state already uses --color-accent-hover */
   --color-accent-soft: rgba(59, 130, 246, 0.1); /* tinted badge backgrounds */
 
   --color-accent-secondary: #0d9488; /* teal — darkened slightly from the dark-theme
@@ -71,6 +80,11 @@
   --color-border-strong: rgba(15, 23, 42, 0.16); /* hover/focus borders */
 
   --color-success: #16a34a;
+  /* Darker than --color-success — same reasoning as --color-accent-hover:
+     the base success green falls short of AA text-contrast (~3.3:1) at
+     normal text sizes, so any green USED AS TEXT (not just a decorative
+     dot/background) must use this shade instead. */
+  --color-success-text: #15803d;
   --color-error: #dc2626;
 
   /* --------------------------------------------------------------------
@@ -123,6 +137,10 @@
   --font-size-xl: 1.375rem;    /* 22px — large standalone stats/quotes */
 
   --font-size-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  /* Distinct from --font-size-h3 — used specifically for standalone proof
+     numbers (About section) that need real visual weight, not just
+     "same size as a card subheading." */
+  --font-size-stat: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
   --font-size-h2: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);
   /* Tuned for the H1's real context: it lives in a ~55%-width column next
      to the hero visual, not the full viewport, so a large vw coefficient
@@ -173,6 +191,9 @@
   --container-padding: var(--space-5); /* widened in responsive.css on larger screens */
 
   --navbar-height: 76px;
+  --navbar-offset-top: var(--space-4); /* floating inset margin from the
+    viewport's top/left/right edges — what turns the bar into a floating
+    rounded pill instead of a full-bleed rectangle flush to the edges */
 
   /* --------------------------------------------------------------------
      RADIUS & BORDERS

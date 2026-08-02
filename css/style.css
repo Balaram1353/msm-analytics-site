@@ -25,16 +25,19 @@ body {
   font-weight: var(--font-weight-regular);
   color: var(--color-text);
   background-color: var(--color-bg);
-  /* Navbar is position: fixed (removed from normal document flow), so
-     without this the hero content would start underneath it. */
-  padding-top: var(--navbar-height);
+  /* No top padding here on purpose — the navbar is transparent and
+     floats OVER the hero (and every other section, as the page
+     scrolls), rather than sitting in a permanently reserved gap above
+     the content. The one place that DOES need to clear the navbar's
+     height — the hero's own heading/text — compensates for it directly
+     in .hero's own padding-top instead. */
 }
 
 /* Anchor-link scrolling (nav → #section) stops short by this many
    pixels, so the target section's heading never ends up hidden behind
    the fixed navbar. */
 html {
-  scroll-padding-top: var(--navbar-height);
+  scroll-padding-top: calc(var(--navbar-height) + var(--navbar-offset-top) * 2);
 }
 
 h1,
@@ -109,7 +112,8 @@ p {
   left: var(--space-4);
   z-index: 1000;
   padding: var(--space-3) var(--space-5);
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-hover); /* white text on the base
+    accent blue fails AA text contrast (~3.6:1) — accent-hover passes */
   color: #fff;
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-sm);
@@ -241,23 +245,39 @@ p {
   padding: var(--space-3) var(--space-6);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  border-radius: var(--radius-sm);
+  /* Full pill, not the small --radius-sm this used to be. Cards moved to
+     --radius-lg and the navbar CTA became a true pill earlier this
+     session — --radius-sm was left behind as the single most generic,
+     least-considered radius on the site, on the component that appears
+     most often (every CTA on the page). Matches the pill language the
+     rest of the site has already committed to. */
+  border-radius: var(--radius-full);
   border: 1px solid transparent;
   white-space: nowrap;
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
     color var(--transition-fast),
+    box-shadow var(--transition-fast),
     transform var(--transition-fast);
 }
 
 .btn--primary {
-  background-color: var(--color-accent);
+  /* accent-hover, not accent — white text directly on the base accent
+     blue is only ~3.6:1 contrast, which fails WCAG AA for normal-size
+     text (4.5:1). accent-hover passes at ~5.2:1. */
+  background-color: var(--color-accent-hover);
   color: #ffffff;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--primary:hover {
-  background-color: var(--color-accent-hover);
+  background-color: var(--color-accent-active);
+  /* Shadow grows alongside the lift, not just the translateY alone —
+     a button rising with no accompanying shadow change reads as
+     sliding, not lifting. The shadow growth is what actually sells
+     the depth change. */
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
@@ -268,8 +288,15 @@ p {
 }
 
 .btn--secondary:hover {
-  background-color: var(--color-bg-elevated);
+  /* accent-soft (not --color-bg-elevated) — the old hover background was
+     nearly invisible in the button's most common placement (the hero,
+     already near-white), so the only perceptible hover cue was the
+     border color. A tinted accent background is visible everywhere
+     regardless of the surrounding section, and ties the hover to the
+     same accent-soft language used elsewhere (nav links, icon badges). */
+  background-color: var(--color-accent-soft);
   border-color: var(--color-accent);
+  color: var(--color-accent-hover);
 }
 
 .btn--sm {
@@ -315,40 +342,29 @@ p {
 
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: var(--navbar-offset-top);
+  left: var(--navbar-offset-top);
+  right: var(--navbar-offset-top);
   z-index: var(--z-navbar);
   height: var(--navbar-height);
   display: flex;
   align-items: center;
-  background-color: rgba(248, 250, 252, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  /* A permanent hairline border — not just added on scroll — so the bar
-     reads as a distinct, elevated surface even at the very top of the
-     page, where it would otherwise sit directly on a near-white hero
-     background with almost nothing to visually separate the two. */
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color var(--transition-base), box-shadow var(--transition-base);
+  /* A solid, fully opaque floating rectangle — inset from the viewport
+     edges (rather than flush top/left/right) with a moderate corner
+     radius matching the site's own card system (--radius-lg, same as
+     .card), rather than either sharp square corners or a full pill. */
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-base);
 }
 
-/* Browsers without backdrop-filter support (a small minority, but
-   real) would otherwise show a very transparent bar with no blur to
-   compensate — this swaps in a solid background instead so the navbar
-   still reads clearly against whatever scrolls underneath it. */
-@supports not (backdrop-filter: blur(1px)) {
-  .navbar {
-    background-color: var(--color-bg-elevated);
-  }
-}
-
-/* Added by script.js once the user scrolls past a small threshold —
-   a more opaque backdrop + a soft shadow, so the bar visibly "lifts"
-   above content once there's something to scroll underneath it. */
-.navbar.is-scrolled {
-  background-color: rgba(248, 250, 252, 0.92);
-  box-shadow: var(--shadow-sm);
+/* A slightly deeper shadow once scrolled, or while the mobile menu is
+   open — a small "lift" cue. No background change needed here anymore;
+   there's no transparency left to transition between. */
+.navbar.is-scrolled,
+.navbar.is-menu-open {
+  box-shadow: var(--shadow-lg);
 }
 
 .navbar__inner {
@@ -356,6 +372,10 @@ p {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  /* Wider than the generic .container padding — content needs more
+     breathing room from the pill's own heavily-rounded corners than a
+     square-cornered bar would need. */
+  padding-inline: var(--space-6);
   position: relative; /* anchors the absolutely-positioned mobile dropdown */
 }
 
@@ -363,14 +383,31 @@ p {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: var(--font-size-lg);
+  font-family: var(--font-family-heading); /* the brand/display font,
+    not the body font — a logotype should look distinct from running
+    UI text, especially now that it's plain text with no icon tile */
+  font-size: 1.25rem; /* bumped up from the shared --font-size-lg (18px) —
+                          the wordmark carries the whole brand identity and
+                          read as underweight for a 76px-tall bar at 18px */
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
-.navbar__logo span {
-  color: var(--color-accent);
+/* Gradient text — for "Analytics", "MSM" (.brand-mark, no longer a
+   boxed icon — see below), and the footer's mirrored logo. One shared
+   rule rather than three near-duplicates, since it's the exact same
+   technique everywhere it's used. Solid color declared FIRST as the
+   fallback for browsers without background-clip: text support (they
+   show solid accent-hover instead of invisible text). */
+.brand-mark,
+.navbar__logo span,
+.footer__logo span {
+  color: var(--color-accent-hover);
+  background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .navbar__actions {
@@ -379,15 +416,35 @@ p {
   gap: var(--space-4);
 }
 
+/* Hidden by default (mobile) — below 480px there isn't reliably enough
+   room for the logo + this button + the hamburger to sit on one row
+   without overflowing (a 210px-ish button next to a ~135px logo and a
+   40px toggle doesn't fit in a ~330px available width). The identical
+   CTA lives inside the mobile dropdown instead (.navbar__menu-cta) below
+   that width. Restored at 480px+ in responsive.css. */
+.navbar__cta {
+  display: none;
+  /* Full-pill radius, matching the nav links right next to it — the
+     generic .btn component's small radius sitting beside fully-rounded
+     pills read as two different corner-radius languages in the same
+     small cluster. Scoped here (not on .btn globally) since other
+     buttons on the page — hero CTA, form submit — don't need to change. */
+  border-radius: var(--radius-full);
+}
+
 /* --- Mobile nav panel (base/mobile styles — overridden at 768px in
        responsive.css to become a static horizontal row) --- */
 .navbar__nav {
   position: absolute;
-  top: calc(var(--navbar-height) - 1px);
-  left: calc(var(--container-padding) * -1);
-  right: calc(var(--container-padding) * -1);
+  top: var(--navbar-height);
+  /* Cancels .navbar__inner's own padding-inline (space-6, not the
+     generic container padding — updated to match) so the panel bleeds
+     to the pill's own edges, matching the pill's width exactly rather
+     than the full viewport. */
+  left: calc(var(--space-6) * -1);
+  right: calc(var(--space-6) * -1);
   background-color: var(--color-bg-elevated);
-  border-bottom: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-md);
   max-height: 0;
   opacity: 0;
@@ -407,34 +464,70 @@ p {
 .navbar__links {
   display: flex;
   flex-direction: column;
-  padding: var(--space-2) var(--container-padding) var(--space-4);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--container-padding) var(--space-4);
 }
 
-.navbar__links li + li {
-  border-top: 1px solid var(--color-border);
-}
-
-.navbar__links a {
-  position: relative;
+.navbar__link {
   display: block;
-  padding-block: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
-  transition: color var(--transition-fast);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  white-space: nowrap; /* guards against multi-word links ("How It Works")
+    wrapping inside their own pill under a tight squeeze near the 980px
+    breakpoint — same guard the shared .btn component already uses */
+  transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.navbar__links a:hover {
+.navbar__link:hover {
   color: var(--color-text);
+  background-color: rgba(15, 23, 42, 0.05);
 }
 
 /* Applied by script.js's scroll-spy to whichever link matches the
-   section currently in view — gives the visitor a sense of "where am
-   I" as they scroll, instead of the nav staying static the whole way
-   down the page. */
-.navbar__links a.is-active {
-  color: var(--color-text);
+   section currently in view. A filled pill/chip — not just a color
+   change — so the current section is unmistakable at a glance. Reuses
+   the same accent-soft/accent-hover token pair as the eyebrow badges
+   elsewhere on the site, so the highlight reads as "this site's blue,"
+   not a generic bright nav highlight. */
+.navbar__link.is-active {
+  color: var(--color-accent-hover);
   font-weight: var(--font-weight-semibold);
+  /* A flat background-color (even low-opacity, even blurred) still has
+     a hard-edged boundary at the pill's own border-radius — that edge
+     is what reads as "a rectangle sitting on top," and the extra blur
+     layer made it worse (a small frosted pane inside an already-frosted
+     bar reads as a distinct elevated glass chip, not a merged tint).
+     A radial glow that fades to fully transparent BEFORE it reaches the
+     element's own edge has no boundary at all to read as a shape — it's
+     a soft highlight centered on the text, not a box. No shadow, no
+     blur: nothing left to signal "elevated." */
+  background-color: transparent;
+  background-image: radial-gradient(
+    ellipse 85% 100% at center,
+    rgba(59, 130, 246, 0.16),
+    rgba(59, 130, 246, 0) 72%
+  );
+}
+
+/* The mobile-only in-dropdown CTA (see index.html comment) — deliberately
+   NOT a .navbar__link, since it's a button-styled action, not a plain
+   wayfinding link, and shouldn't pick up the scroll-spy's Map (script.js
+   only queries .navbar__link elements for that). Now that plain links no
+   longer have divider lines between them, this keeps ONE divider — right
+   above the action row — to separate "navigate" from "act". */
+.navbar__links-cta {
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--container-padding) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.navbar__menu-cta {
+  width: 100%;
+  border-radius: var(--radius-full); /* same pill-matching reasoning as .navbar__cta */
 }
 
 .navbar__toggle {
@@ -446,6 +539,19 @@ p {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+/* Every other interactive element in the bar (nav links) already has a
+   background-fill hover response — the toggle previously had none at
+   all until it was already open, which felt inconsistent. Same neutral
+   fill as .navbar__link:hover, not the accent tint, since this isn't a
+   "current section" indicator, just a hover affordance. */
+.navbar__toggle:hover,
+.navbar__toggle:focus-visible {
+  background-color: rgba(15, 23, 42, 0.05);
 }
 
 .navbar__toggle-bar {
@@ -477,7 +583,12 @@ body.no-scroll {
 /* ===== HERO ===== */
 
 .hero {
-  padding-block: var(--space-10) var(--space-8);
+  /* Top padding absorbs the navbar's height (now that body no longer
+     reserves that space globally) PLUS the section's own original
+     breathing room, so the hero's background still extends to the very
+     top of the page — behind the transparent navbar — while the H1
+     itself still clears the bar instead of rendering underneath it. */
+  padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-10)) var(--space-8);
   /* Clips the blurred glow (below) if it ever bleeds past the edge of
      the viewport, without affecting the floating badge, which overlaps
      the graphic but stays within the section's own box. */
@@ -512,6 +623,36 @@ body.no-scroll {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-4);
+}
+
+.hero__proof {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.hero__proof-label {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-text-muted);
+}
+
+.hero__proof-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.hero__proof-list li {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  letter-spacing: -0.01em;
 }
 
 .hero__graphic {
@@ -556,8 +697,10 @@ body.no-scroll {
   position: relative;
   /* Reserves room for the floating cards, which sit OUTSIDE the main
      card's own box via negative inset — without this padding the
-     floats would collide with the section edge/next element. */
-  padding: var(--space-8) var(--space-6);
+     floats would collide with the section edge/next element. Smaller
+     on mobile (restored to full size at 480px in responsive.css) since
+     the main card itself is much narrower on small phones. */
+  padding: var(--space-6) var(--space-4);
 }
 
 /* Faint dot grid behind the cards — a common depth cue on data-product
@@ -577,12 +720,28 @@ body.no-scroll {
 .hero-visual__card {
   background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  /* Matches the sitewide card radius (--radius-lg, same as .card,
+     .about__proof-card, etc.) — this visual is meant to read as "a real
+     product," so it should use the same corner language as every other
+     card on the page, not a smaller one-off radius. */
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  /* Without this, every label/stat/badge inside inherits body's
+     line-height: 1.6 — tuned for multi-line paragraph reading, not
+     compact UI chrome. That inflates the effective vertical gap around
+     text well beyond what the coded `gap`/`margin` values say, making
+     spacing here impossible to reason about precisely. --snug (1.3),
+     not --tight (1.1) — tight enough to fix that, but with enough room
+     that .hero-visual__stat-label ("faster decisions, average across
+     clients") doesn't look cramped on the odd narrower card where it
+     wraps to two lines. */
+  line-height: var(--line-height-snug);
 }
 
 .hero-visual__card--main {
-  padding: var(--space-5);
+  padding: var(--space-6); /* bumped from space-5 — more generous
+    internal padding reads more like a confident, premium dashboard
+    card and less like a cramped decorative widget */
 }
 
 .hero-visual__card-header {
@@ -608,7 +767,7 @@ body.no-scroll {
   padding: 2px var(--space-2);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-success);
+  color: var(--color-success-text);
   background-color: rgba(22, 163, 74, 0.1);
   border-radius: var(--radius-full);
 }
@@ -617,12 +776,26 @@ body.no-scroll {
   display: block;
   width: 100%;
   height: auto;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .hero-visual__chart-grid {
   stroke: var(--color-border);
   stroke-width: 1;
+}
+
+.hero-visual__chart-axis-label {
+  fill: var(--color-text-muted);
+  font-size: 9px;
+  font-family: var(--font-family-base);
+}
+
+.hero-visual__chart-line-muted {
+  fill: none;
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+  opacity: 0.5;
 }
 
 .hero-visual__chart-point {
@@ -640,7 +813,6 @@ body.no-scroll {
 
 .hero-visual__chart-axis {
   display: flex;
-  justify-content: space-between;
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border);
@@ -648,15 +820,31 @@ body.no-scroll {
   color: var(--color-text-muted);
 }
 
+/* 5 EQUAL flex columns with centered text — not justify-content:
+   space-between (which is edge-anchored: first label's left edge at 0%,
+   last label's right edge at 100%). The SVG data points are CENTER-
+   anchored at exactly 10/30/50/70/90% of the chart width; equal columns
+   with centered content land label centers at those exact same marks,
+   so alignment holds by construction instead of by two different
+   layout algorithms coincidentally agreeing. */
+.hero-visual__chart-axis span {
+  flex: 1;
+  text-align: center;
+}
+
 .hero-visual__stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-2); /* was a hardcoded 2px, off the spacing scale —
+    and too tight now that the stat value reads at 28px instead of the
+    22px it was tuned against */
 }
 
 .hero-visual__stat-value {
   font-family: var(--font-family-heading);
-  font-size: var(--font-size-xl);
+  font-size: 1.75rem; /* bumped from --font-size-xl (22px) — this is the
+    card's payoff number and needs real weight, not the same scale as
+    surrounding secondary UI text */
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-h3);
   color: var(--color-text);
@@ -669,36 +857,80 @@ body.no-scroll {
 
 /* Floating cards — smaller, absolutely positioned at opposite corners
    of the main card, each with a slight rotation so the composition
-   reads as tactile/layered rather than a rigid grid. */
+   reads as tactile/layered rather than a rigid grid. Deliberately
+   lighter elevation than the main card (--shadow-md, not --shadow-lg)
+   — these are supporting callouts, not the star of the composition,
+   and sharing identical shadow weight with the main card flattened
+   that hierarchy. */
 .hero-visual__card--float-top,
 .hero-visual__card--float-bottom {
   position: absolute;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   width: max-content;
-  max-width: 210px;
+  box-shadow: var(--shadow-md);
+  /* Kept deliberately small on mobile — the main card itself is often
+     only ~250px wide on small phones, so a 210px-wide floating card
+     pinned to its corner would crowd or overlap the card's own content.
+     Restored to full size at 480px+ in responsive.css. */
+  max-width: 150px;
 }
 
 .hero-visual__card--float-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   top: 0;
   right: 0;
   transform: rotate(-2deg);
 }
 
 .hero-visual__card--float-bottom {
+  min-width: 120px; /* the sparkline bars need a bit more guaranteed
+    width than icon+text did, so they don't get squeezed illegibly thin */
   bottom: 0;
   left: 0;
   transform: rotate(2deg);
 }
 
+.hero-visual__spark-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.hero-visual__float-value--teal {
+  color: var(--color-accent-secondary);
+}
+
+.hero-visual__spark-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 26px;
+}
+
+.hero-visual__spark-bars span {
+  flex: 1;
+  background-color: var(--color-accent-secondary);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.75;
+}
+
+.hero-visual__spark-bars span:nth-child(1) { height: 45%; }
+.hero-visual__spark-bars span:nth-child(2) { height: 60%; }
+.hero-visual__spark-bars span:nth-child(3) { height: 50%; }
+.hero-visual__spark-bars span:nth-child(4) { height: 75%; }
+.hero-visual__spark-bars span:nth-child(5) { height: 65%; }
+.hero-visual__spark-bars span:nth-child(6) { height: 100%; }
+
 .hero-visual__float-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   background-color: var(--color-accent-soft);
@@ -706,23 +938,19 @@ body.no-scroll {
 }
 
 .hero-visual__float-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
-/* A second, deliberate touch of the secondary accent (teal) on the other
-   floating card — two flat blue chips read as repetitive; alternating
-   the two brand accents across them adds a little color richness while
-   staying inside the same two-color system (not introducing a new hue). */
-.hero-visual__float-icon--teal {
-  background-color: rgba(13, 148, 136, 0.12);
-  color: var(--color-accent-secondary);
-}
+/* The teal "second accent" touch now lives on .hero-visual__float-value
+   --teal instead (the bottom card dropped its icon for a sparkline —
+   see the .hero-visual__spark-* rules above), so the icon-specific teal
+   variant that used to live here is gone; nothing references it anymore. */
 
 .hero-visual__float-text {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--space-1); /* was a hardcoded 1px, off the spacing scale */
 }
 
 .hero-visual__float-title {
@@ -731,10 +959,14 @@ body.no-scroll {
 }
 
 .hero-visual__float-value {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
-  white-space: nowrap;
+  /* nowrap is only safe once the card is restored to its full 210px
+     width at 480px+ (responsive.css) — on the smaller mobile card,
+     forcing "Auto-generated · 2m ago" onto one line would just overflow
+     the card instead of wrapping. */
+  white-space: normal;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -746,18 +978,6 @@ body.no-scroll {
     0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.35); }
     50% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0); }
   }
-}
-
-.hero__badge-value {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
-  color: var(--color-accent-secondary);
-}
-
-.hero__badge-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
 }
 
 /* --------------------------------------------------------------------
@@ -841,9 +1061,6 @@ body.no-scroll {
 
 .transform__before {
   color: var(--color-text-muted);
-  text-decoration: line-through;
-  text-decoration-color: var(--color-border-strong);
-  text-decoration-thickness: 1.5px;
 }
 
 .transform__after {
@@ -1027,7 +1244,8 @@ body.no-scroll {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
-  background-color: var(--color-accent);
+  background-color: var(--color-accent-hover); /* same AA text-contrast fix
+    as .btn--primary and .skip-link — see --color-accent-hover comment */
   color: #ffffff;
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
@@ -1128,8 +1346,9 @@ body.no-scroll {
 
 .about__proof-value {
   font-family: var(--font-family-heading);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-stat);
   font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
   letter-spacing: var(--tracking-h3);
   color: var(--color-accent-hover);
 }
@@ -1443,14 +1662,40 @@ textarea.form-field__input {
   background-color: rgba(22, 163, 74, 0.08);
   border: 1px solid rgba(22, 163, 74, 0.3);
   border-radius: var(--radius-sm);
-  color: var(--color-success);
+  color: var(--color-success-text);
   font-weight: var(--font-weight-medium);
+}
+
+/* ===== CLOSING CTA BAND =====
+   The one deliberate inverted/dark section on the page — everything
+   else alternates white/pale-tint, so this band is the page's single
+   high-contrast "beat" instead of the scroll just trailing off after
+   the contact form. Reuses .section-heading__eyebrow (already themed
+   for .section--inverted) rather than a bespoke label style. */
+
+.cta-band__inner {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.cta-band__inner .section-heading__eyebrow {
+  margin-bottom: var(--space-4);
+}
+
+.cta-band__inner h2 {
+  margin-bottom: var(--space-4);
+}
+
+.cta-band__inner p {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-8);
 }
 
 /* ===== FOOTER ===== */
 
 .footer {
-  margin-top: var(--space-16);
+  margin-top: var(--space-8);
   border-top: 1px solid var(--color-border);
   /* A step darker than the page background (which itself is a step
      darker than card white) — gives the footer a "floor" feeling,
@@ -1481,15 +1726,15 @@ textarea.form-field__input {
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
+  font-family: var(--font-family-heading);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
-.footer__logo span {
-  color: var(--color-accent);
-}
+/* .brand-mark and .footer__logo span's gradient-text styling is defined
+   once, near .navbar__logo, since it's the identical shared rule. */
 
 .footer__tagline {
   max-width: 36ch;

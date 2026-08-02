@@ -41,19 +41,30 @@
     <div class="container navbar__inner">
 
       <a href="#hero" class="navbar__logo">
-        MSM<span>Analytics</span>
+        <span class="brand-mark">MSM</span>
+        <span>Analytics</span>
       </a>
 
       <!-- Collapses into a dropdown on mobile, becomes a static row at
-           768px+ (see responsive.css). id is targeted by aria-controls
-           on the toggle button below. -->
-      <nav class="navbar__nav" id="navbar-nav">
+           980px+ (see responsive.css — raised from the shared 768px
+           tablet breakpoint because 6 links + logo + CTA genuinely need
+           the extra room). id is targeted by aria-controls on the
+           toggle button below. -->
+      <nav class="navbar__nav" id="navbar-nav" aria-label="Primary">
         <ul class="navbar__links">
-          <li><a href="#services">Services</a></li>
-          <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#work">Case Studies</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#services" class="navbar__link">Services</a></li>
+          <li><a href="#how-it-works" class="navbar__link">How It Works</a></li>
+          <li><a href="#work" class="navbar__link">Case Studies</a></li>
+          <li><a href="#about" class="navbar__link">About</a></li>
+          <li><a href="#faq" class="navbar__link">FAQ</a></li>
+          <li><a href="#contact" class="navbar__link">Contact</a></li>
+          <!-- Mobile/small-screen only — the persistent .navbar__cta in
+               .navbar__actions is hidden below 480px (not enough room
+               next to the logo + hamburger), so this gives small-screen
+               visitors the same CTA reachable via the dropdown instead. -->
+          <li class="navbar__links-cta">
+            <a href="#contact" class="btn btn--primary btn--sm navbar__menu-cta">Book a Strategy Call</a>
+          </li>
         </ul>
       </nav>
 
@@ -99,6 +110,20 @@
             <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
             <a href="#services" class="btn btn--secondary">Explore Services</a>
           </div>
+
+          <!-- Trust signal directly in the hero — real client names (the
+               same ones detailed later in Case Studies), not placeholder
+               logos. Premium SaaS/consulting sites consistently put proof
+               right next to the headline claim rather than burying it
+               several sections down. -->
+          <div class="hero__proof">
+            <span class="hero__proof-label">Trusted by teams at</span>
+            <ul class="hero__proof-list">
+              <li>MSIG</li>
+              <li>QuantivRisk</li>
+              <li>Zywave</li>
+            </ul>
+          </div>
         </div>
 
         <!-- Purely decorative — hidden from assistive tech entirely rather
@@ -118,7 +143,7 @@
                 <span class="hero-visual__pill">Live</span>
               </div>
 
-              <svg class="hero-visual__chart" viewBox="0 0 320 130" preserveAspectRatio="none">
+              <svg class="hero-visual__chart" viewBox="0 0 320 155" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="heroChartFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32" />
@@ -129,29 +154,51 @@
                 <!-- Baseline gridlines — the single biggest cue that turns
                      a decorative squiggle into something that reads as a
                      real chart rendering real data. -->
-                <line x1="0" y1="24" x2="320" y2="24" class="hero-visual__chart-grid" />
-                <line x1="0" y1="63" x2="320" y2="63" class="hero-visual__chart-grid" />
-                <line x1="0" y1="102" x2="320" y2="102" class="hero-visual__chart-grid" />
+                <line x1="0" y1="25" x2="320" y2="25" class="hero-visual__chart-grid" />
+                <line x1="0" y1="75" x2="320" y2="75" class="hero-visual__chart-grid" />
+                <line x1="0" y1="125" x2="320" y2="125" class="hero-visual__chart-grid" />
 
-                <!-- Anchor points sit at 0/80/160/240/320 — evenly spaced
-                     across the full width so they line up exactly under
-                     the 5 evenly-spaced month labels below. The previous
-                     version had uneven anchor spacing under evenly-spaced
-                     labels, so nothing lined up. -->
-                <path d="M0,102 C27,94 53,74 80,66 C107,58 133,50 160,44 C187,38 213,28 240,22 C267,16 293,10 320,6 L320,130 L0,130 Z"
+                <!-- Faint value references — otherwise 3 gridlines read as
+                     decoration rather than anchoring to actual plotted data. -->
+                <text x="4" y="21" class="hero-visual__chart-axis-label">120</text>
+                <text x="4" y="71" class="hero-visual__chart-axis-label">80</text>
+                <text x="4" y="121" class="hero-visual__chart-axis-label">40</text>
+
+                <!-- Anchor points sit at x=32/96/160/224/288 — the exact
+                     CENTERS of 5 equal 64px-wide slices (10%/30%/50%/70%/90%
+                     of the 320-wide viewBox), not the previous 0/80/160/
+                     240/320. That change is what makes alignment with the
+                     axis labels below EXACT rather than approximate: the
+                     labels use 5 equal flex columns with centered text
+                     (see .hero-visual__chart-axis), so both the SVG points
+                     and the HTML labels are centered on the same 10/30/50/
+                     70/90% marks by construction, instead of two different
+                     alignment models (center-anchored points vs. edge-
+                     anchored flex space-between) that were never
+                     guaranteed to agree. -->
+                <path d="M32,140 C53,131 75,109 96,100 C117,92 139,73 160,65 C181,58 203,42 224,35 C245,31 267,19 288,15 L288,155 L32,155 Z"
                       fill="url(#heroChartFill)" />
-                <path d="M0,102 C27,94 53,74 80,66 C107,58 133,50 160,44 C187,38 213,28 240,22 C267,16 293,10 320,6"
+
+                <!-- Muted "previous period" line, drawn after the fill so
+                     it stays visible wherever it dips under it — current
+                     period overtakes it early and pulls ahead by the end,
+                     a common, easy-to-read comparison device on real
+                     dashboards. -->
+                <path d="M32,132 C53,129 75,121 96,118 C117,114 139,104 160,100 C181,96 203,84 224,80 C245,75 267,63 288,58"
+                      class="hero-visual__chart-line-muted" />
+
+                <path d="M32,140 C53,131 75,109 96,100 C117,92 139,73 160,65 C181,58 203,42 224,35 C245,31 267,19 288,15"
                       fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
 
                 <!-- Real data-point markers along the line, not just a lone
                      dot at the end — this is what makes it look plotted
                      from actual values rather than drawn as a flourish. -->
-                <circle cx="0" cy="102" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="80" cy="66" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="160" cy="44" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="240" cy="22" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="320" cy="6" r="9" class="hero-visual__chart-point-ring" />
-                <circle cx="320" cy="6" r="4.5" fill="var(--color-accent)" />
+                <circle cx="32" cy="140" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="96" cy="100" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="160" cy="65" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="224" cy="35" r="3.5" class="hero-visual__chart-point" />
+                <circle cx="288" cy="15" r="9" class="hero-visual__chart-point-ring" />
+                <circle cx="288" cy="15" r="4.5" fill="var(--color-accent)" />
               </svg>
 
               <div class="hero-visual__chart-axis">
@@ -166,7 +213,7 @@
 
             <div class="hero-visual__card hero-visual__card--float-top">
               <span class="hero-visual__float-icon">
-                <svg viewBox="0 0 20 20"><path d="M10 3v14M4 9l6-6 6 6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 20 20"><path d="M10 3v14M4 9l6-6 6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
               <span class="hero-visual__float-text">
                 <span class="hero-visual__float-title">Forecast confidence</span>
@@ -174,14 +221,19 @@
               </span>
             </div>
 
+            <!-- Deliberately a different UI module than the top float —
+                 a mini sparkline instead of a second icon+text pairing —
+                 so the two floating cards read as genuinely different
+                 pieces of product UI rather than one component reused
+                 with different copy. -->
             <div class="hero-visual__card hero-visual__card--float-bottom">
-              <span class="hero-visual__float-icon hero-visual__float-icon--teal">
-                <svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="hero-visual__float-text">
-                <span class="hero-visual__float-title">Weekly report</span>
-                <span class="hero-visual__float-value">Auto-generated &middot; 2m ago</span>
-              </span>
+              <div class="hero-visual__spark-header">
+                <span class="hero-visual__float-title">Weekly reports</span>
+                <span class="hero-visual__float-value hero-visual__float-value--teal">+18%</span>
+              </div>
+              <div class="hero-visual__spark-bars" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
             </div>
           </div>
         </div>
@@ -406,7 +458,7 @@
 
         <div class="how-it-works__cta reveal">
           <!-- TODO: replace href with real Calendly URL once available -->
-          <a href="#contact" class="btn btn--primary">Start with a Strategy Call</a>
+          <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
         </div>
 
       </div>
@@ -454,6 +506,31 @@
     <section id="about" class="about section section--tint">
       <div class="container about__inner reveal-group">
 
+        <!-- Content comes first in DOM (not just visually at desktop) so
+             mobile/screen-reader users hit the "About" heading and intro
+             BEFORE a bare stats card with no section context above it.
+             Desktop reflows this via CSS `order` in responsive.css so the
+             stat card still sits visually on the left. -->
+        <div class="about__content reveal">
+          <span class="section-heading__eyebrow">About</span>
+          <h2>Practical AI expertise, without the jargon</h2>
+          <p>
+            MSM Analytics was founded on a simple idea: most businesses don't need
+            more dashboards or more AI hype — they need a team that can translate
+            messy data and emerging technology into decisions their people can
+            actually act on.
+          </p>
+          <p>
+            <strong>Our mission is simple:</strong> make AI and data science
+            genuinely useful for teams without a data science department —
+            practical, explainable, and built around how you already work.
+          </p>
+          <a href="#work" class="about__proof-link">
+            See how this looks in practice — real client engagements
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
         <!-- Real proof points instead of a placeholder team photo — an
              empty "photo coming soon" box undermines credibility more
              than not having a photo at all. Numbers are grounded in the
@@ -479,26 +556,6 @@
               <span class="about__proof-label">Explainable outputs — never a black box</span>
             </div>
           </div>
-        </div>
-
-        <div class="about__content reveal">
-          <span class="section-heading__eyebrow">About</span>
-          <h2>Practical AI expertise, without the jargon</h2>
-          <p>
-            MSM Analytics was founded on a simple idea: most businesses don't need
-            more dashboards or more AI hype — they need a team that can translate
-            messy data and emerging technology into decisions their people can
-            actually act on.
-          </p>
-          <p>
-            <strong>Our mission is simple:</strong> make AI and data science
-            genuinely useful for teams without a data science department —
-            practical, explainable, and built around how you already work.
-          </p>
-          <a href="#work" class="about__proof-link">
-            See how this looks in practice — real client engagements
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
         </div>
 
       </div>
@@ -687,6 +744,22 @@
       </div>
     </section>
 
+    <!-- ====================================================================
+         CLOSING CTA — the site's one deliberate high-contrast "beat".
+         Every other section is white or pale-tint; this inverted band
+         gives the page a real visual punctuation mark before the footer,
+         instead of just trailing off after the contact form.
+         ==================================================================== -->
+    <section class="cta-band section section--inverted">
+      <div class="container cta-band__inner reveal">
+        <span class="section-heading__eyebrow">Let's Talk</span>
+        <h2>Ready to turn your data into decisions?</h2>
+        <p>Book a free 30-minute strategy call — no pressure, no obligation, just a clear read on where AI can actually help your business.</p>
+        <!-- TODO: replace href with real Calendly URL once available -->
+        <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
+      </div>
+    </section>
+
   </main>
 
   <!-- ======================================================================
@@ -697,7 +770,8 @@
 
       <div class="footer__brand">
         <a href="#hero" class="footer__logo">
-          MSM<span>Analytics</span>
+          <span class="brand-mark">MSM</span>
+          <span>Analytics</span>
         </a>
         <p class="footer__tagline">Practical AI and data science for businesses that want clarity, not more complexity.</p>
 
@@ -709,7 +783,7 @@
               <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/><path d="M7.5 11v6M11.5 17v-3.5c0-1.5 1-2.5 2.25-2.5s2.25 1 2.25 2.5V17" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
             <a href="#" class="footer__social-link" aria-label="MSM Analytics on X">
-              <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </a>
           </div>
         </div>

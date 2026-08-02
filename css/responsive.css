@@ -21,17 +21,31 @@
    from scratch.
    ========================================================================== */
 
+/* ===== NAVBAR — swap the persistent header CTA for the identical
+   in-dropdown CTA once there's enough width for the logo + button +
+   hamburger to sit on one row without crowding. ===== */
+@media (min-width: 480px) {
+  .navbar__cta {
+    display: inline-flex;
+  }
+
+  .navbar__links-cta {
+    display: none;
+  }
+}
+
 /* ===== NAVBAR — promote the mobile dropdown to a static horizontal row,
    hide the hamburger, once there's enough width for it.
 
-   Uses its OWN breakpoint (900px) rather than the shared 768px "tablet"
-   breakpoint used elsewhere in this file. With 5 nav links of varying
+   Uses its OWN breakpoint (980px) rather than the shared 768px "tablet"
+   breakpoint used elsewhere in this file. With 6 nav links of varying
    length ("How It Works", "Case Studies") plus the logo and CTA button
-   all competing for space, 768px genuinely isn't wide enough — that
-   combination was measured wrapping and overlapping the logo at 768px
-   before this was raised to 900px. Other sections stay on the shared
+   all competing for space, 768px genuinely isn't wide enough — 5 links
+   were already measured wrapping/overlapping the logo at 768px (which
+   is why this was first raised to 900px), and a 6th link ("Contact")
+   needed a bit more headroom still. Other sections stay on the shared
    768px tablet breakpoint since they don't have this constraint. ===== */
-@media (min-width: 900px) {
+@media (min-width: 980px) {
   .navbar__nav {
     position: static;
     max-height: none;
@@ -44,38 +58,26 @@
     border-bottom: none;
   }
 
+  /* The 6 links render as ONE shared pill-shaped "track" (a segmented
+     control), not 6 independently-floating pills — each link is a
+     segment inside this single element, highlighted on hover/active,
+     rather than a separate shape sitting in open space. The CTA button
+     deliberately stays OUTSIDE this group (in .navbar__actions) so it
+     still reads as the one distinct action, not another segment. */
   .navbar__links {
     flex-direction: row;
     align-items: center;
-    gap: var(--space-6);
-    padding: 0;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    background-color: var(--color-bg-tint);
+    border-radius: var(--radius-full);
   }
 
-  .navbar__links li + li {
-    border-top: none;
-  }
-
-  .navbar__links a {
-    padding-block: var(--space-2);
-  }
-
-  /* Underline-on-hover only makes sense once links sit in a horizontal
-     row — on the mobile dropdown it would look wrong under a
-     full-width block link. */
-  .navbar__links a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--color-accent);
-    transition: width var(--transition-base);
-  }
-
-  .navbar__links a:hover::after,
-  .navbar__links a.is-active::after {
-    width: 100%;
+  /* Padding is present at rest (not just on hover/active) so the
+     highlight appearing never shifts layout. */
+  .navbar__link {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
   }
 
   .navbar__toggle {
@@ -87,12 +89,43 @@
    layout once there's enough width for both to breathe. ===== */
 @media (min-width: 1024px) {
   .hero {
-    padding-block: var(--space-16) var(--space-12);
+    padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-16)) var(--space-12);
   }
 
   .hero__inner {
     grid-template-columns: 1.1fr 1fr;
     gap: var(--space-12);
+  }
+}
+
+/* ===== HERO VISUAL — restore full-size floating cards once there's
+   enough room for them not to crowd the main card (see style.css for
+   why the base/mobile sizing is deliberately smaller). ===== */
+@media (min-width: 480px) {
+  .hero-visual {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .hero-visual__card--float-top,
+  .hero-visual__card--float-bottom {
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    max-width: 210px;
+  }
+
+  .hero-visual__float-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-visual__float-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hero-visual__float-value {
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
   }
 }
 
@@ -148,12 +181,11 @@
   }
 }
 
-@media (min-width: 640px) {
-  .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
+/* grid-3 deliberately has NO 2-column intermediate step (unlike grid-4
+   above): with exactly 3 items, a 2-column breakpoint always orphans
+   the 3rd card alone on its own row at tablet widths. Staying
+   single-column until there's room for all 3 side by side avoids that
+   unbalanced in-between state. */
 @media (min-width: 1024px) {
   .grid-3 {
     grid-template-columns: repeat(3, 1fr);
@@ -210,6 +242,18 @@
   .about__inner {
     grid-template-columns: 0.9fr 1.4fr;
     gap: var(--space-12);
+  }
+
+  /* .about__content now comes FIRST in the DOM (so mobile/screen-reader
+     users hit the "About" heading before a bare stats card) — this
+     restores the original visual layout at desktop width: stat card
+     on the left (narrower column), content on the right (wider column). */
+  .about__proof {
+    order: 1;
+  }
+
+  .about__content {
+    order: 2;
   }
 }
 

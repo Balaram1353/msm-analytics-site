@@ -48,11 +48,34 @@ window.addEventListener("scroll", () => {
 
 /* --- Mobile menu toggle --- */
 
+/* The closed dropdown is only hidden VISUALLY by CSS (max-height: 0 +
+   overflow: hidden) — that alone does NOT remove its links from tab
+   order or from the accessibility tree. Without this, a keyboard user
+   tabbing from the logo lands on 6 invisible, zero-height links before
+   ever reaching the CTA/hamburger, and screen readers announce them
+   too, out of context. `inert` fixes both at once (unfocusable, not
+   exposed to AT) — but only while we're actually in the collapsed
+   mobile layout; at 980px+ the nav is always visible and must stay
+   fully interactive, so we track that breakpoint here too. */
+const desktopNavQuery = window.matchMedia("(min-width: 980px)");
+
+function syncNavInert() {
+  const isCollapsedLayout = !desktopNavQuery.matches;
+  const isClosed = !navMenu.classList.contains("is-open");
+  navMenu.inert = isCollapsedLayout && isClosed;
+}
+
 function openMobileMenu() {
   navMenu.classList.add("is-open");
   navToggle.classList.add("is-active");
   navToggle.setAttribute("aria-expanded", "true");
   document.body.classList.add("no-scroll");
+  // Forces the same glass background the scrolled state uses, even at
+  // scrollY 0 — otherwise the solid dropdown panel appears to float
+  // below a still-fully-transparent bar with nothing visually anchoring
+  // it to a header.
+  navbar.classList.add("is-menu-open");
+  syncNavInert();
 }
 
 function closeMobileMenu() {
@@ -60,7 +83,12 @@ function closeMobileMenu() {
   navToggle.classList.remove("is-active");
   navToggle.setAttribute("aria-expanded", "false");
   document.body.classList.remove("no-scroll");
+  navbar.classList.remove("is-menu-open");
+  syncNavInert();
 }
+
+desktopNavQuery.addEventListener("change", syncNavInert);
+syncNavInert();
 
 navToggle.addEventListener("click", () => {
   const isOpen = navMenu.classList.contains("is-open");
@@ -105,7 +133,7 @@ document.addEventListener("keydown", (event) => {
    -------------------------------------------------------------------- */
 
 const navLinksBySectionId = new Map();
-document.querySelectorAll(".navbar__links a").forEach((link) => {
+document.querySelectorAll(".navbar__link").forEach((link) => {
   const sectionId = link.getAttribute("href").slice(1); // "#faq" -> "faq"
   navLinksBySectionId.set(sectionId, link);
 });
