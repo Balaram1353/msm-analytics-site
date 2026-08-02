@@ -269,6 +269,34 @@ p {
   background-color: var(--color-accent-hover);
   color: #ffffff;
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden; /* contains the ::before shine sweep below */
+}
+
+/* Diagonal light sweep on hover — a thin, skewed white gradient band
+   that travels across the button. A restrained, purely-CSS version of
+   the "shine" effect premium SaaS marketing sites use on their primary
+   CTA, rather than a static color change alone. */
+.btn--primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 650ms var(--ease-out-expo);
+}
+
+.btn--primary:hover::before {
+  left: 130%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn--primary::before {
+    display: none;
+  }
 }
 
 .btn--primary:hover {
@@ -318,7 +346,7 @@ p {
   .reveal {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity var(--transition-slow) ease, transform var(--transition-slow) ease;
+    transition: opacity var(--transition-slow) var(--ease-out-expo), transform var(--transition-slow) var(--ease-out-expo);
   }
 
   .reveal.is-visible {
@@ -593,9 +621,50 @@ body.no-scroll {
      the viewport, without affecting the floating badge, which overlaps
      the graphic but stays within the section's own box. */
   overflow-x: hidden;
+  /* Containing block for the particle canvas + cursor spotlight layers
+     below, both of which need to sit BEHIND .hero__inner but stay
+     confined to the hero's own box rather than the nearest other
+     positioned ancestor. */
+  position: relative;
+}
+
+/* Ambient cursor-follow glow — a second, interactive layer on top of the
+   static blurred blobs in .hero__graphic::before. script.js updates
+   --spot-x/--spot-y on pointermove; until JS runs (or on touch devices
+   with no pointermove) they fall back to a fixed point near the
+   headline, so this never renders as a hard-edged, mispositioned shape. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    500px circle at var(--spot-x, 20%) var(--spot-y, 30%),
+    rgba(59, 130, 246, 0.08),
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before {
+    display: none;
+  }
+}
+
+.hero__particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .hero__inner {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
@@ -658,6 +727,10 @@ body.no-scroll {
 .hero__graphic {
   position: relative;
   min-width: 0; /* see the CONTACT section for why grid items need this */
+  /* Depth for the mouse-tilt effect on .hero-visual__card--main below —
+     without a perspective on an ancestor, rotateX/rotateY render as a
+     flat skew instead of a believable 3D tilt. */
+  perspective: 1400px;
 }
 
 /* Same fix as .hero__graphic above — this is the OTHER hero__inner
@@ -742,6 +815,20 @@ body.no-scroll {
   padding: var(--space-6); /* bumped from space-5 — more generous
     internal padding reads more like a confident, premium dashboard
     card and less like a cramped decorative widget */
+}
+
+/* Subtle mouse-tilt — script.js sets --tilt-x/--tilt-y as the pointer
+   moves over .hero__graphic, so the card leans slightly toward the
+   cursor like a real physical object catching light, and eases back to
+   flat on mouseleave via the transition below. Gated to devices that
+   actually have a mouse (hover: hover) and to users who haven't asked
+   for reduced motion — on touch/reduced-motion, the card just stays flat. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero-visual__card--main {
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 500ms var(--ease-out-expo);
+    will-change: transform;
+  }
 }
 
 .hero-visual__card-header {
@@ -978,6 +1065,32 @@ body.no-scroll {
     0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.35); }
     50% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0); }
   }
+
+  /* Gentle idle bob on the two floating cards, so the composition reads
+     as "alive" even before the user scrolls or moves the cursor.
+     Keyframes bake in the SAME rotation the static rule above declares
+     (-2deg / 2deg) — the animation fully replaces that declaration for
+     these users, it doesn't add on top of it, so the two must agree at
+     0%/100% or the card would visibly snap to a different angle the
+     instant the animation engine takes over. Offset durations (6s vs
+     7s) keep the two cards from ever bobbing in perfect lockstep. */
+  .hero-visual__card--float-top {
+    animation: float-bob-top 6s ease-in-out infinite;
+  }
+
+  .hero-visual__card--float-bottom {
+    animation: float-bob-bottom 7s ease-in-out infinite;
+  }
+
+  @keyframes float-bob-top {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50% { transform: rotate(-2deg) translateY(-8px); }
+  }
+
+  @keyframes float-bob-bottom {
+    0%, 100% { transform: rotate(2deg) translateY(0); }
+    50% { transform: rotate(2deg) translateY(8px); }
+  }
 }
 
 /* --------------------------------------------------------------------
@@ -1012,7 +1125,11 @@ body.no-scroll {
 
 .card:hover {
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
+  /* Two shadow layers: the existing neutral --shadow-md keeps the card
+     grounded, PLUS a soft accent-tinted glow beneath it — a colored
+     shadow (not just gray) is what makes a hover state read as
+     "premium product" rather than a generic Bootstrap-style lift. */
+  box-shadow: var(--shadow-md), 0 24px 48px -28px rgba(59, 130, 246, 0.45);
   transform: translateY(-4px);
 }
 

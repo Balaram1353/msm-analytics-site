@@ -346,3 +346,243 @@ contactForm.addEventListener("submit", (event) => {
    a hardcoded year is the kind of thing that quietly goes stale on a
    live site and nobody notices for months. */
 document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+/* ==========================================================================
+   HERO — ambient particle network
+   ==========================================================================
+   A slow-moving field of dots that link into faint lines when close
+   together — a "live network/data" visual behind the hero copy, built
+   entirely on <canvas> so there's no video file or external asset to
+   ship. Skipped entirely under prefers-reduced-motion (reuses the same
+   flag the scroll-reveal system already checked above), and paused via
+   the Page Visibility API so a backgrounded tab isn't spending CPU on
+   an animation nobody can see.
+   ========================================================================== */
+
+const particleCanvas = document.getElementById("hero-particles");
+
+if (particleCanvas && !prefersReducedMotion) {
+  const ctx = particleCanvas.getContext("2d");
+  const heroSection = document.getElementById("hero");
+  // Capped at 2 — devicePixelRatio can be 3+ on some phones, and canvas
+  // memory/fill cost scales with the SQUARE of this value. 2x is already
+  // indistinguishable from "native" sharpness at this element size.
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const linkDistance = 140;
+
+  let particles = [];
+  let width = 0;
+  let height = 0;
+  let animationFrameId = null;
+
+  function resizeCanvas() {
+    width = heroSection.clientWidth;
+    height = heroSection.clientHeight;
+    particleCanvas.width = width * dpr;
+    particleCanvas.height = height * dpr;
+    particleCanvas.style.width = `${width}px`;
+    particleCanvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Density scales with the hero's actual area rather than a fixed
+    // count, so this looks equally "right" on a small phone hero and a
+    // wide desktop one instead of sparse/overcrowded at either extreme.
+    const targetCount = Math.round((width * height) / 22000);
+    const count = Math.max(18, Math.min(70, targetCount));
+
+    particles = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+    }));
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, width, height);
+
+    particles.forEach((particle) => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      // Bounce off the hero's edges rather than wrapping — wrapping
+      // makes a particle visibly "teleport" across the screen, which
+      // reads as a bug rather than an ambient effect.
+      if (particle.x <= 0 || particle.x >= width) particle.vx *= -1;
+      if (particle.y <= 0 || particle.y >= height) particle.vy *= -1;
+    });
+
+    // O(n^2) pairwise distance check — fine at this particle count
+    // (max 70 -> ~2,400 pairs/frame), the standard approach for a
+    // decorative link-graph at this scale.
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < linkDistance) {
+          ctx.strokeStyle = `rgba(59, 130, 246, ${0.16 * (1 - distance / linkDistance)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    particles.forEach((particle) => {
+      ctx.fillStyle = "rgba(59, 130, 246, 0.45)";
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    animationFrameId = requestAnimationFrame(drawFrame);
+  }
+
+  resizeCanvas();
+  drawFrame();
+
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeCanvas, 200);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animationFrameId);
+    } else {
+      drawFrame();
+    }
+  });
+}
+
+/* ==========================================================================
+   HERO — cursor spotlight + product-card tilt
+   ==========================================================================
+   Two small pointer-driven effects, both gated behind the same checks
+   as the tilt CSS itself (a real mouse present, and no reduced-motion
+   preference) so this code doesn't run pointless work on touch devices
+   or for users who've opted out of motion.
+   ========================================================================== */
+
+const supportsHover = window.matchMedia("(hover: hover)").matches;
+
+if (!prefersReducedMotion) {
+  const heroSection = document.getElementById("hero");
+
+  // Ambient glow that follows the cursor around the hero section —
+  // purely visual, reads --spot-x/--spot-y back out in the .hero::before
+  // radial-gradient in style.css.
+  if (heroSection && supportsHover) {
+    let spotlightQueued = false;
+
+    heroSection.addEventListener("pointermove", (event) => {
+      if (spotlightQueued) return;
+      spotlightQueued = true;
+
+      requestAnimationFrame(() => {
+        const rect = heroSection.getBoundingClientRect();
+        const xPct = ((event.clientX - rect.left) / rect.width) * 100;
+        const yPct = ((event.clientY - rect.top) / rect.height) * 100;
+        heroSection.style.setProperty("--spot-x", `${xPct}%`);
+        heroSection.style.setProperty("--spot-y", `${yPct}%`);
+        spotlightQueued = false;
+      });
+    });
+  }
+
+  // Product-card tilt — the main hero chart card leans slightly toward
+  // the cursor, like a physical object catching light, then eases back
+  // to flat on mouseleave (the transition lives on the card itself in
+  // style.css, so this handler only ever needs to set target values).
+  const heroGraphic = document.querySelector(".hero__graphic");
+  const tiltCard = document.querySelector(".hero-visual__card--main");
+
+  if (heroGraphic && tiltCard && supportsHover) {
+    const maxTiltDeg = 7;
+
+    heroGraphic.addEventListener("mousemove", (event) => {
+      const rect = heroGraphic.getBoundingClientRect();
+      const xRatio = (event.clientX - rect.left) / rect.width; // 0 - 1
+      const yRatio = (event.clientY - rect.top) / rect.height; // 0 - 1
+      const rotateY = (xRatio - 0.5) * maxTiltDeg * 2;
+      const rotateX = -(yRatio - 0.5) * maxTiltDeg * 2;
+
+      tiltCard.style.setProperty("--tilt-x", `${rotateX}deg`);
+      tiltCard.style.setProperty("--tilt-y", `${rotateY}deg`);
+    });
+
+    heroGraphic.addEventListener("mouseleave", () => {
+      tiltCard.style.setProperty("--tilt-x", "0deg");
+      tiltCard.style.setProperty("--tilt-y", "0deg");
+    });
+  }
+}
+
+/* ==========================================================================
+   ANIMATED STAT COUNTERS
+   ==========================================================================
+   Any element with class="js-counter" counts up from 0 to its own final
+   value the first time it scrolls into view, instead of just appearing.
+   Deliberately generic rather than hardcoded per-element: it parses
+   each element's OWN existing text (e.g. "+42%", "19–30%", "100%") into
+   a leading sign, a leading number, and whatever text follows — so the
+   exact same function drives every stat on the page, and the markup
+   stays the single source of truth for the real values (nothing is
+   duplicated into a data-* attribute that could drift out of sync).
+   ========================================================================== */
+
+function animateCounter(el) {
+  const finalText = el.textContent.trim();
+  // Leading optional sign, leading number (integer or decimal), then
+  // whatever's left (%, a unit, an en-dash + second number, etc.) is
+  // kept as a static suffix — only the FIRST number in the string ever
+  // animates. For "19–30%" this counts 0 -> 19 while "–30%" sits there
+  // unchanged the whole time, landing on the exact original text.
+  const match = finalText.match(/^([+\-]?)(\d+(?:\.\d+)?)(.*)$/);
+  if (!match) return; // no leading number (shouldn't happen for .js-counter) — leave as-is
+
+  const [, sign, numberText, suffix] = match;
+  const targetValue = parseFloat(numberText);
+  const isDecimal = numberText.includes(".");
+  const duration = 1400;
+  const startTime = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+    const currentValue = targetValue * eased;
+
+    el.textContent = `${sign}${isDecimal ? currentValue.toFixed(1) : Math.round(currentValue)}${suffix}`;
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      // Land on the exact original string — guards against any float
+      // rounding drift (e.g. "19.999999...") ever being left on screen.
+      el.textContent = finalText;
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+const counterElements = document.querySelectorAll(".js-counter");
+
+if (!prefersReducedMotion && counterElements.length) {
+  const counterObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+
+  counterElements.forEach((el) => counterObserver.observe(el));
+}

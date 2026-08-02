@@ -95,6 +95,12 @@
          HERO — built in Step 2
          ==================================================================== -->
     <section id="hero" class="hero">
+      <!-- Ambient network/particle animation — pure canvas, no video asset.
+           Purely decorative (aria-hidden), sits behind all hero content via
+           z-index, and is entirely skipped by script.js when the user has
+           prefers-reduced-motion set. -->
+      <canvas class="hero__particles" id="hero-particles" aria-hidden="true"></canvas>
+
       <div class="container hero__inner">
 
         <div class="hero__content reveal">
@@ -206,7 +212,7 @@
               </div>
 
               <div class="hero-visual__stat">
-                <span class="hero-visual__stat-value">+42%</span>
+                <span class="hero-visual__stat-value js-counter">+42%</span>
                 <span class="hero-visual__stat-label">faster decisions, average across clients</span>
               </div>
             </div>
@@ -217,7 +223,7 @@
               </span>
               <span class="hero-visual__float-text">
                 <span class="hero-visual__float-title">Forecast confidence</span>
-                <span class="hero-visual__float-value">94%</span>
+                <span class="hero-visual__float-value js-counter">94%</span>
               </span>
             </div>
 
@@ -229,7 +235,7 @@
             <div class="hero-visual__card hero-visual__card--float-bottom">
               <div class="hero-visual__spark-header">
                 <span class="hero-visual__float-title">Weekly reports</span>
-                <span class="hero-visual__float-value hero-visual__float-value--teal">+18%</span>
+                <span class="hero-visual__float-value hero-visual__float-value--teal js-counter">+18%</span>
               </div>
               <div class="hero-visual__spark-bars" aria-hidden="true">
                 <span></span><span></span><span></span><span></span><span></span><span></span>
@@ -540,19 +546,19 @@
             <span class="about__proof-eyebrow">By the numbers</span>
 
             <div class="about__proof-stat">
-              <span class="about__proof-value">3</span>
+              <span class="about__proof-value js-counter">3</span>
               <span class="about__proof-label">Industries served — insurance, risk &amp; analytics</span>
             </div>
             <div class="about__proof-divider"></div>
 
             <div class="about__proof-stat">
-              <span class="about__proof-value">19&ndash;30%</span>
+              <span class="about__proof-value js-counter">19&ndash;30%</span>
               <span class="about__proof-label">Prediction error (MAPE) on production models</span>
             </div>
             <div class="about__proof-divider"></div>
 
             <div class="about__proof-stat">
-              <span class="about__proof-value">100%</span>
+              <span class="about__proof-value js-counter">100%</span>
               <span class="about__proof-label">Explainable outputs — never a black box</span>
             </div>
           </div>
