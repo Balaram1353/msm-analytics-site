@@ -1304,12 +1304,6 @@ body.no-scroll {
   transform: translateX(4px);
 }
 
-.services__cta {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--space-10);
-}
-
 /* ===== HOW IT WORKS ===== */
 
 /* Base (mobile) layout: a vertical timeline — circle + content side by
@@ -1402,7 +1396,23 @@ body.no-scroll {
 .how-it-works__cta {
   display: flex;
   justify-content: center;
-  margin-top: var(--space-10);
+  /* Was space-10 (64px), sized for the full-weight button this wrapper
+     used to center. A plain text link is much lighter visually, and
+     that much clearance above it read as an unexplained gap rather
+     than intentional breathing room — space-8 (48px) matches the
+     rhythm used elsewhere between a section's last content block and
+     a closing element. */
+  margin-top: var(--space-8);
+}
+
+.how-it-works__cta-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-hover);
+}
+
+.how-it-works__cta-link:hover {
+  text-decoration: underline;
 }
 
 /* ===== CASE STUDIES =====
