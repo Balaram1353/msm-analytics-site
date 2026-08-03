@@ -474,18 +474,21 @@ p {
   background-color: var(--color-bg-elevated);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-md);
-  max-height: 0;
+  /* Same 0fr -> 1fr grid-row trick used for the FAQ accordion panels
+     (see the ===== FAQ ===== section below for the full rationale) —
+     used here instead of a guessed max-height because a fixed px value
+     (previously 320px) silently clips the panel once its real content
+     (6 links + the CTA row) runs taller, with no visual warning. This
+     version always animates to the content's true height. */
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
   overflow: hidden;
-  /* Height and opacity animate at different speeds on purpose: the
-     panel finishes expanding slightly before it finishes fading in,
-     which reads as a more deliberate motion than both properties
-     landing at exactly the same instant. */
-  transition: max-height var(--transition-slow) ease, opacity var(--transition-base) ease;
+  transition: grid-template-rows var(--transition-slow) ease, opacity var(--transition-base) ease;
 }
 
 .navbar__nav.is-open {
-  max-height: 320px;
+  grid-template-rows: 1fr;
   opacity: 1;
 }
 
@@ -494,6 +497,11 @@ p {
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-3) var(--container-padding) var(--space-4);
+  /* Grid items get an automatic min-height equal to their content's
+     natural size unless overflow is non-visible — without this, the
+     parent .navbar__nav's 0fr row can't actually shrink to 0 and the
+     collapse animation would stall/jump instead of closing smoothly. */
+  overflow: hidden;
 }
 
 .navbar__link {
@@ -694,36 +702,6 @@ body.no-scroll {
   gap: var(--space-4);
 }
 
-.hero__proof {
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border);
-}
-
-.hero__proof-label {
-  display: block;
-  margin-bottom: var(--space-3);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow);
-  color: var(--color-text-muted);
-}
-
-.hero__proof-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6);
-}
-
-.hero__proof-list li {
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
-  letter-spacing: -0.01em;
-}
-
 .hero__graphic {
   position: relative;
   min-width: 0; /* see the CONTACT section for why grid items need this */
@@ -772,8 +750,13 @@ body.no-scroll {
      card's own box via negative inset — without this padding the
      floats would collide with the section edge/next element. Smaller
      on mobile (restored to full size at 480px in responsive.css) since
-     the main card itself is much narrower on small phones. */
-  padding: var(--space-6) var(--space-4);
+     the main card itself is much narrower on small phones.
+     Top padding is taller than the rest specifically: below 480px the
+     float-top card's own max-width is narrow enough that "Forecast
+     confidence" wraps to 2 lines, making that card taller — without
+     the extra top clearance its bottom edge overlaps the main card's
+     "Live" badge instead of just overhanging blank space above it. */
+  padding: var(--space-8) var(--space-4) var(--space-6);
 }
 
 /* Faint dot grid behind the cards — a common depth cue on data-product
@@ -863,7 +846,10 @@ body.no-scroll {
   display: block;
   width: 100%;
   height: auto;
-  margin-bottom: var(--space-3);
+  /* Matches the header-to-chart and axis-to-stat gaps (both space-4) —
+     this was the one internal seam still on space-3 (12px instead of
+     16px), breaking the card's otherwise-consistent vertical rhythm. */
+  margin-bottom: var(--space-4);
 }
 
 .hero-visual__chart-grid {
@@ -1029,15 +1015,10 @@ body.no-scroll {
   height: 14px;
 }
 
-/* The teal "second accent" touch now lives on .hero-visual__float-value
-   --teal instead (the bottom card dropped its icon for a sparkline —
-   see the .hero-visual__spark-* rules above), so the icon-specific teal
-   variant that used to live here is gone; nothing references it anymore. */
-
 .hero-visual__float-text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1); /* was a hardcoded 1px, off the spacing scale */
+  gap: var(--space-1);
 }
 
 .hero-visual__float-title {
@@ -1049,10 +1030,6 @@ body.no-scroll {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
-  /* nowrap is only safe once the card is restored to its full 210px
-     width at 480px+ (responsive.css) — on the smaller mobile card,
-     forcing "Auto-generated · 2m ago" onto one line would just overflow
-     the card instead of wrapping. */
   white-space: normal;
 }
 
@@ -1066,14 +1043,6 @@ body.no-scroll {
     50% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0); }
   }
 
-  /* Gentle idle bob on the two floating cards, so the composition reads
-     as "alive" even before the user scrolls or moves the cursor.
-     Keyframes bake in the SAME rotation the static rule above declares
-     (-2deg / 2deg) — the animation fully replaces that declaration for
-     these users, it doesn't add on top of it, so the two must agree at
-     0%/100% or the card would visibly snap to a different angle the
-     instant the animation engine takes over. Offset durations (6s vs
-     7s) keep the two cards from ever bobbing in perfect lockstep. */
   .hero-visual__card--float-top {
     animation: float-bob-top 6s ease-in-out infinite;
   }
@@ -1241,6 +1210,12 @@ body.no-scroll {
 
 .benefits .card h3 {
   margin-bottom: var(--space-2);
+  /* Reserves space for 2 lines regardless of whether this card's title
+     actually wraps that far. Without it, a 1-line title (e.g. "Data
+     Clarity") lets its body paragraph start ~30px higher than a
+     neighboring 2-line title's paragraph, breaking the row's shared
+     baseline. em-based so it tracks h3's own fluid font-size. */
+  min-height: calc(var(--line-height-snug) * 2em);
 }
 
 /* ===== SERVICES ===== */
@@ -1347,6 +1322,10 @@ body.no-scroll {
 }
 
 .how-it-works__step {
+  position: relative; /* anchors the connector line below, which needs to
+    span this step's full (content-dependent) height plus the gap to the
+    next step — not just a fixed distance from the circle's own bottom
+    edge, which fails as soon as the body copy runs past 1 line. */
   display: flex;
   align-items: flex-start;
   gap: var(--space-5);
@@ -1366,22 +1345,54 @@ body.no-scroll {
   color: #ffffff;
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
+  /* In the mobile/tablet row layout (circle beside heading+paragraph,
+     align-items: flex-start), a plain top-align leaves the circle's
+     center sitting well below the much-shorter heading line next to
+     it. This shifts the circle up by exactly half the difference
+     between its own height and one heading line's height, so its
+     center lands on the heading's center instead — computed from the
+     same tokens the heading itself uses (font-size-h3, line-height-
+     snug), not a guessed pixel offset, so it stays correct as the
+     fluid heading size changes across viewports. Reset to 0 at the
+     1024px breakpoint, where the circle sits above the heading instead
+     of beside it and doesn't need this. */
+  margin-top: calc((var(--line-height-snug) * var(--font-size-h3) - 56px) / 2);
 }
 
-/* Mobile connector: a short line, exactly as long as the list's own
-   gap, dropped from the bottom of each circle (except the last one).
-   Because its length matches --space-8 exactly — the same value used
-   for the list's `gap` — it always reaches precisely to the top of the
-   next circle, regardless of how tall the step above or below it is. */
-.how-it-works__step:not(:last-child) .step-number::after {
+/* Mobile/tablet connector: stretches from the bottom of this circle
+   through this step's own (content-dependent) height plus the list's
+   row gap, so it always lands exactly on the next circle's top edge
+   regardless of how tall the step's body copy runs. Colored (not the
+   neutral border gray) and animated into a slow drift between the two
+   brand accents, so the line reads as an active current running
+   through the process rather than a static ruler mark. */
+.how-it-works__step:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Circle's bottom edge, accounting for the same negative margin-top
+     that re-centers it against the heading above — without this the
+     line would start ~15px below where the circle actually ends. */
+  top: calc((var(--line-height-snug) * var(--font-size-h3) + 56px) / 2);
+  bottom: calc(-1 * var(--space-8));
+  left: 27px; /* horizontal center of the 56px circle, minus half the line's own width */
   width: 2px;
-  height: var(--space-8);
-  background-color: var(--color-border);
+  background: linear-gradient(
+    var(--color-accent) 0%,
+    var(--color-accent-secondary) 50%,
+    var(--color-accent) 100%
+  );
+  background-size: 100% 300%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .how-it-works__step:not(:last-child)::after {
+    animation: how-it-works-flow 4s linear infinite;
+  }
+}
+
+@keyframes how-it-works-flow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 150%; }
 }
 
 .how-it-works__step-content h3 {
@@ -1420,6 +1431,10 @@ body.no-scroll {
 
 .card--work h3 {
   margin-bottom: var(--space-3);
+  /* Same fixed-line-count reservation as .benefits .card h3 — keeps the
+     body paragraph aligned across cards whose titles wrap 2 lines,
+     even though one card's title (3 lines) will still run taller. */
+  min-height: calc(var(--line-height-snug) * 2em);
 }
 
 /* ===== ABOUT ===== */
@@ -1481,9 +1496,12 @@ body.no-scroll {
 }
 
 .about__proof-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
+  /* inline-block (not inline-flex) deliberately — this link's text can
+     wrap to 2 lines at narrow widths, and flex's align-items:center
+     would then center the icon against the whole wrapped block instead
+     of trailing the last word, leaving it visually stranded to the
+     right. Plain inline flow lets the icon wrap as part of the text. */
+  display: inline-block;
   margin-top: var(--space-2);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -1493,6 +1511,8 @@ body.no-scroll {
 .about__proof-link svg {
   width: 16px;
   height: 16px;
+  margin-left: var(--space-2);
+  vertical-align: middle;
   transition: transform var(--transition-fast);
 }
 
@@ -1511,6 +1531,14 @@ body.no-scroll {
 .about__content h2 {
   margin-bottom: var(--space-5);
   max-width: 20ch;
+}
+
+.about__content h4 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  max-width: 42ch;
+  margin-bottom: var(--space-5);
 }
 
 .about__content > p {
@@ -1915,6 +1943,12 @@ textarea.form-field__input {
 }
 
 .footer__nav ul {
+  /* This <ul> has no class attribute, so reset.css's ul[class] selector
+     (which strips markers/padding only from lists we've explicitly
+     turned into layout) never reaches it — list-style/padding have to
+     be repeated here instead of relying on the shared reset. */
+  list-style: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

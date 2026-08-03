@@ -48,7 +48,10 @@
 @media (min-width: 980px) {
   .navbar__nav {
     position: static;
-    max-height: none;
+    /* Desktop nav is never toggled .is-open, so without resetting the
+       grid row here it would stay stuck at the base (closed) 0fr and
+       every link would render at zero height. */
+    display: block;
     overflow: visible;
     opacity: 1; /* base styles default this to 0 for the closed mobile
                    dropdown state — desktop nav is never "opened" via
@@ -71,6 +74,8 @@
     padding: var(--space-1);
     background-color: var(--color-bg-tint);
     border-radius: var(--radius-full);
+    overflow: visible; /* undo the mobile collapse-animation hook so
+      hover/focus states (pill highlight, focus rings) never clip */
   }
 
   /* Padding is present at rest (not just on hover/active) so the
@@ -212,13 +217,15 @@
     text-align: center;
   }
 
-  /* Turn off the mobile per-circle connector... */
-  .how-it-works__step .step-number::after {
+  /* Turn off the mobile per-step connector... */
+  .how-it-works__step::after {
     display: none;
   }
 
   /* ...and draw one line spanning between the first and last column's
-     circle centers instead. z-index: 0 keeps it behind the circles. */
+     circle centers instead. z-index: 0 keeps it behind the circles.
+     Same colored flowing gradient as the mobile connector, just running
+     horizontally instead of vertically. */
   .how-it-works__list::before {
     content: "";
     position: absolute;
@@ -226,12 +233,31 @@
     left: calc(100% / 6);
     right: calc(100% / 6);
     height: 2px;
-    background-color: var(--color-border);
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-secondary) 50%,
+      var(--color-accent) 100%
+    );
+    background-size: 300% 100%;
     z-index: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .how-it-works__list::before {
+      animation: how-it-works-flow-horizontal 4s linear infinite;
+    }
+  }
+
+  @keyframes how-it-works-flow-horizontal {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 150% 0%; }
   }
 
   .step-number {
     z-index: 1; /* sits above the connecting line */
+    margin-top: 0; /* cancels the mobile row-layout centering hack —
+      the circle sits above the heading here, not beside it */
     margin-bottom: var(--space-5);
   }
 }
