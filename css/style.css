@@ -751,12 +751,15 @@ body.no-scroll {
      floats would collide with the section edge/next element. Smaller
      on mobile (restored to full size at 480px in responsive.css) since
      the main card itself is much narrower on small phones.
-     Top padding is taller than the rest specifically: below 480px the
-     float-top card's own max-width is narrow enough that "Forecast
-     confidence" wraps to 2 lines, making that card taller — without
-     the extra top clearance its bottom edge overlaps the main card's
-     "Live" badge instead of just overhanging blank space above it. */
-  padding: var(--space-8) var(--space-4) var(--space-6);
+     Symmetric top/bottom on purpose: an earlier version gave this extra
+     top-only padding to keep the float-top card's bottom edge clear of
+     the main card's "Live" badge, because at narrow widths "Forecast
+     confidence" wrapped to 2 lines and made that card taller than the
+     float-bottom card. The actual fix for that is sizing the float-top
+     card to stay on one line (see max-width on .hero-visual__card
+     --float-top/--float-bottom above) — with both floats the same
+     height again, they need the same clearance on both sides. */
+  padding: var(--space-8) var(--space-4);
 }
 
 /* Faint dot grid behind the cards — a common depth cue on data-product
@@ -944,8 +947,16 @@ body.no-scroll {
   /* Kept deliberately small on mobile — the main card itself is often
      only ~250px wide on small phones, so a 210px-wide floating card
      pinned to its corner would crowd or overlap the card's own content.
-     Restored to full size at 480px+ in responsive.css. */
-  max-width: 150px;
+     Restored to full size at 480px+ in responsive.css.
+     175px specifically: the smallest width that lets "Forecast
+     confidence" render on one line at this font size (measured — 170px
+     is the actual wrap point, this adds a few px of headroom). Below
+     that, the float-top card grows a 2nd text line and gets taller
+     than the float-bottom card, which used to require asymmetric
+     vertical padding on .hero-visual to keep it clear of the main
+     card's header; keeping both cards single-line keeps them the same
+     height, so the container padding can stay symmetric instead. */
+  max-width: 175px;
 }
 
 .hero-visual__card--float-top {
