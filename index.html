@@ -102,11 +102,35 @@
          HERO — built in Step 2
          ==================================================================== -->
     <section id="hero" class="hero">
-      <!-- Ambient network/particle animation — pure canvas, no video asset.
-           Purely decorative (aria-hidden), sits behind all hero content via
-           z-index, and is entirely skipped by script.js when the user has
-           prefers-reduced-motion set. -->
-      <canvas class="hero__particles" id="hero-particles" aria-hidden="true"></canvas>
+      <!-- Background video: "Aerial shot of calm blue sea"
+           Source: Mixkit (https://mixkit.co/free-stock-video/aerial-shot-of-calm-blue-sea-1080/)
+           Author: not individually credited on Mixkit (platform-published clip)
+           License: Mixkit Stock Video Free License — free for commercial and
+           personal use; attribution not required but appreciated.
+           https://mixkit.co/license/#videoFree
+           Downloaded and re-encoded locally (assets/video/hero-bg.mp4 /
+           .webm) rather than hotlinked — see README.md for full credit and
+           processing notes.
+
+           <source> elements are attached by script.js, not written here,
+           so prefers-reduced-motion / Save-Data / slow connections can
+           skip the network request entirely rather than just hiding a
+           video that already started downloading. The poster frame below
+           is what actually renders in all of those cases, and is also
+           the only thing that ever renders if the video errors out. -->
+      <video
+        class="hero__video"
+        id="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="assets/video/hero-poster.jpg"
+        aria-hidden="true"
+        tabindex="-1"
+      ></video>
+      <div class="hero__scrim" aria-hidden="true"></div>
 
       <div class="container hero__inner">
 
@@ -122,118 +146,6 @@
             <!-- TODO: replace href with real Calendly URL once available -->
             <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
             <a href="#services" class="btn btn--secondary">Explore Services</a>
-          </div>
-        </div>
-
-        <!-- Purely decorative — hidden from assistive tech entirely rather
-             than given alt text, since it conveys no information a screen
-             reader user needs (the same content is already in the text
-             next to it). A layered composition of "product UI" cards
-             (rather than a single flat illustration) reads as a real
-             system doing real work, not a generic stock chart. -->
-        <div class="hero__graphic reveal" aria-hidden="true">
-          <div class="hero-visual">
-            <div class="hero-visual__grid"></div>
-
-            <div class="hero-visual__card hero-visual__card--main">
-              <div class="hero-visual__card-header">
-                <span class="hero-visual__live-dot"></span>
-                <span>Revenue trend</span>
-                <span class="hero-visual__pill">Live</span>
-              </div>
-
-              <svg class="hero-visual__chart" viewBox="0 0 320 155">
-                <defs>
-                  <linearGradient id="heroChartFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32" />
-                    <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-
-                <!-- Baseline gridlines — the single biggest cue that turns
-                     a decorative squiggle into something that reads as a
-                     real chart rendering real data. -->
-                <line x1="0" y1="25" x2="320" y2="25" class="hero-visual__chart-grid" />
-                <line x1="0" y1="75" x2="320" y2="75" class="hero-visual__chart-grid" />
-                <line x1="0" y1="125" x2="320" y2="125" class="hero-visual__chart-grid" />
-
-                <!-- Faint value references — otherwise 3 gridlines read as
-                     decoration rather than anchoring to actual plotted data. -->
-                <text x="4" y="21" class="hero-visual__chart-axis-label">120</text>
-                <text x="4" y="71" class="hero-visual__chart-axis-label">80</text>
-                <text x="4" y="121" class="hero-visual__chart-axis-label">40</text>
-
-                <!-- Anchor points sit at x=32/96/160/224/288 — the exact
-                     CENTERS of 5 equal 64px-wide slices (10%/30%/50%/70%/90%
-                     of the 320-wide viewBox), not the previous 0/80/160/
-                     240/320. That change is what makes alignment with the
-                     axis labels below EXACT rather than approximate: the
-                     labels use 5 equal flex columns with centered text
-                     (see .hero-visual__chart-axis), so both the SVG points
-                     and the HTML labels are centered on the same 10/30/50/
-                     70/90% marks by construction, instead of two different
-                     alignment models (center-anchored points vs. edge-
-                     anchored flex space-between) that were never
-                     guaranteed to agree. -->
-                <path d="M32,140 C53,131 75,109 96,100 C117,92 139,73 160,65 C181,58 203,42 224,35 C245,31 267,19 288,15 L288,155 L32,155 Z"
-                      fill="url(#heroChartFill)" />
-
-                <!-- Muted "previous period" line, drawn after the fill so
-                     it stays visible wherever it dips under it — current
-                     period overtakes it early and pulls ahead by the end,
-                     a common, easy-to-read comparison device on real
-                     dashboards. -->
-                <path d="M32,132 C53,129 75,121 96,118 C117,114 139,104 160,100 C181,96 203,84 224,80 C245,75 267,63 288,58"
-                      class="hero-visual__chart-line-muted" />
-
-                <path d="M32,140 C53,131 75,109 96,100 C117,92 139,73 160,65 C181,58 203,42 224,35 C245,31 267,19 288,15"
-                      fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-
-                <!-- Real data-point markers along the line, not just a lone
-                     dot at the end — this is what makes it look plotted
-                     from actual values rather than drawn as a flourish. -->
-                <circle cx="32" cy="140" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="96" cy="100" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="160" cy="65" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="224" cy="35" r="3.5" class="hero-visual__chart-point" />
-                <circle cx="288" cy="15" r="9" class="hero-visual__chart-point-ring" />
-                <circle cx="288" cy="15" r="4.5" fill="var(--color-accent)" />
-              </svg>
-
-              <div class="hero-visual__chart-axis">
-                <span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
-              </div>
-
-              <div class="hero-visual__stat">
-                <span class="hero-visual__stat-value js-counter">+42%</span>
-                <span class="hero-visual__stat-label">Faster decisions</span>
-              </div>
-            </div>
-
-            <div class="hero-visual__card hero-visual__card--float-top">
-              <span class="hero-visual__float-icon">
-                <svg viewBox="0 0 20 20"><path d="M10 3v14M4 9l6-6 6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="hero-visual__float-text">
-                <span class="hero-visual__float-title">Forecast confidence</span>
-                <span class="hero-visual__float-value js-counter">94%</span>
-              </span>
-            </div>
-
-            <!-- Deliberately a different UI module than the top float —
-                 a mini sparkline instead of a second icon+text pairing —
-                 so the two floating cards read as genuinely different
-                 pieces of product UI rather than one component reused
-                 with different copy. -->
-            <div class="hero-visual__card hero-visual__card--float-bottom">
-              <div class="hero-visual__spark-header">
-                <span class="hero-visual__float-title">Weekly reports</span>
-                <span class="hero-visual__float-value hero-visual__float-value--teal js-counter">+18%</span>
-              </div>
-              <div class="hero-visual__spark-bars" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-            </div>
           </div>
         </div>
 

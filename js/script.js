@@ -348,123 +348,13 @@ contactForm.addEventListener("submit", (event) => {
 document.getElementById("footer-year").textContent = new Date().getFullYear();
 
 /* ==========================================================================
-   HERO — ambient particle network
+   HERO — cursor spotlight
    ==========================================================================
-   A slow-moving field of dots that link into faint lines when close
-   together — a "live network/data" visual behind the hero copy, built
-   entirely on <canvas> so there's no video file or external asset to
-   ship. Skipped entirely under prefers-reduced-motion (reuses the same
-   flag the scroll-reveal system already checked above), and paused via
-   the Page Visibility API so a backgrounded tab isn't spending CPU on
-   an animation nobody can see.
-   ========================================================================== */
-
-const particleCanvas = document.getElementById("hero-particles");
-
-if (particleCanvas && !prefersReducedMotion) {
-  const ctx = particleCanvas.getContext("2d");
-  const heroSection = document.getElementById("hero");
-  // Capped at 2 — devicePixelRatio can be 3+ on some phones, and canvas
-  // memory/fill cost scales with the SQUARE of this value. 2x is already
-  // indistinguishable from "native" sharpness at this element size.
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const linkDistance = 140;
-
-  let particles = [];
-  let width = 0;
-  let height = 0;
-  let animationFrameId = null;
-
-  function resizeCanvas() {
-    width = heroSection.clientWidth;
-    height = heroSection.clientHeight;
-    particleCanvas.width = width * dpr;
-    particleCanvas.height = height * dpr;
-    particleCanvas.style.width = `${width}px`;
-    particleCanvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Density scales with the hero's actual area rather than a fixed
-    // count, so this looks equally "right" on a small phone hero and a
-    // wide desktop one instead of sparse/overcrowded at either extreme.
-    const targetCount = Math.round((width * height) / 22000);
-    const count = Math.max(18, Math.min(70, targetCount));
-
-    particles = Array.from({ length: count }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
-    }));
-  }
-
-  function drawFrame() {
-    ctx.clearRect(0, 0, width, height);
-
-    particles.forEach((particle) => {
-      particle.x += particle.vx;
-      particle.y += particle.vy;
-      // Bounce off the hero's edges rather than wrapping — wrapping
-      // makes a particle visibly "teleport" across the screen, which
-      // reads as a bug rather than an ambient effect.
-      if (particle.x <= 0 || particle.x >= width) particle.vx *= -1;
-      if (particle.y <= 0 || particle.y >= height) particle.vy *= -1;
-    });
-
-    // O(n^2) pairwise distance check — fine at this particle count
-    // (max 70 -> ~2,400 pairs/frame), the standard approach for a
-    // decorative link-graph at this scale.
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < linkDistance) {
-          ctx.strokeStyle = `rgba(59, 130, 246, ${0.16 * (1 - distance / linkDistance)})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    particles.forEach((particle) => {
-      ctx.fillStyle = "rgba(59, 130, 246, 0.45)";
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, 1.6, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    animationFrameId = requestAnimationFrame(drawFrame);
-  }
-
-  resizeCanvas();
-  drawFrame();
-
-  let resizeTimeout;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(resizeCanvas, 200);
-  });
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      cancelAnimationFrame(animationFrameId);
-    } else {
-      drawFrame();
-    }
-  });
-}
-
-/* ==========================================================================
-   HERO — cursor spotlight + product-card tilt
-   ==========================================================================
-   Two small pointer-driven effects, both gated behind the same checks
-   as the tilt CSS itself (a real mouse present, and no reduced-motion
-   preference) so this code doesn't run pointless work on touch devices
-   or for users who've opted out of motion.
+   A soft glow that follows the cursor around the hero section — purely
+   visual, reads --spot-x/--spot-y back out in the .hero::before
+   radial-gradient in style.css. Gated behind the same checks the CSS
+   itself uses (a real mouse present, no reduced-motion preference) so
+   this doesn't run pointless work on touch devices.
    ========================================================================== */
 
 const supportsHover = window.matchMedia("(hover: hover)").matches;
@@ -472,9 +362,6 @@ const supportsHover = window.matchMedia("(hover: hover)").matches;
 if (!prefersReducedMotion) {
   const heroSection = document.getElementById("hero");
 
-  // Ambient glow that follows the cursor around the hero section —
-  // purely visual, reads --spot-x/--spot-y back out in the .hero::before
-  // radial-gradient in style.css.
   if (heroSection && supportsHover) {
     let spotlightQueued = false;
 
@@ -492,32 +379,87 @@ if (!prefersReducedMotion) {
       });
     });
   }
+}
 
-  // Product-card tilt — the main hero chart card leans slightly toward
-  // the cursor, like a physical object catching light, then eases back
-  // to flat on mouseleave (the transition lives on the card itself in
-  // style.css, so this handler only ever needs to set target values).
-  const heroGraphic = document.querySelector(".hero__graphic");
-  const tiltCard = document.querySelector(".hero-visual__card--main");
+/* ==========================================================================
+   HERO — background video, loaded conditionally
+   ==========================================================================
+   The <video> in index.html has autoplay/muted/loop/playsinline plus a
+   poster, but deliberately NO <source> children in the markup. A <video>
+   with no playable source never issues a network request no matter what
+   its other attributes say — so "don't load the video" just means "never
+   append a <source>," and the poster attribute keeps rendering on its
+   own as a static image for as long as that's true. That covers two of
+   the required fallbacks with no extra code:
+     - prefers-reduced-motion: reduce -> sources never attached, poster
+       is the permanent background, no autoplay ever happens.
+     - Save-Data / 2g / slow-2g -> same as above.
+   The third case — "errors, or never reaches canplay" — needs explicit
+   handling below. It's not hypothetical: some engines' canPlayType()
+   reports WebM/VP9 as supported but then never actually decode it —
+   readyState sits at 0 (HAVE_NOTHING) indefinitely and no "error" event
+   ever fires, since nothing actually failed, it just never progresses.
+   A listener on "error" alone misses that case entirely, so there's a
+   second, explicit timeout that retries with MP4 alone (the one format
+   every engine that plays video at all can decode) if "canplay" hasn't
+   fired within a few seconds. ========================================================================== */
 
-  if (heroGraphic && tiltCard && supportsHover) {
-    const maxTiltDeg = 7;
+const heroVideo = document.getElementById("hero-video");
 
-    heroGraphic.addEventListener("mousemove", (event) => {
-      const rect = heroGraphic.getBoundingClientRect();
-      const xRatio = (event.clientX - rect.left) / rect.width; // 0 - 1
-      const yRatio = (event.clientY - rect.top) / rect.height; // 0 - 1
-      const rotateY = (xRatio - 0.5) * maxTiltDeg * 2;
-      const rotateX = -(yRatio - 0.5) * maxTiltDeg * 2;
+if (heroVideo) {
+  const connection =
+    navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const isDataSaverOrSlow =
+    connection &&
+    (connection.saveData || /^(slow-2g|2g)$/.test(connection.effectiveType || ""));
 
-      tiltCard.style.setProperty("--tilt-x", `${rotateX}deg`);
-      tiltCard.style.setProperty("--tilt-y", `${rotateY}deg`);
+  if (!prefersReducedMotion && !isDataSaverOrSlow) {
+    function attachSources(list) {
+      heroVideo.querySelectorAll("source").forEach((el) => el.remove());
+      list.forEach(({ src, type }) => {
+        const source = document.createElement("source");
+        source.src = src;
+        source.type = type;
+        heroVideo.appendChild(source);
+      });
+      heroVideo.load();
+    }
+
+    // WebM/VP9 first (smaller, what Chrome/Firefox/Edge use), MP4/H.264
+    // second as the fallback every engine that plays video at all can
+    // decode.
+    attachSources([
+      { src: "assets/video/hero-bg.webm", type: "video/webm" },
+      { src: "assets/video/hero-bg.mp4", type: "video/mp4" },
+    ]);
+
+    let hasReachedCanplay = false;
+    heroVideo.addEventListener("canplay", () => {
+      hasReachedCanplay = true;
     });
 
-    heroGraphic.addEventListener("mouseleave", () => {
-      tiltCard.style.setProperty("--tilt-x", "0deg");
-      tiltCard.style.setProperty("--tilt-y", "0deg");
+    // Explicit decode failure — drop straight to MP4-only rather than
+    // waiting out the stall timeout below.
+    heroVideo.addEventListener("error", () => {
+      if (heroVideo.currentSrc.endsWith(".mp4")) {
+        // Already on the fallback format and it still failed — give up
+        // and let the poster stand in permanently.
+        heroVideo.querySelectorAll("source").forEach((el) => el.remove());
+        heroVideo.removeAttribute("src");
+        return;
+      }
+      attachSources([{ src: "assets/video/hero-bg.mp4", type: "video/mp4" }]);
     });
+
+    // Silent stall — the source was accepted but never actually became
+    // playable (the WebM-claims-support-but-can't-decode-it case). Only
+    // retries once: if canplay hasn't fired within 4s and we're not
+    // already on the MP4 fallback, switch to it.
+    setTimeout(() => {
+      if (!hasReachedCanplay && !heroVideo.currentSrc.endsWith(".mp4")) {
+        attachSources([{ src: "assets/video/hero-bg.mp4", type: "video/mp4" }]);
+      }
+    }, 4000);
   }
 }
 

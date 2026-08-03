@@ -90,47 +90,14 @@
   }
 }
 
-/* ===== HERO — switch from stacked to a two-column (text | graphic)
-   layout once there's enough width for both to breathe. ===== */
+/* ===== HERO — more vertical breathing room once there's height to
+   spare; still a single left-aligned copy column over the full-bleed
+   video (see style.css — the graphic column this used to balance
+   against is gone). ===== */
 @media (min-width: 1024px) {
   .hero {
     padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-16)) var(--space-12);
-  }
-
-  .hero__inner {
-    grid-template-columns: 1.1fr 1fr;
-    gap: var(--space-12);
-  }
-}
-
-/* ===== HERO VISUAL — restore full-size floating cards once there's
-   enough room for them not to crowd the main card (see style.css for
-   why the base/mobile sizing is deliberately smaller). ===== */
-@media (min-width: 480px) {
-  .hero-visual {
-    padding: var(--space-8) var(--space-6);
-  }
-
-  .hero-visual__card--float-top,
-  .hero-visual__card--float-bottom {
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    max-width: 210px;
-  }
-
-  .hero-visual__float-icon {
-    width: 32px;
-    height: 32px;
-  }
-
-  .hero-visual__float-icon svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .hero-visual__float-value {
-    font-size: var(--font-size-sm);
-    white-space: nowrap;
+    min-height: 680px;
   }
 }
 

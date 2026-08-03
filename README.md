@@ -45,7 +45,11 @@ the contact form" below).
 │   └── script.js          Nav menu, scroll-reveal, FAQ accordion,
 │                           form validation, scroll-spy, footer year
 │
-├── images/  icons/  assets/   Reserved for real assets (currently empty —
+├── assets/
+│   └── video/             Hero background video — see "Hero background
+│                           video" below for source/license
+│
+├── images/  icons/            Reserved for real assets (currently empty —
 │                               see "What's still a placeholder" below)
 │
 └── README.md              This file
@@ -92,11 +96,36 @@ real Calendly (or other scheduling) link.
 
 ---
 
+## Hero background video
+
+The hero section's background is a real downloaded video, not a hotlinked
+URL or a CSS/canvas effect:
+
+- **Clip**: "Aerial shot of calm blue sea"
+- **Source**: [Mixkit](https://mixkit.co/free-stock-video/aerial-shot-of-calm-blue-sea-1080/)
+- **Author**: not individually credited on Mixkit (platform-published clip)
+- **License**: [Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree)
+  — free for commercial and personal use; attribution not required, but
+  appreciated
+- **Files**: downloaded at 1920×1080 and re-encoded locally —
+  `assets/video/hero-bg.mp4` (H.264, ~2.1MB), `assets/video/hero-bg.webm`
+  (VP9, ~1.4MB, served first to browsers that support it), and
+  `assets/video/hero-poster.jpg` (first frame, ~72KB) as the poster/fallback
+  image
+
+`js/script.js` only attaches `<source>` elements to the `<video>` (and
+therefore only lets the browser request the video file) when the visitor
+hasn't asked for reduced motion and doesn't appear to be on a slow or
+data-saver connection (`navigator.connection.saveData` /
+`effectiveType`). In every other case — including if the video ever
+errors — the `poster` image is what actually renders, since a `<video>`
+with no attached source never issues a network request in the first
+place.
+
 ## What's still a placeholder (built for easy swapping)
 
-- **Hero graphic & About photo**: hand-built inline SVG / a labeled
-  placeholder box, not real images. The About photo is written as a
-  `<div>` specifically so it's easy to find and replace — search
+- **About photo**: a labeled placeholder box, not a real image. Written as
+  a `<div>` specifically so it's easy to find and replace — search
   `index.html` for `Founder Photo` and swap that block for a real
   `<img src="..." alt="[Name], Founder of MSM Analytics">`. Once you do,
   add `loading="lazy"` to it (and to any other image you add below the

@@ -625,30 +625,74 @@ body.no-scroll {
      top of the page — behind the transparent navbar — while the H1
      itself still clears the bar instead of rendering underneath it. */
   padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-10)) var(--space-8);
-  /* Clips the blurred glow (below) if it ever bleeds past the edge of
-     the viewport, without affecting the floating badge, which overlaps
-     the graphic but stays within the section's own box. */
-  overflow-x: hidden;
-  /* Containing block for the particle canvas + cursor spotlight layers
-     below, both of which need to sit BEHIND .hero__inner but stay
-     confined to the hero's own box rather than the nearest other
-     positioned ancestor. */
+  overflow: hidden; /* keeps the video's object-fit:cover overflow and
+    the cursor-glow from ever bleeding past the section's own edges */
   position: relative;
+  /* Video is decorative background media, so the hero itself needs a
+     minimum height independent of the (now much shorter) text column —
+     otherwise the section could collapse to just the copy's height on
+     short-content viewports and barely show any video at all. */
+  min-height: 560px;
 }
 
-/* Ambient cursor-follow glow — a second, interactive layer on top of the
-   static blurred blobs in .hero__graphic::before. script.js updates
-   --spot-x/--spot-y on pointermove; until JS runs (or on touch devices
-   with no pointermove) they fall back to a fixed point near the
-   headline, so this never renders as a hard-edged, mispositioned shape. */
+/* ===== BACKGROUND VIDEO =====
+   Source: "Aerial shot of calm blue sea" — Mixkit (assets.mixkit.co),
+   downloaded (not hotlinked) under the Mixkit Stock Video Free License
+   (free for commercial/personal use; attribution not required but
+   appreciated — https://mixkit.co/license/#videoFree). Full credit and
+   the original page URL are also recorded in README.md.
+   See index.html for how sources are attached conditionally via JS
+   (prefers-reduced-motion / Save-Data / slow connection all skip
+   loading the video entirely and leave the poster frame in place). */
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  object-fit: cover;
+  /* Anchors the frame toward its upper portion (more open sky/horizon,
+     less of the close-up water at the very end of the loop) so the
+     crop stays visually calm at tall/narrow aspect ratios. */
+  object-position: center 30%;
+}
+
+/* Dark scrim between the video and the text layer — heavier on the left
+   where the copy sits, easing off toward the right so the video still
+   reads as a video rather than just a dark panel. Alpha values here are
+   deliberately verified, not eyeballed: sampling the actual compressed
+   footage frame-by-frame, the lightest moment in the loop (the pale sky
+   near the start, ~rgb(116,146,178)) is the worst case for text
+   contrast. At 0.75 alpha (the lowest value inside the text column,
+   55-100% is outside it) that still blends to a contrast ratio of
+   12.4:1 for --color-text-inverted and 5.2:1 for
+   --color-text-inverted-muted against that lightest frame — comfortably
+   past the 3:1 (H1) / 4.5:1 (body) minimums with margin for the darker
+   frames only making it easier. Uses --color-bg-inverted as the tint so
+   it's the same "ink" as the rest of the site's dark surfaces. */
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    rgba(11, 15, 25, 0.85) 0%,
+    rgba(11, 15, 25, 0.75) 55%,
+    rgba(11, 15, 25, 0.55) 75%,
+    rgba(11, 15, 25, 0.3) 100%
+  );
+}
+
+/* Ambient cursor-follow glow — sits above the scrim so it still reads
+   against the dark overlay instead of getting lost in the video. */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 2;
   background: radial-gradient(
     500px circle at var(--spot-x, 20%) var(--spot-y, 30%),
-    rgba(59, 130, 246, 0.08),
+    rgba(59, 130, 246, 0.16),
     transparent 65%
   );
   pointer-events: none;
@@ -660,27 +704,26 @@ body.no-scroll {
   }
 }
 
-.hero__particles {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
 .hero__inner {
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-  gap: var(--space-10);
+  z-index: 3;
+}
+
+.hero__content {
+  /* Left-aligned at a constrained width (not full-bleed, not centered)
+     rather than stretching across the now-empty second column — long
+     enough for the subtitle's own 52ch cap to matter, short enough that
+     the video still has real room to breathe on the right. */
+  max-width: 640px;
 }
 
 .hero__content .section-heading__eyebrow {
   margin-bottom: var(--space-4);
+  /* The base eyebrow badge (accent-on-soft-tint) assumes a light page
+     background; over the video it needs the inverted treatment like
+     the rest of the hero copy. */
+  color: var(--color-text-inverted);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .hero__title {
@@ -688,12 +731,14 @@ body.no-scroll {
   max-width: 18ch; /* keeps the large headline from stretching into one
                        long line on wide screens — wraps to 2-3 lines
                        instead, which is easier to scan. */
+  color: var(--color-text-inverted);
 }
 
 .hero__subtitle {
   max-width: 52ch;
   margin-bottom: var(--space-6);
   font-size: var(--font-size-lg);
+  color: var(--color-text-inverted-muted);
 }
 
 .hero__actions {
@@ -702,375 +747,19 @@ body.no-scroll {
   gap: var(--space-4);
 }
 
-.hero__graphic {
-  position: relative;
-  min-width: 0; /* see the CONTACT section for why grid items need this */
-  /* Depth for the mouse-tilt effect on .hero-visual__card--main below —
-     without a perspective on an ancestor, rotateX/rotateY render as a
-     flat skew instead of a believable 3D tilt. */
-  perspective: 1400px;
+/* Secondary CTA also assumed a light background (dark text, subtle
+   border) — inverted to a ghost button that reads clearly over video:
+   transparent fill, an inverted (translucent white) border, and full
+   inverted-white text instead of the light theme's --color-text. */
+.hero .btn--secondary {
+  color: var(--color-text-inverted);
+  border-color: var(--color-border-inverted);
 }
 
-/* Same fix as .hero__graphic above — this is the OTHER hero__inner
-   grid item (the text column). Added here as its own rule since it
-   didn't otherwise need a base style block yet. */
-.hero__content {
-  min-width: 0;
-}
-
-/* Soft, blurred two-tone glow behind the card — a common "premium tech
-   product" visual cue. Pure CSS (radial-gradient + blur), no image
-   asset needed. Sits behind the SVG via z-index: -1. Lower opacity
-   than a dark-theme version would use — a light background needs much
-   less "glow" before a color wash starts to look like a smudge rather
-   than a deliberate accent. */
-.hero__graphic::before {
-  content: "";
-  position: absolute;
-  inset: -15%;
-  background:
-    radial-gradient(circle at 30% 30%, var(--color-accent) 0%, transparent 60%),
-    radial-gradient(circle at 75% 70%, var(--color-accent-secondary) 0%, transparent 60%);
-  filter: blur(70px);
-  opacity: 0.16;
-  z-index: -1;
-}
-
-/* --------------------------------------------------------------------
-   HERO VISUAL — a layered "product UI" composition: one main card
-   (a live-looking chart + headline stat) with two smaller cards
-   floating at its corners, rather than a single flat illustration.
-   This is the same visual language Stripe/Linear/Vercel-style sites
-   use to signal "real, working system" instead of stock iconography.
-   -------------------------------------------------------------------- */
-
-.hero-visual {
-  position: relative;
-  /* Reserves room for the floating cards, which sit OUTSIDE the main
-     card's own box via negative inset — without this padding the
-     floats would collide with the section edge/next element. Smaller
-     on mobile (restored to full size at 480px in responsive.css) since
-     the main card itself is much narrower on small phones.
-     Symmetric top/bottom on purpose: an earlier version gave this extra
-     top-only padding to keep the float-top card's bottom edge clear of
-     the main card's "Live" badge, because at narrow widths "Forecast
-     confidence" wrapped to 2 lines and made that card taller than the
-     float-bottom card. The actual fix for that is sizing the float-top
-     card to stay on one line (see max-width on .hero-visual__card
-     --float-top/--float-bottom above) — with both floats the same
-     height again, they need the same clearance on both sides. */
-  padding: var(--space-8) var(--space-4);
-}
-
-/* Faint dot grid behind the cards — a common depth cue on data-product
-   marketing sites. Pure CSS radial-gradient repeated as a background,
-   no image asset. Fades out toward the edges via a mask so it reads as
-   atmosphere rather than a hard-edged tile. */
-.hero-visual__grid {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1px);
-  background-size: 22px 22px;
-  -webkit-mask-image: radial-gradient(ellipse at center, black 45%, transparent 80%);
-  mask-image: radial-gradient(ellipse at center, black 45%, transparent 80%);
-  z-index: -1;
-}
-
-.hero-visual__card {
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  /* Matches the sitewide card radius (--radius-lg, same as .card,
-     .about__proof-card, etc.) — this visual is meant to read as "a real
-     product," so it should use the same corner language as every other
-     card on the page, not a smaller one-off radius. */
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  /* Without this, every label/stat/badge inside inherits body's
-     line-height: 1.6 — tuned for multi-line paragraph reading, not
-     compact UI chrome. That inflates the effective vertical gap around
-     text well beyond what the coded `gap`/`margin` values say, making
-     spacing here impossible to reason about precisely. --snug (1.3),
-     not --tight (1.1) — tight enough to fix that, but with enough room
-     that .hero-visual__stat-label ("faster decisions, average across
-     clients") doesn't look cramped on the odd narrower card where it
-     wraps to two lines. */
-  line-height: var(--line-height-snug);
-}
-
-.hero-visual__card--main {
-  padding: var(--space-6); /* bumped from space-5 — more generous
-    internal padding reads more like a confident, premium dashboard
-    card and less like a cramped decorative widget */
-}
-
-/* Subtle mouse-tilt — script.js sets --tilt-x/--tilt-y as the pointer
-   moves over .hero__graphic, so the card leans slightly toward the
-   cursor like a real physical object catching light, and eases back to
-   flat on mouseleave via the transition below. Gated to devices that
-   actually have a mouse (hover: hover) and to users who haven't asked
-   for reduced motion — on touch/reduced-motion, the card just stays flat. */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .hero-visual__card--main {
-    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-    transition: transform 500ms var(--ease-out-expo);
-    will-change: transform;
-  }
-}
-
-.hero-visual__card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-}
-
-.hero-visual__live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-success);
-  flex-shrink: 0;
-}
-
-.hero-visual__pill {
-  margin-left: auto;
-  padding: 2px var(--space-2);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-success-text);
-  background-color: rgba(22, 163, 74, 0.1);
-  border-radius: var(--radius-full);
-}
-
-.hero-visual__chart {
-  display: block;
-  width: 100%;
-  height: auto;
-  /* Matches the header-to-chart and axis-to-stat gaps (both space-4) —
-     this was the one internal seam still on space-3 (12px instead of
-     16px), breaking the card's otherwise-consistent vertical rhythm. */
-  margin-bottom: var(--space-4);
-}
-
-.hero-visual__chart-grid {
-  stroke: var(--color-border);
-  stroke-width: 1;
-}
-
-.hero-visual__chart-axis-label {
-  fill: var(--color-text-muted);
-  font-size: 9px;
-  font-family: var(--font-family-base);
-}
-
-.hero-visual__chart-line-muted {
-  fill: none;
-  stroke: var(--color-text-muted);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 4;
-  opacity: 0.5;
-}
-
-.hero-visual__chart-point {
-  fill: var(--color-bg-elevated);
-  stroke: var(--color-accent);
-  stroke-width: 2;
-}
-
-.hero-visual__chart-point-ring {
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 1.5;
-  opacity: 0.3;
-}
-
-.hero-visual__chart-axis {
-  display: flex;
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-
-/* 5 EQUAL flex columns with centered text — not justify-content:
-   space-between (which is edge-anchored: first label's left edge at 0%,
-   last label's right edge at 100%). The SVG data points are CENTER-
-   anchored at exactly 10/30/50/70/90% of the chart width; equal columns
-   with centered content land label centers at those exact same marks,
-   so alignment holds by construction instead of by two different
-   layout algorithms coincidentally agreeing. */
-.hero-visual__chart-axis span {
-  flex: 1;
-  text-align: center;
-}
-
-.hero-visual__stat {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2); /* was a hardcoded 2px, off the spacing scale —
-    and too tight now that the stat value reads at 28px instead of the
-    22px it was tuned against */
-}
-
-.hero-visual__stat-value {
-  font-family: var(--font-family-heading);
-  font-size: 1.75rem; /* bumped from --font-size-xl (22px) — this is the
-    card's payoff number and needs real weight, not the same scale as
-    surrounding secondary UI text */
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--tracking-h3);
-  color: var(--color-text);
-}
-
-.hero-visual__stat-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-
-/* Floating cards — smaller, absolutely positioned at opposite corners
-   of the main card, each with a slight rotation so the composition
-   reads as tactile/layered rather than a rigid grid. Deliberately
-   lighter elevation than the main card (--shadow-md, not --shadow-lg)
-   — these are supporting callouts, not the star of the composition,
-   and sharing identical shadow weight with the main card flattened
-   that hierarchy. */
-.hero-visual__card--float-top,
-.hero-visual__card--float-bottom {
-  position: absolute;
-  padding: var(--space-2) var(--space-3);
-  width: max-content;
-  box-shadow: var(--shadow-md);
-  /* Kept deliberately small on mobile — the main card itself is often
-     only ~250px wide on small phones, so a 210px-wide floating card
-     pinned to its corner would crowd or overlap the card's own content.
-     Restored to full size at 480px+ in responsive.css.
-     175px specifically: the smallest width that lets "Forecast
-     confidence" render on one line at this font size (measured — 170px
-     is the actual wrap point, this adds a few px of headroom). Below
-     that, the float-top card grows a 2nd text line and gets taller
-     than the float-bottom card, which used to require asymmetric
-     vertical padding on .hero-visual to keep it clear of the main
-     card's header; keeping both cards single-line keeps them the same
-     height, so the container padding can stay symmetric instead. */
-  max-width: 175px;
-}
-
-.hero-visual__card--float-top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  top: 0;
-  right: 0;
-  transform: rotate(-2deg);
-}
-
-.hero-visual__card--float-bottom {
-  min-width: 120px; /* the sparkline bars need a bit more guaranteed
-    width than icon+text did, so they don't get squeezed illegibly thin */
-  bottom: 0;
-  left: 0;
-  transform: rotate(2deg);
-}
-
-.hero-visual__spark-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
-}
-
-.hero-visual__float-value--teal {
-  color: var(--color-accent-secondary);
-}
-
-.hero-visual__spark-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 26px;
-}
-
-.hero-visual__spark-bars span {
-  flex: 1;
-  background-color: var(--color-accent-secondary);
-  border-radius: 2px 2px 0 0;
-  opacity: 0.75;
-}
-
-.hero-visual__spark-bars span:nth-child(1) { height: 45%; }
-.hero-visual__spark-bars span:nth-child(2) { height: 60%; }
-.hero-visual__spark-bars span:nth-child(3) { height: 50%; }
-.hero-visual__spark-bars span:nth-child(4) { height: 75%; }
-.hero-visual__spark-bars span:nth-child(5) { height: 65%; }
-.hero-visual__spark-bars span:nth-child(6) { height: 100%; }
-
-.hero-visual__float-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  background-color: var(--color-accent-soft);
-  color: var(--color-accent-hover);
-}
-
-.hero-visual__float-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-.hero-visual__float-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.hero-visual__float-title {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-
-.hero-visual__float-value {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  white-space: normal;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-visual__live-dot {
-    animation: hero-pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes hero-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.35); }
-    50% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0); }
-  }
-
-  .hero-visual__card--float-top {
-    animation: float-bob-top 6s ease-in-out infinite;
-  }
-
-  .hero-visual__card--float-bottom {
-    animation: float-bob-bottom 7s ease-in-out infinite;
-  }
-
-  @keyframes float-bob-top {
-    0%, 100% { transform: rotate(-2deg) translateY(0); }
-    50% { transform: rotate(-2deg) translateY(-8px); }
-  }
-
-  @keyframes float-bob-bottom {
-    0%, 100% { transform: rotate(2deg) translateY(0); }
-    50% { transform: rotate(2deg) translateY(8px); }
-  }
+.hero .btn--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-text-inverted);
 }
 
 /* --------------------------------------------------------------------
