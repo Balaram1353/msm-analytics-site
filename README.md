@@ -42,12 +42,12 @@ the contact form" below).
 │   └── responsive.css      All @media breakpoint overrides
 │
 ├── js/
-│   └── script.js          Nav menu, scroll-reveal, FAQ accordion,
-│                           form validation, scroll-spy, footer year
+│   └── script.js          Nav menu, scroll-reveal, FAQ accordion, hero
+│                           canvas animation, form validation, scroll-spy,
+│                           footer year
 │
 ├── assets/
-│   └── video/             Hero background video — see "Hero background
-│                           video" below for source/license
+│   └── fonts/             Self-hosted webfonts (see "Customizing" below)
 │
 ├── images/  icons/            Reserved for real assets (currently empty —
 │                               see "What's still a placeholder" below)
@@ -96,31 +96,30 @@ real Calendly (or other scheduling) link.
 
 ---
 
-## Hero background video
+## Hero background animation
 
-The hero section's background is a real downloaded video, not a hotlinked
-URL or a CSS/canvas effect:
+The hero section's background is a `<canvas>` animation drawn entirely in
+`js/script.js` — no image or video asset involved. It loops through four
+phases (roughly 12–16 seconds, varying slightly each cycle):
 
-- **Clip**: "Aerial shot of calm blue sea"
-- **Source**: [Mixkit](https://mixkit.co/free-stock-video/aerial-shot-of-calm-blue-sea-1080/)
-- **Author**: not individually credited on Mixkit (platform-published clip)
-- **License**: [Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree)
-  — free for commercial and personal use; attribution not required, but
-  appreciated
-- **Files**: downloaded at 1920×1080 and re-encoded locally —
-  `assets/video/hero-bg.mp4` (H.264, ~2.1MB), `assets/video/hero-bg.webm`
-  (VP9, ~1.4MB, served first to browsers that support it), and
-  `assets/video/hero-poster.jpg` (first frame, ~72KB) as the poster/fallback
-  image
+- **Scattered** — faint points drift slowly at random.
+- **Resolving** — points ease onto a smooth, upward-trending curve
+  (eased, staggered per point so they don't all land at once).
+- **Resolved** — a line strokes through the points with a soft gradient
+  fill beneath.
+- **Dissolving** — the line/fill fade out and points ease back to new
+  random positions before the curve regenerates and the loop repeats.
 
-`js/script.js` only attaches `<source>` elements to the `<video>` (and
-therefore only lets the browser request the video file) when the visitor
-hasn't asked for reduced motion and doesn't appear to be on a slow or
-data-saver connection (`navigator.connection.saveData` /
-`effectiveType`). In every other case — including if the video ever
-errors — the `poster` image is what actually renders, since a `<video>`
-with no attached source never issues a network request in the first
-place.
+Colors come from `--color-accent` / `--color-accent-secondary` in
+`css/variables.css` via `getComputedStyle`, not hardcoded hex values, so
+a palette change there carries through automatically. Density is
+weighted away from the left column where the headline and CTAs sit.
+
+`prefers-reduced-motion: reduce` renders a single static resolved frame
+and never starts the animation loop at all — the motion is the part
+that needs consent, not the presence of the curve itself. The loop also
+pauses via the Page Visibility API whenever the tab is backgrounded, and
+the resize handler is debounced.
 
 ## What's still a placeholder (built for easy swapping)
 
