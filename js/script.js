@@ -382,477 +382,86 @@ if (!prefersReducedMotion) {
 }
 
 /* ==========================================================================
-   HERO — scatter-to-trend canvas animation
+   HERO — background video, loaded conditionally
    ==========================================================================
-   Ambient background behind the hero copy, drawn entirely on <canvas> —
-   no image or video asset. A continuous ~12-16s loop through four phases:
+   The <video> in index.html has autoplay/muted/loop/playsinline plus a
+   poster, but deliberately NO <source> children in the markup. A <video>
+   with no playable source never issues a network request no matter what
+   its other attributes say — so "don't load the video" just means "never
+   append a <source>," and the poster attribute keeps rendering on its
+   own as a static image for as long as that's true. That covers two of
+   the required fallbacks with no extra code:
+     - prefers-reduced-motion: reduce -> sources never attached, poster
+       is the permanent background, no autoplay ever happens.
+     - Save-Data / 2g / slow-2g -> same as above.
+   The third case — "errors, or never reaches canplay" — needs explicit
+   handling below. It's not hypothetical: some engines' canPlayType()
+   reports WebM/VP9 as supported but then never actually decode it —
+   readyState sits at 0 (HAVE_NOTHING) indefinitely and no "error" event
+   ever fires, since nothing actually failed, it just never progresses.
+   A listener on "error" alone misses that case entirely, so there's a
+   second, explicit timeout that retries with MP4 alone (the one format
+   every engine that plays video at all can decode) if "canplay" hasn't
+   fired within a few seconds. ========================================================================== */
 
-     scattered  — points drift slowly at random, faint, no line.
-     resolving  — points ease (eased, staggered per-point) onto a smooth
-                  upward-trending curve.
-     resolved   — points hold on the curve; a stroked line + soft gradient
-                  fill render through them.
-     dissolving — line/fill fade out, points ease back to new random
-                  drift positions, then the loop repeats with a freshly
-                  regenerated curve.
+const heroVideo = document.getElementById("hero-video");
 
-   Colors are read from the CSS custom properties (--color-accent /
-   --color-accent-secondary) via getComputedStyle rather than hardcoded,
-   so a palette change in variables.css carries through automatically.
+if (heroVideo) {
+  const connection =
+    navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const isDataSaverOrSlow =
+    connection &&
+    (connection.saveData || /^(slow-2g|2g)$/.test(connection.effectiveType || ""));
 
-   Performance: no pairwise (O(n^2)) distance checks anywhere — unlike a
-   particle-link network, this design only ever draws ONE path through
-   the points (in curve order) plus one gradient fill and n small dot
-   fills per frame, so the whole update+draw pass is O(n) regardless of
-   point count.
-   ========================================================================== */
-
-(function initHeroCanvas() {
-  const canvas = document.getElementById("hero-canvas");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const heroSection = document.getElementById("hero");
-
-  const styles = getComputedStyle(document.documentElement);
-  const accent = styles.getPropertyValue("--color-accent").trim() || "#3b82f6";
-  const accentSecondary =
-    styles.getPropertyValue("--color-accent-secondary").trim() || "#0d9488";
-
-  // Everything this animation draws is capped at this alpha — it sits
-  // behind an H1 people need to read.
-  const MAX_ALPHA = 0.18;
-
-  const PHASE_DURATIONS_BASE = {
-    scattered: 4000,
-    resolving: 3000,
-    resolved: 3000,
-    dissolving: 3000,
-  };
-  const PHASE_ORDER = ["scattered", "resolving", "resolved", "dissolving"];
-
-  function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  }
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-
-  let dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let width = 0;
-  let height = 0;
-  let points = [];
-  let curveControlPoints = null;
-  let phase = "scattered";
-  let phaseStart = performance.now();
-  let phaseDurations = { ...PHASE_DURATIONS_BASE };
-  let hiddenAt = null;
-  let rafId = null;
-  let contentBox = null;
-  let layoutRegion = null;
-
-  // Measures where .hero__content actually sits (in canvas-local, CSS
-  // pixel coordinates) so the animation can avoid it — rather than
-  // assuming it lives in a fixed fraction of the canvas width, which
-  // breaks down the moment the copy spans the full width at narrow
-  // viewports.
-  function computeContentBox() {
-    const contentEl = heroSection.querySelector(".hero__content");
-    if (!contentEl) {
-      contentBox = null;
-      return;
-    }
-    const heroRect = heroSection.getBoundingClientRect();
-    const rect = contentEl.getBoundingClientRect();
-    contentBox = {
-      left: rect.left - heroRect.left,
-      top: rect.top - heroRect.top,
-      right: rect.right - heroRect.left,
-      bottom: rect.bottom - heroRect.top,
-    };
-  }
-
-  // Picks the rectangle the animation is allowed to live in: beside the
-  // copy when there's real room there (desktop/tablet), or below it when
-  // there isn't (the copy spans the full width at narrow viewports) —
-  // so the curve and scattered points never render on top of the
-  // headline/body text regardless of layout.
-  function computeLayoutRegion() {
-    const margin = 24;
-    if (!contentBox) {
-      layoutRegion = { x0: width * 0.1, y0: height * 0.12, x1: width * 0.92, y1: height * 0.88 };
-      return;
-    }
-    const spaceRight = width - contentBox.right;
-    const spaceBelow = height - contentBox.bottom;
-    if (spaceRight > 200) {
-      layoutRegion = {
-        x0: contentBox.right + margin,
-        y0: height * 0.12,
-        x1: width - margin,
-        y1: height * 0.88,
-      };
-    } else {
-      const bandTop = contentBox.bottom + margin;
-      layoutRegion = {
-        x0: margin,
-        y0: bandTop,
-        x1: width - margin,
-        y1: Math.max(bandTop + 60, height - 16),
-      };
-    }
-  }
-
-  // x is weighted toward the far end of the available region (exponent
-  // skews the [0,1) random sample toward 1) so density stays low right
-  // at the region's near edge — i.e. closest to the copy.
-  function randomRegionPoint() {
-    const useBiased = Math.random() < 0.8;
-    const xFrac = useBiased ? 1 - Math.pow(Math.random(), 1.8) : Math.random();
-    const x = layoutRegion.x0 + xFrac * (layoutRegion.x1 - layoutRegion.x0);
-    const y = layoutRegion.y0 + Math.random() * (layoutRegion.y1 - layoutRegion.y0);
-    return { x, y };
-  }
-
-  function pointCountForArea(w, h) {
-    let count = Math.round((w * h) / 22000);
-    count = Math.max(18, Math.min(70, count));
-    if (w < 480) {
-      count = Math.max(10, Math.round(count * 0.5));
-    }
-    return count;
-  }
-
-  function randomizePhaseDurations() {
-    // Scales each phase by the same random factor so the ~4:3:3:3 ratio
-    // holds while the total cycle length varies (~12-16s) cycle to
-    // cycle, so the loop never feels perfectly metronomic.
-    const scale = 0.92 + Math.random() * 0.32;
-    phaseDurations = {
-      scattered: PHASE_DURATIONS_BASE.scattered * scale,
-      resolving: PHASE_DURATIONS_BASE.resolving * scale,
-      resolved: PHASE_DURATIONS_BASE.resolved * scale,
-      dissolving: PHASE_DURATIONS_BASE.dissolving * scale,
-    };
-  }
-
-  // Regenerates the ascending trend curve (4 cubic-bezier control points,
-  // left-to-right, y decreasing = trending up) with fresh random jitter,
-  // confined to layoutRegion — beside the copy or below it, whichever is
-  // actually free (see computeLayoutRegion).
-  function regenerateCurve() {
-    const regionW = layoutRegion.x1 - layoutRegion.x0;
-    const regionH = layoutRegion.y1 - layoutRegion.y0;
-    const leftX = layoutRegion.x0 + regionW * Math.random() * 0.08;
-    const rightX = layoutRegion.x1 - regionW * Math.random() * 0.06;
-    const baseY = layoutRegion.y1 - regionH * Math.random() * 0.08;
-    const topY = layoutRegion.y0 + regionH * Math.random() * 0.1;
-
-    curveControlPoints = [
-      { x: leftX, y: baseY },
-      {
-        x: lerp(leftX, rightX, 0.35 + (Math.random() - 0.5) * 0.15),
-        y: lerp(baseY, topY, 0.25 + (Math.random() - 0.5) * 0.2),
-      },
-      {
-        x: lerp(leftX, rightX, 0.7 + (Math.random() - 0.5) * 0.15),
-        y: lerp(baseY, topY, 0.7 + (Math.random() - 0.5) * 0.2),
-      },
-      { x: rightX, y: topY },
-    ];
-  }
-
-  function curvePoint(t) {
-    const [p0, p1, p2, p3] = curveControlPoints;
-    const mt = 1 - t;
-    const x =
-      mt * mt * mt * p0.x + 3 * mt * mt * t * p1.x + 3 * mt * t * t * p2.x + t * t * t * p3.x;
-    const y =
-      mt * mt * mt * p0.y + 3 * mt * mt * t * p1.y + 3 * mt * t * t * p2.y + t * t * t * p3.y;
-    return { x, y };
-  }
-
-  function randomDriftTarget(p) {
-    p.driftVX = (Math.random() - 0.5) * 6;
-    p.driftVY = (Math.random() - 0.5) * 6;
-  }
-
-  function createPoint() {
-    const { x, y } = randomRegionPoint();
-    const p = {
-      x,
-      y,
-      driftVX: 0,
-      driftVY: 0,
-      originX: x,
-      originY: y,
-      targetX: x,
-      targetY: y,
-      stagger: Math.random() * 0.3,
-      radius: 1.2 + Math.random() * 1.3,
-      jitter: (Math.random() - 0.5) * 10,
-    };
-    randomDriftTarget(p);
-    return p;
-  }
-
-  function buildPoints() {
-    const count = pointCountForArea(width, height);
-    points = Array.from({ length: count }, createPoint);
-  }
-
-  function assignCurveTargets() {
-    const ordered = [...points].sort((a, b) => a.x - b.x);
-    ordered.forEach((p, i) => {
-      const t = ordered.length === 1 ? 0.5 : i / (ordered.length - 1);
-      const curveXY = curvePoint(t);
-      p.targetX = curveXY.x + p.jitter;
-      p.targetY = curveXY.y + p.jitter * 0.4;
-      p.stagger = Math.random() * 0.3;
-    });
-  }
-
-  function beginResolving() {
-    points.forEach((p) => {
-      p.originX = p.x;
-      p.originY = p.y;
-    });
-    regenerateCurve();
-    assignCurveTargets();
-  }
-
-  function beginDissolving() {
-    points.forEach((p) => {
-      p.originX = p.x;
-      p.originY = p.y;
-      const target = randomRegionPoint();
-      p.targetX = target.x;
-      p.targetY = target.y;
-      p.stagger = Math.random() * 0.3;
-    });
-  }
-
-  function completeDissolve() {
-    points.forEach((p) => {
-      p.x = p.targetX;
-      p.y = p.targetY;
-      randomDriftTarget(p);
-    });
-    randomizePhaseDurations();
-  }
-
-  function updatePhase(now) {
-    const elapsed = now - phaseStart;
-    if (elapsed < phaseDurations[phase]) return;
-
-    const currentIndex = PHASE_ORDER.indexOf(phase);
-    const nextPhase = PHASE_ORDER[(currentIndex + 1) % PHASE_ORDER.length];
-    phaseStart = now;
-    phase = nextPhase;
-
-    if (phase === "resolving") beginResolving();
-    else if (phase === "dissolving") beginDissolving();
-    else if (phase === "scattered") completeDissolve();
-  }
-
-  function updatePoints(now, dt) {
-    const raw = Math.min(1, (now - phaseStart) / phaseDurations[phase]);
-
-    if (phase === "resolving" || phase === "dissolving") {
-      points.forEach((p) => {
-        const local = Math.max(0, Math.min(1, (raw - p.stagger) / (1 - p.stagger || 1)));
-        const eased = easeInOutCubic(local);
-        p.x = lerp(p.originX, p.targetX, eased);
-        p.y = lerp(p.originY, p.targetY, eased);
+  if (!prefersReducedMotion && !isDataSaverOrSlow) {
+    function attachSources(list) {
+      heroVideo.querySelectorAll("source").forEach((el) => el.remove());
+      list.forEach(({ src, type }) => {
+        const source = document.createElement("source");
+        source.src = src;
+        source.type = type;
+        heroVideo.appendChild(source);
       });
-    } else if (phase === "scattered") {
-      // Bounded by layoutRegion, not the raw canvas — otherwise a point
-      // could drift out of the free space and over the copy over the
-      // course of a long scattered phase.
-      const { x0, y0, x1, y1 } = layoutRegion;
-      points.forEach((p) => {
-        p.x += p.driftVX * dt;
-        p.y += p.driftVY * dt;
-        if (p.x < x0 || p.x > x1) p.driftVX *= -1;
-        if (p.y < y0 || p.y > y1) p.driftVY *= -1;
-        p.x = Math.max(x0, Math.min(x1, p.x));
-        p.y = Math.max(y0, Math.min(y1, p.y));
-      });
-    }
-    // "resolved" phase: points hold their curve position, no update needed.
-
-    return raw;
-  }
-
-  function lineFillAlpha(raw) {
-    if (phase === "scattered") return 0;
-    if (phase === "resolving") return MAX_ALPHA * easeInOutCubic(raw);
-    if (phase === "resolved") return MAX_ALPHA;
-    if (phase === "dissolving") return MAX_ALPHA * (1 - easeInOutCubic(raw));
-    return 0;
-  }
-
-  function pointAlpha(raw) {
-    const base = 0.08;
-    const peak = 0.16;
-    if (phase === "scattered") return base;
-    if (phase === "resolving") return lerp(base, peak, easeInOutCubic(raw));
-    if (phase === "resolved") return peak;
-    if (phase === "dissolving") return lerp(peak, base, easeInOutCubic(raw));
-    return base;
-  }
-
-  function draw(raw) {
-    ctx.clearRect(0, 0, width, height);
-
-    const lfAlpha = lineFillAlpha(raw);
-    if (lfAlpha > 0.002) {
-      const ordered = [...points].sort((a, b) => a.x - b.x);
-      const baselineY = Math.min(height - 4, layoutRegion.y1 + 20);
-
-      ctx.beginPath();
-      ordered.forEach((p, i) => {
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      });
-
-      const gradient = ctx.createLinearGradient(0, layoutRegion.y0, 0, baselineY);
-      gradient.addColorStop(0, hexToRgba(accent, lfAlpha * 0.55));
-      gradient.addColorStop(1, hexToRgba(accent, 0));
-
-      // Fill: continue the same path down to a baseline and back before
-      // filling, so the stroke above stays a clean single line.
-      const fillPath = new Path2D();
-      ordered.forEach((p, i) => {
-        if (i === 0) fillPath.moveTo(p.x, p.y);
-        else fillPath.lineTo(p.x, p.y);
-      });
-      fillPath.lineTo(ordered[ordered.length - 1].x, baselineY);
-      fillPath.lineTo(ordered[0].x, baselineY);
-      fillPath.closePath();
-      ctx.fillStyle = gradient;
-      ctx.fill(fillPath);
-
-      ctx.strokeStyle = hexToRgba(accentSecondary, lfAlpha);
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.stroke();
+      heroVideo.load();
     }
 
-    const pAlpha = pointAlpha(raw);
-    ctx.fillStyle = hexToRgba(accent, pAlpha);
-    points.forEach((p) => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fill();
+    // WebM/VP9 first (smaller, what Chrome/Firefox/Edge use), MP4/H.264
+    // second as the fallback every engine that plays video at all can
+    // decode.
+    attachSources([
+      { src: "assets/video/hero-bg.webm", type: "video/webm" },
+      { src: "assets/video/hero-bg.mp4", type: "video/mp4" },
+    ]);
+
+    let hasReachedCanplay = false;
+    heroVideo.addEventListener("canplay", () => {
+      hasReachedCanplay = true;
     });
-  }
 
-  // Colors in variables.css are plain hex (#3b82f6) — this only needs to
-  // support that one format, not a general-purpose color parser.
-  function hexToRgba(hex, alpha) {
-    const clean = hex.replace("#", "");
-    const r = parseInt(clean.substring(0, 2), 16);
-    const g = parseInt(clean.substring(2, 4), 16);
-    const b = parseInt(clean.substring(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }
-
-  function resizeCanvas() {
-    const rect = heroSection.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    computeContentBox();
-    computeLayoutRegion();
-    buildPoints();
-    if (phase === "resolving" || phase === "resolved" || phase === "dissolving") {
-      regenerateCurve();
-      assignCurveTargets();
-    }
-  }
-
-  let resizeTimer = null;
-  function onResize() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resizeCanvas, 180);
-  }
-
-  let lastFrameTime = performance.now();
-  function tick(now) {
-    const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
-    lastFrameTime = now;
-    updatePhase(now);
-    const raw = updatePoints(now, dt);
-    draw(raw);
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function drawStaticReducedMotionFrame() {
-    const rect = heroSection.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    computeContentBox();
-    computeLayoutRegion();
-    buildPoints();
-    regenerateCurve();
-    assignCurveTargets();
-    points.forEach((p) => {
-      p.x = p.targetX;
-      p.y = p.targetY;
-    });
-    // draw()'s alpha functions branch on `phase` — force it to "resolved"
-    // so the static frame actually shows the full-strength line + fill,
-    // not the (default) faint scattered-phase look.
-    phase = "resolved";
-    draw(1);
-  }
-
-  if (prefersReducedMotion) {
-    // A still resolved frame is a fine background on its own — the RAF
-    // loop (and the resize/visibility listeners it would need) never
-    // starts at all, since the motion itself is what needs consent.
-    drawStaticReducedMotionFrame();
-    return;
-  }
-
-  resizeCanvas();
-  window.addEventListener("resize", onResize);
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      hiddenAt = performance.now();
-      if (rafId !== null) cancelAnimationFrame(rafId);
-      rafId = null;
-    } else {
-      if (hiddenAt !== null) {
-        // Shift the phase clock forward by however long the tab was
-        // hidden, so the paused time doesn't count as elapsed animation
-        // time and the phase doesn't jump ahead on return.
-        const hiddenDuration = performance.now() - hiddenAt;
-        phaseStart += hiddenDuration;
-        hiddenAt = null;
+    // Explicit decode failure — drop straight to MP4-only rather than
+    // waiting out the stall timeout below.
+    heroVideo.addEventListener("error", () => {
+      if (heroVideo.currentSrc.endsWith(".mp4")) {
+        // Already on the fallback format and it still failed — give up
+        // and let the poster stand in permanently.
+        heroVideo.querySelectorAll("source").forEach((el) => el.remove());
+        heroVideo.removeAttribute("src");
+        return;
       }
-      lastFrameTime = performance.now();
-      rafId = requestAnimationFrame(tick);
-    }
-  });
+      attachSources([{ src: "assets/video/hero-bg.mp4", type: "video/mp4" }]);
+    });
 
-  rafId = requestAnimationFrame(tick);
-})();
+    // Silent stall — the source was accepted but never actually became
+    // playable (the WebM-claims-support-but-can't-decode-it case). Only
+    // retries once: if canplay hasn't fired within 4s and we're not
+    // already on the MP4 fallback, switch to it.
+    setTimeout(() => {
+      if (!hasReachedCanplay && !heroVideo.currentSrc.endsWith(".mp4")) {
+        attachSources([{ src: "assets/video/hero-bg.mp4", type: "video/mp4" }]);
+      }
+    }, 4000);
+  }
+}
 
 /* ==========================================================================
    ANIMATED STAT COUNTERS

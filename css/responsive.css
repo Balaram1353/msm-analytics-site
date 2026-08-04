@@ -92,8 +92,8 @@
 
 /* ===== HERO — more vertical breathing room once there's height to
    spare; still a single left-aligned copy column over the full-bleed
-   canvas animation (see style.css — the graphic column this used to
-   balance against is gone). ===== */
+   video (see style.css — the graphic column this used to balance
+   against is gone). ===== */
 @media (min-width: 1024px) {
   .hero {
     padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-16)) var(--space-12);

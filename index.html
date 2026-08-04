@@ -102,12 +102,35 @@
          HERO — built in Step 2
          ==================================================================== -->
     <section id="hero" class="hero">
-      <!-- Ambient background animation, drawn entirely in JS — no image or
-           video asset. Canvas-only decoration behind the copy; see
-           "HERO — scatter-to-trend canvas animation" in js/script.js for
-           the scatter/resolve/dissolve loop and its prefers-reduced-motion
-           fallback (a single static resolved frame, no RAF loop). -->
-      <canvas class="hero__canvas" id="hero-canvas" aria-hidden="true"></canvas>
+      <!-- Background video: "Aerial shot of calm blue sea"
+           Source: Mixkit (https://mixkit.co/free-stock-video/aerial-shot-of-calm-blue-sea-1080/)
+           Author: not individually credited on Mixkit (platform-published clip)
+           License: Mixkit Stock Video Free License — free for commercial and
+           personal use; attribution not required but appreciated.
+           https://mixkit.co/license/#videoFree
+           Downloaded and re-encoded locally (assets/video/hero-bg.mp4 /
+           .webm) rather than hotlinked — see README.md for full credit and
+           processing notes.
+
+           <source> elements are attached by script.js, not written here,
+           so prefers-reduced-motion / Save-Data / slow connections can
+           skip the network request entirely rather than just hiding a
+           video that already started downloading. The poster frame below
+           is what actually renders in all of those cases, and is also
+           the only thing that ever renders if the video errors out. -->
+      <video
+        class="hero__video"
+        id="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="assets/video/hero-poster.jpg"
+        aria-hidden="true"
+        tabindex="-1"
+      ></video>
+      <div class="hero__scrim" aria-hidden="true"></div>
 
       <div class="container hero__inner">
 
