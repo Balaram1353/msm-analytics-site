@@ -391,6 +391,25 @@ p {
   transition: box-shadow var(--transition-base);
 }
 
+/* Dims the rest of the page while the mobile menu is open. First child
+   of .navbar (see index.html) so it inherits the header's z-index:100
+   stacking context — no extra z-index math needed to sit above the
+   page but below the pill/panel, which paint after it in DOM order. */
+.navbar__scrim {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-scrim);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base) ease, visibility 0s linear var(--transition-base);
+}
+
+.navbar__scrim.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--transition-base) ease;
+}
+
 /* A slightly deeper shadow once scrolled, or while the mobile menu is
    open — a small "lift" cue. No background change needed here anymore;
    there's no transparency left to transition between. */
@@ -452,12 +471,12 @@ p {
   gap: var(--space-4);
 }
 
-/* Hidden by default (mobile) — below 480px there isn't reliably enough
-   room for the logo + this button + the hamburger to sit on one row
-   without overflowing (a 210px-ish button next to a ~135px logo and a
-   40px toggle doesn't fit in a ~330px available width). The identical
-   CTA lives inside the mobile dropdown instead (.navbar__menu-cta) below
-   that width. Restored at 480px+ in responsive.css. */
+/* Hidden by default (mobile/tablet) — below 768px the hamburger toggle
+   is still the primary nav affordance (it doesn't disappear until
+   980px), so a second CTA button competing for attention in the same
+   bar is confusing, not just tight on space. The identical CTA lives
+   inside the mobile dropdown instead (.navbar__menu-cta) below that
+   width. Restored at 768px+ in responsive.css. */
 .navbar__cta {
   display: none;
   /* Full-pill radius, matching the nav links right next to it — the
@@ -473,25 +492,39 @@ p {
 .navbar__nav {
   position: absolute;
   top: var(--navbar-height);
-  /* Cancels .navbar__inner's own padding-inline (space-6, not the
-     generic container padding — updated to match) so the panel bleeds
-     to the pill's own edges, matching the pill's width exactly rather
-     than the full viewport. */
-  left: calc(var(--space-6) * -1);
-  right: calc(var(--space-6) * -1);
+  /* Offsets are already relative to .navbar__inner's padding edge (its
+     nearest positioned ancestor), which is exactly the pill's own
+     width — 0/0 makes the panel match the pill's horizontal inset and
+     width exactly. (A previous version used a negative
+     calc(var(--space-6) * -1) here on the theory that it needed to
+     "cancel" .navbar__inner's padding — that's not how absolutely
+     positioned offsets work; they don't see the containing block's
+     padding as a constraint to begin with, so the negative offset was
+     pure overflow: the panel rendered 32px wider on each side than the
+     pill above it, bleeding off-screen at 375px.) */
+  left: 0;
+  right: 0;
   background-color: var(--color-surface);
   border-radius: 0 0 var(--radius-card) var(--radius-card);
   box-shadow: var(--shadow-md);
-  /* Same 0fr -> 1fr grid-row trick used for the FAQ accordion panels
-     (see the ===== FAQ ===== section below for the full rationale) —
-     used here instead of a guessed max-height because a fixed px value
-     (previously 320px) silently clips the panel once its real content
-     (6 links + the CTA row) runs taller, with no visual warning. This
-     version always animates to the content's true height. */
+  /* Height-fit and clearly bounded (not full-viewport): the panel sizes
+     to its own content (6 links + the in-panel CTA) via the same
+     0fr -> 1fr grid-row trick the FAQ accordion panels use, capped at
+     a max-height so it can never exceed the viewport on a very short
+     screen — it scrolls internally past that point instead of pushing
+     content off-screen. A dedicated scrim (.navbar__scrim, below)
+     covers the rest of the page so the boundary between "panel" and
+     "everything else" is a deliberate, dimmed edge instead of hero
+     content showing through the gap underneath. */
+  max-height: calc(100vh - var(--navbar-height) - var(--navbar-offset-top) * 2);
+  overflow-x: hidden;
+  overflow-y: auto; /* still "non-visible" for the grid auto-minimum-size
+    rule the 0fr collapse depends on (same mechanism overflow:hidden
+    provided before), but allows scrolling past max-height instead of
+    silently clipping content on a very short viewport. */
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  overflow: hidden;
   transition: grid-template-rows var(--transition-slow) ease, opacity var(--transition-base) ease;
 }
 

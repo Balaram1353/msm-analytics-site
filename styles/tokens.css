@@ -58,6 +58,8 @@
   --color-text-inverted-muted: #97a3b8;
   --color-border-inverted: rgba(255, 255, 255, 0.12);
   --color-border-inverted-strong: rgba(255, 255, 255, 0.3); /* hover state */
+  --color-scrim: rgba(11, 15, 25, 0.5); /* page-dimming overlay behind the
+    open mobile menu — --color-ground-inverted's navy at 50% */
 
   /* --------------------------------------------------------------------
      HERO-SPECIFIC EFFECTS — the scrim gradient stops were hand-tuned and

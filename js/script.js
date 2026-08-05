@@ -23,6 +23,7 @@
 const navbar = document.getElementById("navbar");
 const navToggle = document.getElementById("navbar-toggle");
 const navMenu = document.getElementById("navbar-nav");
+const navScrim = document.getElementById("navbar-scrim");
 
 /* --- Solid background once the user scrolls past a small threshold ---
    We read scroll position on every "scroll" event, which can fire dozens
@@ -65,6 +66,14 @@ function syncNavInert() {
   navMenu.inert = isCollapsedLayout && isClosed;
 }
 
+/* Every link inside the panel, in DOM order — the 6 nav links plus the
+   in-panel CTA (also an <a>). Queried fresh each time rather than cached,
+   same reasoning as the event-delegation click handler below: keeps
+   working automatically if the markup changes. */
+function getPanelFocusable() {
+  return Array.from(navMenu.querySelectorAll("a[href]"));
+}
+
 function openMobileMenu() {
   navMenu.classList.add("is-open");
   navToggle.classList.add("is-active");
@@ -75,16 +84,32 @@ function openMobileMenu() {
   // below a still-fully-transparent bar with nothing visually anchoring
   // it to a header.
   navbar.classList.add("is-menu-open");
+  navScrim.classList.add("is-open");
   syncNavInert();
+  // Move focus into the panel so a keyboard user lands somewhere inside
+  // it immediately, rather than staying on the toggle they just pressed
+  // (which would otherwise be the last thing announced, with the newly
+  // revealed content silently skipped over).
+  const [firstLink] = getPanelFocusable();
+  firstLink?.focus();
 }
 
-function closeMobileMenu() {
+/* returnFocus is false for the "clicked a link" path — the user's intent
+   there is to go wherever that link points, so yanking focus back to the
+   toggle right after would fight the browser's own anchor-jump behavior.
+   Every other close path (Escape, the toggle itself, outside/scrim
+   click) has no "elsewhere" the user was headed, so focus returns to the
+   control that opened the panel — standard expected behavior for any
+   dismissible menu/dialog. */
+function closeMobileMenu(returnFocus = true) {
   navMenu.classList.remove("is-open");
   navToggle.classList.remove("is-active");
   navToggle.setAttribute("aria-expanded", "false");
   document.body.classList.remove("no-scroll");
   navbar.classList.remove("is-menu-open");
+  navScrim.classList.remove("is-open");
   syncNavInert();
+  if (returnFocus) navToggle.focus();
 }
 
 desktopNavQuery.addEventListener("change", syncNavInert);
@@ -102,23 +127,50 @@ navToggle.addEventListener("click", () => {
    if links are ever added/removed from the markup later. */
 navMenu.addEventListener("click", (event) => {
   if (event.target.tagName === "A") {
+    closeMobileMenu(false);
+  }
+});
+
+/* Close on click outside the navbar entirely. The scrim lives inside
+   .navbar (see index.html) for z-index-stacking reasons, so a click on
+   it would otherwise count as "inside" by this check — handled as its
+   own explicit listener instead. */
+document.addEventListener("click", (event) => {
+  const isOpen = navMenu.classList.contains("is-open");
+  const clickedInsideNavbar = navbar.contains(event.target) && event.target !== navScrim;
+  if (isOpen && !clickedInsideNavbar) {
     closeMobileMenu();
   }
 });
 
-/* Close on click outside the navbar entirely. */
-document.addEventListener("click", (event) => {
-  const isOpen = navMenu.classList.contains("is-open");
-  const clickedInsideNavbar = navbar.contains(event.target);
-  if (isOpen && !clickedInsideNavbar) {
-    closeMobileMenu();
-  }
+navScrim.addEventListener("click", () => {
+  if (navMenu.classList.contains("is-open")) closeMobileMenu();
 });
 
 /* Close on Escape — standard expected behavior for any dismissible menu/dialog. */
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && navMenu.classList.contains("is-open")) {
     closeMobileMenu();
+  }
+});
+
+/* Focus trap: while the panel is open, Tab from its last focusable
+   element wraps to the first, and Shift+Tab from the first wraps to the
+   last — a keyboard user can't tab past the panel into the (dimmed,
+   scroll-locked) page behind it. Escape remains the way out for anyone
+   who doesn't want to cycle back around. */
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab" || !navMenu.classList.contains("is-open")) return;
+  const focusable = getPanelFocusable();
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 });
 

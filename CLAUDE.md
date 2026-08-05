@@ -40,6 +40,7 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
   --color-text-inverted-muted: #97a3b8;
   --color-border-inverted: rgba(255, 255, 255, 0.12);
   --color-border-inverted-strong: rgba(255, 255, 255, 0.3);
+  --color-scrim: rgba(11, 15, 25, 0.5);
 
   /* Hero-specific effects — the scrim gradient was hand-tuned and
      verified (dense sampling across the video, worst-case contrast

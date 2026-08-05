@@ -45,6 +45,14 @@
        HEADER / NAVBAR — built in Step 1
        ====================================================================== -->
   <header class="navbar" id="navbar">
+    <!-- Dims the rest of the page while the mobile menu is open. Lives
+         first inside .navbar (not appended to <body>) so it inherits
+         the header's own z-index:100 stacking context — sits below the
+         pill/panel (painted after it in DOM order) but above everything
+         outside .navbar, with no extra z-index math needed. Clicking it
+         closes the menu, same as clicking outside. -->
+    <div class="navbar__scrim" id="navbar-scrim"></div>
+
     <div class="container navbar__inner">
 
       <a href="#hero" class="navbar__logo">
@@ -65,10 +73,12 @@
           <li><a href="#about" class="navbar__link">About</a></li>
           <li><a href="#faq" class="navbar__link">FAQ</a></li>
           <li><a href="#contact" class="navbar__link">Contact</a></li>
-          <!-- Mobile/small-screen only — the persistent .navbar__cta in
-               .navbar__actions is hidden below 480px (not enough room
-               next to the logo + hamburger), so this gives small-screen
-               visitors the same CTA reachable via the dropdown instead. -->
+          <!-- Mobile/tablet only — the persistent .navbar__cta in
+               .navbar__actions is hidden below 768px (the hamburger is
+               still the primary nav action at that width; a second CTA
+               competing with it in the same bar is confusing), so this
+               gives those visitors the same CTA reachable via the
+               dropdown instead, as the last item. -->
           <li class="navbar__links-cta">
             <a href="#contact" class="btn btn--primary btn--sm navbar__menu-cta">Book a Strategy Call</a>
           </li>

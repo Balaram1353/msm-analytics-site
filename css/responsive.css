@@ -23,8 +23,13 @@
 
 /* ===== NAVBAR — swap the persistent header CTA for the identical
    in-dropdown CTA once there's enough width for the logo + button +
-   hamburger to sit on one row without crowding. ===== */
-@media (min-width: 480px) {
+   hamburger to sit on one row without crowding. Raised from 480px to
+   768px: below 768px the hamburger toggle is still the primary nav
+   affordance (it doesn't disappear until 980px, see below), so a
+   second, competing CTA button in the same bar reads as two actions
+   fighting for attention — the in-dropdown CTA is reachable via the
+   toggle instead. ===== */
+@media (min-width: 768px) {
   .navbar__cta {
     display: inline-flex;
   }
