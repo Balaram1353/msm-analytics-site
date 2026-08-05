@@ -1,0 +1,63 @@
+/* ==========================================================================
+   TOKENS.CSS — Design token contract (implementation)
+   ==========================================================================
+   Mirrors the token block in CLAUDE.md under "## Design tokens" exactly.
+   That block is the contract; this file is what actually ships. Keep them
+   in sync — if you change a value here, change it there too.
+
+   Self-hosted, latin-subset, variable woff2 files. No CDN request at
+   runtime, no unused unicode ranges (cyrillic/vietnamese/latin-ext
+   subsets were dropped at download time).
+   ========================================================================== */
+
+@font-face {
+  font-family: "Martian Mono";
+  src: url("../fonts/martian-mono-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Public Sans";
+  src: url("../fonts/public-sans-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Ground & ink */
+  --ground:      #EEF1F0;
+  --surface:     #F7F9F8;
+  --ink:         #12231F;
+  --caption:     #5B6B66;
+
+  /* Chart language */
+  --centerline:  #2B6E5B;  /* rail, CTA, in-control signal */
+  --band:        #C7DAD3;  /* confidence band fill, borders */
+  --flag:        #C22F39;  /* ALARM. The out-of-control point ONLY.
+                              Never a button. Max 1 use per viewport. */
+
+  /* Type */
+  --t-xs:   0.75rem;
+  --t-sm:   0.9375rem;
+  --t-base: 1.0625rem;
+  --t-md:   1.25rem;
+  --t-lg:   1.5rem;
+  --t-xl:   2rem;
+  --t-2xl:  2.75rem;
+
+  --font-display: "Martian Mono", ui-monospace, monospace;
+  --font-body:    "Public Sans", system-ui, sans-serif;
+
+  /* Spacing — 4px base. These values exist and no others. */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;  --s6: 24px;
+  --s8: 32px; --s12: 48px; --s16: 64px; --s24: 96px; --s32: 128px;
+
+  /* Rhythm */
+  --section-y:   var(--s24);
+  --section-max: 1140px;
+  --rail-x:      var(--s12);
+  --radius:      999px;  /* pills only. Cards use 4px. Nothing else. */
+}
