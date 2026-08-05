@@ -12,7 +12,7 @@
 
    As we build each section in later steps, that section's specific
    styles get appended to this file under a clearly commented heading,
-   e.g. "/* ===== HERO ===== */".
+   e.g. a "===== HERO =====" banner comment.
    ========================================================================== */
 
 /* --------------------------------------------------------------------
@@ -636,7 +636,7 @@ body.no-scroll {
 }
 
 /* ===== BACKGROUND VIDEO =====
-   Source: "Aerial shot of calm blue sea" — Mixkit (assets.mixkit.co),
+   Source: "Flowing Blue Lights in Motion" — Mixkit (assets.mixkit.co),
    downloaded (not hotlinked) under the Mixkit Stock Video Free License
    (free for commercial/personal use; attribution not required but
    appreciated — https://mixkit.co/license/#videoFree). Full credit and
@@ -651,35 +651,34 @@ body.no-scroll {
   height: 100%;
   z-index: 0;
   object-fit: cover;
-  /* Anchors the frame toward its upper portion (more open sky/horizon,
-     less of the close-up water at the very end of the loop) so the
-     crop stays visually calm at tall/narrow aspect ratios. */
-  object-position: center 30%;
+  object-position: center;
 }
 
 /* Dark scrim between the video and the text layer — heavier on the left
    where the copy sits, easing off toward the right so the video still
    reads as a video rather than just a dark panel. Alpha values here are
-   deliberately verified, not eyeballed: sampling the actual compressed
-   footage frame-by-frame, the lightest moment in the loop (the pale sky
-   near the start, ~rgb(116,146,178)) is the worst case for text
-   contrast. At 0.75 alpha (the lowest value inside the text column,
-   55-100% is outside it) that still blends to a contrast ratio of
-   12.4:1 for --color-text-inverted and 5.2:1 for
-   --color-text-inverted-muted against that lightest frame — comfortably
-   past the 3:1 (H1) / 4.5:1 (body) minimums with margin for the darker
-   frames only making it easier. Uses --color-bg-inverted as the tint so
-   it's the same "ink" as the rest of the site's dark surfaces. */
+   deliberately verified against the actual compressed footage, not
+   eyeballed: this clip is a soft glowing-light loop whose brightest
+   moments spike to near-white (~rgb 255) well inside the text column,
+   not just a uniformly dark background — a lighter scrim tuned only for
+   the average brightness would fail at those peaks. Sampling 38 frames
+   across the full loop at a grid of points inside the text column, 0.92
+   alpha (the lowest value inside that column — 55-100% is outside it)
+   still blends the brightest sampled pixel to a contrast ratio of
+   13.6:1 for --color-text-inverted and 5.7:1 for
+   --color-text-inverted-muted — comfortably past the 3:1 (H1) / 4.5:1
+   (body) minimums. Uses --color-bg-inverted as the tint so it's the
+   same "ink" as the rest of the site's dark surfaces. */
 .hero__scrim {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(
     to right,
-    rgba(11, 15, 25, 0.85) 0%,
-    rgba(11, 15, 25, 0.75) 55%,
-    rgba(11, 15, 25, 0.55) 75%,
-    rgba(11, 15, 25, 0.3) 100%
+    rgba(11, 15, 25, 0.92) 0%,
+    rgba(11, 15, 25, 0.88) 55%,
+    rgba(11, 15, 25, 0.65) 75%,
+    rgba(11, 15, 25, 0.35) 100%
   );
 }
 

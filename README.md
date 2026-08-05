@@ -101,16 +101,16 @@ real Calendly (or other scheduling) link.
 The hero section's background is a real downloaded video, not a hotlinked
 URL or a CSS/canvas effect:
 
-- **Clip**: "Aerial shot of calm blue sea"
-- **Source**: [Mixkit](https://mixkit.co/free-stock-video/aerial-shot-of-calm-blue-sea-1080/)
+- **Clip**: "Flowing Blue Lights in Motion"
+- **Source**: [Mixkit](https://mixkit.co/free-stock-video/flowing-blue-lights-in-motion-101442/)
 - **Author**: not individually credited on Mixkit (platform-published clip)
 - **License**: [Mixkit Stock Video Free License](https://mixkit.co/license/#videoFree)
   — free for commercial and personal use; attribution not required, but
   appreciated
 - **Files**: downloaded at 1920×1080 and re-encoded locally —
-  `assets/video/hero-bg.mp4` (H.264, ~2.1MB), `assets/video/hero-bg.webm`
-  (VP9, ~1.4MB, served first to browsers that support it), and
-  `assets/video/hero-poster.jpg` (first frame, ~72KB) as the poster/fallback
+  `assets/video/hero-bg.mp4` (H.264, ~2.2MB), `assets/video/hero-bg.webm`
+  (VP9, ~1.2MB, served first to browsers that support it), and
+  `assets/video/hero-poster.jpg` (first frame, ~26KB) as the poster/fallback
   image
 
 `js/script.js` only attaches `<source>` elements to the `<video>` (and
