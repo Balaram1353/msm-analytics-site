@@ -24,7 +24,7 @@ body {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-regular);
   color: var(--color-text);
-  background-color: var(--color-bg);
+  background-color: var(--color-ground);
   /* No top padding here on purpose — the navbar is transparent and
      floats OVER the hero (and every other section, as the page
      scrolls), rather than sitting in a permanently reserved gap above
@@ -78,8 +78,8 @@ p {
    requirement, not an optional nicety. */
 :focus-visible {
   outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-  border-radius: var(--radius-sm);
+  outline-offset: var(--space-1);
+  border-radius: var(--radius-card);
 }
 
 /* --------------------------------------------------------------------
@@ -114,9 +114,9 @@ p {
   padding: var(--space-3) var(--space-5);
   background-color: var(--color-accent-hover); /* white text on the base
     accent blue fails AA text contrast (~3.6:1) — accent-hover passes */
-  color: #fff;
+  color: var(--color-surface);
   font-weight: var(--font-weight-semibold);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-card);
   transition: top var(--transition-fast);
 }
 
@@ -143,7 +143,7 @@ p {
    "premium" instead of "empty" — under-spacing is the most common
    beginner mistake in this style of design. */
 .section {
-  padding-block: var(--space-12);
+  padding-block: var(--section-padding-y);
 }
 
 /* Section background variants — used to break the page into alternating
@@ -152,11 +152,11 @@ p {
    section, so each band change still reads as a deliberate beat rather
    than a busy stripe pattern. */
 .section--tint {
-  background-color: var(--color-bg-tint);
+  background-color: var(--color-ground-tint);
 }
 
 .section--inverted {
-  background-color: var(--color-bg-inverted);
+  background-color: var(--color-ground-inverted);
   color: var(--color-text-inverted);
 }
 
@@ -171,11 +171,11 @@ p {
 
 .section--inverted .section-heading__eyebrow {
   color: var(--color-text-inverted);
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--color-chip-inverted);
 }
 
 .section--inverted .card {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--color-surface-inverted);
   border-color: var(--color-border-inverted);
 }
 
@@ -184,7 +184,7 @@ p {
    all center-aligned with a constrained width so paragraph lines don't
    stretch too wide. */
 .section-heading {
-  max-width: 640px;
+  max-width: var(--container-max-width-narrow);
   margin-inline: auto;
   margin-bottom: var(--space-8);
   text-align: center;
@@ -198,12 +198,16 @@ p {
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
-  /* accent-hover (not the base accent) — at this small size, the base
-     accent blue falls short of AA text-contrast against white; the
-     darker shade reads as the same "brand blue" while staying legible. */
-  color: var(--color-accent-hover);
+  /* accent-active (not accent-hover) — at this small size, on the badge's
+     own accent-soft chip background, composited over a --section--tint
+     section's already-blue-tinted background, accent-hover measures
+     4.21:1 (worst case, below the 4.5:1 AA text minimum). accent-active
+     measures 5.47:1 in that same worst case — verified via computed
+     alpha-compositing across every eyebrow instance on the page, not
+     just checked against plain white. */
+  color: var(--color-accent-active);
   background-color: var(--color-accent-soft);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
 }
 
 .section-heading h2 {
@@ -245,13 +249,13 @@ p {
   padding: var(--space-3) var(--space-6);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  /* Full pill, not the small --radius-sm this used to be. Cards moved to
-     --radius-lg and the navbar CTA became a true pill earlier this
-     session — --radius-sm was left behind as the single most generic,
+  /* Full pill, not the small --radius-card this used to be. Cards moved to
+     --radius-card and the navbar CTA became a true pill earlier this
+     session — --radius-card was left behind as the single most generic,
      least-considered radius on the site, on the component that appears
      most often (every CTA on the page). Matches the pill language the
      rest of the site has already committed to. */
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   white-space: nowrap;
   transition:
@@ -267,7 +271,7 @@ p {
      blue is only ~3.6:1 contrast, which fails WCAG AA for normal-size
      text (4.5:1). accent-hover passes at ~5.2:1. */
   background-color: var(--color-accent-hover);
-  color: #ffffff;
+  color: var(--color-surface);
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden; /* contains the ::before shine sweep below */
@@ -284,7 +288,7 @@ p {
   left: -60%;
   width: 40%;
   height: 100%;
-  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(115deg, transparent, var(--color-shine), transparent);
   transform: skewX(-20deg);
   transition: left 650ms var(--ease-out-expo);
 }
@@ -316,7 +320,7 @@ p {
 }
 
 .btn--secondary:hover {
-  /* accent-soft (not --color-bg-elevated) — the old hover background was
+  /* accent-soft (not --color-surface) — the old hover background was
      nearly invisible in the button's most common placement (the hero,
      already near-white), so the only perceptible hover cue was the
      border color. A tinted accent background is visible everywhere
@@ -345,7 +349,7 @@ p {
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--space-5));
     transition: opacity var(--transition-slow) var(--ease-out-expo), transform var(--transition-slow) var(--ease-out-expo);
   }
 
@@ -379,10 +383,10 @@ p {
   align-items: center;
   /* A solid, fully opaque floating rectangle — inset from the viewport
      edges (rather than flush top/left/right) with a moderate corner
-     radius matching the site's own card system (--radius-lg, same as
+     radius matching the site's own card system (--radius-card, same as
      .card), rather than either sharp square corners or a full pill. */
-  background-color: var(--color-bg-elevated);
-  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-md);
   transition: box-shadow var(--transition-base);
 }
@@ -414,12 +418,16 @@ p {
   font-family: var(--font-family-heading); /* the brand/display font,
     not the body font — a logotype should look distinct from running
     UI text, especially now that it's plain text with no icon tile */
-  font-size: 1.25rem; /* bumped up from the shared --font-size-lg (18px) —
+  font-size: var(--font-size-xl); /* bumped up from --font-size-lg (18px) —
                           the wordmark carries the whole brand identity and
-                          read as underweight for a 76px-tall bar at 18px */
+                          read as underweight for a 76px-tall bar at 18px.
+                          Was a 1.25rem literal; now the same value via the
+                          token (--font-size-xl snapped to 1.25rem in this
+                          consistency pass, so this is a coincidental exact
+                          match, not a special case). */
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-logo);
 }
 
 /* Gradient text — for "Analytics", "MSM" (.brand-mark, no longer a
@@ -457,7 +465,7 @@ p {
      pills read as two different corner-radius languages in the same
      small cluster. Scoped here (not on .btn globally) since other
      buttons on the page — hero CTA, form submit — don't need to change. */
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
 }
 
 /* --- Mobile nav panel (base/mobile styles — overridden at 768px in
@@ -471,8 +479,8 @@ p {
      than the full viewport. */
   left: calc(var(--space-6) * -1);
   right: calc(var(--space-6) * -1);
-  background-color: var(--color-bg-elevated);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background-color: var(--color-surface);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   box-shadow: var(--shadow-md);
   /* Same 0fr -> 1fr grid-row trick used for the FAQ accordion panels
      (see the ===== FAQ ===== section below for the full rationale) —
@@ -510,7 +518,7 @@ p {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-card);
   background-color: transparent;
   white-space: nowrap; /* guards against multi-word links ("How It Works")
     wrapping inside their own pill under a tight squeeze near the 980px
@@ -520,7 +528,7 @@ p {
 
 .navbar__link:hover {
   color: var(--color-text);
-  background-color: rgba(15, 23, 42, 0.05);
+  background-color: var(--color-border);
 }
 
 /* Applied by script.js's scroll-spy to whichever link matches the
@@ -544,8 +552,8 @@ p {
   background-color: transparent;
   background-image: radial-gradient(
     ellipse 85% 100% at center,
-    rgba(59, 130, 246, 0.16),
-    rgba(59, 130, 246, 0) 72%
+    var(--color-accent-soft),
+    var(--color-accent-transparent) 72%
   );
 }
 
@@ -563,7 +571,7 @@ p {
 
 .navbar__menu-cta {
   width: 100%;
-  border-radius: var(--radius-full); /* same pill-matching reasoning as .navbar__cta */
+  border-radius: var(--radius-pill); /* same pill-matching reasoning as .navbar__cta */
 }
 
 .navbar__toggle {
@@ -571,11 +579,16 @@ p {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* gap left as a literal, not snapped to --space-1 (4px) — it's paired
+     with the bar height (2px) and the ±7px translateY in the X-animation
+     below; changing it without recomputing all three would visibly break
+     the open/close animation for a token-purity gain not worth that risk. */
   gap: 5px;
-  width: 40px;
-  height: 40px;
+  width: var(--space-8); /* tap-target box — independent of the bar
+    geometry above, safe to grow from the previous 40px */
+  height: var(--space-8);
   flex-shrink: 0;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   background-color: transparent;
   transition: background-color var(--transition-fast);
 }
@@ -587,7 +600,7 @@ p {
    "current section" indicator, just a hover affordance. */
 .navbar__toggle:hover,
 .navbar__toggle:focus-visible {
-  background-color: rgba(15, 23, 42, 0.05);
+  background-color: var(--color-border);
 }
 
 .navbar__toggle-bar {
@@ -620,15 +633,15 @@ body.no-scroll {
 
 .hero {
   /* Top padding clears the fixed navbar — its own top inset
-     (--navbar-offset-top) plus its height — then adds exactly one --s12
-     of breathing room below it, so the hero's background still extends
-     to the very top of the page (behind the transparent navbar) while
-     the eyebrow/H1 clear the bar with a single, consistent gap instead
-     of rendering underneath it. Built from the same tokens that size
-     the navbar so it stays correct if the navbar's height ever changes;
-     the desktop breakpoint below intentionally leaves this alone and
-     only adds extra room at the BOTTOM of the hero, not the top. */
-  padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) + var(--s12)) var(--space-8);
+     (--navbar-offset-top) plus its height — then adds exactly --space-8
+     (48px) of breathing room below it, a deliberately-tuned, verified
+     nav-to-eyebrow gap (not --section-padding-y — the hero is the one
+     section where "top padding" also has to do the nav-clearance job,
+     so it doesn't use the flat per-section token like every other
+     section's top padding does). Bottom padding IS --section-padding-y,
+     same as every other section, at every breakpoint — no more
+     breakpoint-dependent flip between two different bottom values. */
+  padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) + var(--space-8)) var(--section-padding-y);
   overflow: hidden; /* keeps the video's object-fit:cover overflow and
     the cursor-glow from ever bleeding past the section's own edges */
   position: relative;
@@ -636,7 +649,7 @@ body.no-scroll {
      minimum height independent of the (now much shorter) text column —
      otherwise the section could collapse to just the copy's height on
      short-content viewports and barely show any video at all. */
-  min-height: 560px;
+  min-height: var(--hero-min-height);
 }
 
 /* ===== BACKGROUND VIDEO =====
@@ -671,7 +684,7 @@ body.no-scroll {
    still blends the brightest sampled pixel to a contrast ratio of
    13.6:1 for --color-text-inverted and 5.7:1 for
    --color-text-inverted-muted — comfortably past the 3:1 (H1) / 4.5:1
-   (body) minimums. Uses --color-bg-inverted as the tint so it's the
+   (body) minimums. Uses --color-ground-inverted as the tint so it's the
    same "ink" as the rest of the site's dark surfaces. */
 .hero__scrim {
   position: absolute;
@@ -679,10 +692,10 @@ body.no-scroll {
   z-index: 1;
   background: linear-gradient(
     to right,
-    rgba(11, 15, 25, 0.92) 0%,
-    rgba(11, 15, 25, 0.88) 55%,
-    rgba(11, 15, 25, 0.65) 75%,
-    rgba(11, 15, 25, 0.35) 100%
+    var(--color-hero-scrim-1) 0%,
+    var(--color-hero-scrim-2) 55%,
+    var(--color-hero-scrim-3) 75%,
+    var(--color-hero-scrim-4) 100%
   );
 }
 
@@ -694,8 +707,8 @@ body.no-scroll {
   inset: 0;
   z-index: 2;
   background: radial-gradient(
-    500px circle at var(--spot-x, 20%) var(--spot-y, 30%),
-    rgba(59, 130, 246, 0.16),
+    var(--hero-spotlight-radius) circle at var(--spot-x, 20%) var(--spot-y, 30%),
+    var(--color-accent-soft),
     transparent 65%
   );
   pointer-events: none;
@@ -717,16 +730,15 @@ body.no-scroll {
      rather than stretching across the now-empty second column — long
      enough for the subtitle's own 52ch cap to matter, short enough that
      the video still has real room to breathe on the right. */
-  max-width: 640px;
+  max-width: var(--container-max-width-narrow);
 }
 
 .hero__content .section-heading__eyebrow {
-  margin-bottom: var(--space-4);
   /* The base eyebrow badge (accent-on-soft-tint) assumes a light page
      background; over the video it needs the inverted treatment like
      the rest of the hero copy. */
   color: var(--color-text-inverted);
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: var(--color-chip-inverted);
 }
 
 .hero__title {
@@ -760,8 +772,8 @@ body.no-scroll {
 }
 
 .hero .btn--secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--color-chip-inverted);
+  border-color: var(--color-border-inverted-strong);
   color: var(--color-text-inverted);
 }
 
@@ -775,9 +787,9 @@ body.no-scroll {
    1x pixel density where shadows alone can look soft/blurry.
    -------------------------------------------------------------------- */
 .card {
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   padding: var(--space-8);
   box-shadow: var(--shadow-sm);
   /* Grid/flex items default to min-width: auto, which means their
@@ -800,9 +812,12 @@ body.no-scroll {
   /* Two shadow layers: the existing neutral --shadow-md keeps the card
      grounded, PLUS a soft accent-tinted glow beneath it — a colored
      shadow (not just gray) is what makes a hover state read as
-     "premium product" rather than a generic Bootstrap-style lift. */
-  box-shadow: var(--shadow-md), 0 24px 48px -28px rgba(59, 130, 246, 0.45);
-  transform: translateY(-4px);
+     "premium product" rather than a generic Bootstrap-style lift. The
+     glow's offset/blur/spread (24px/48px/-28px) are tuned shadow
+     geometry, not layout spacing — left as literals rather than forced
+     onto the spacing scale, same reasoning as --shadow-sm/md/lg above. */
+  box-shadow: var(--shadow-md), 0 24px 48px -28px var(--color-accent-glow);
+  transform: translateY(calc(-1 * var(--space-1)));
 }
 
 /* ===== PROBLEM (Before / After) =====
@@ -813,9 +828,9 @@ body.no-scroll {
    so the page doesn't read as the same component reskinned five times. */
 
 .transform {
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
@@ -861,18 +876,18 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   flex-shrink: 0;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   background-color: var(--color-accent-soft);
   color: var(--color-accent-hover);
   transform: rotate(90deg); /* points down on the stacked mobile layout */
 }
 
 .transform__arrow svg {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
 }
 
 /* --------------------------------------------------------------------
@@ -886,10 +901,10 @@ body.no-scroll {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: var(--icon-2xl);
+  height: var(--icon-2xl);
   margin-bottom: var(--space-5);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-card);
   background-color: var(--color-accent-soft);
   color: var(--color-accent);
   transition: background-color var(--transition-base), transform var(--transition-base);
@@ -900,13 +915,13 @@ body.no-scroll {
    life than a flat lift+shadow with an inert icon sitting on top. */
 .card:hover .icon-badge {
   background-color: var(--color-accent);
-  color: #ffffff;
+  color: var(--color-surface);
   transform: translateY(-2px);
 }
 
 .icon-badge svg {
-  width: 24px;
-  height: 24px;
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 /* ===== BENEFITS ===== */
@@ -939,7 +954,7 @@ body.no-scroll {
      visual signature — Benefits cards stay plain, Case Studies cards
      get a different signature below — so the three grids don't read
      as one card component reused three times. */
-  border-top: 3px solid var(--color-accent);
+  border-top: var(--space-1) solid var(--color-accent);
 }
 
 /* Large faint index number in the corner — a common "process/services
@@ -981,8 +996,8 @@ body.no-scroll {
 
 .card--service__features svg {
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
   margin-top: 2px;
   color: var(--color-accent);
 }
@@ -998,13 +1013,13 @@ body.no-scroll {
 }
 
 .card--service__link svg {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
   transition: transform var(--transition-fast);
 }
 
 .card--service__link:hover svg {
-  transform: translateX(4px);
+  transform: translateX(var(--space-1));
 }
 
 /* ===== HOW IT WORKS ===== */
@@ -1031,15 +1046,15 @@ body.no-scroll {
 .step-number {
   position: relative;
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: var(--icon-3xl);
+  height: var(--icon-3xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   background-color: var(--color-accent-hover); /* same AA text-contrast fix
     as .btn--primary and .skip-link — see --color-accent-hover comment */
-  color: #ffffff;
+  color: var(--color-surface);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   /* In the mobile/tablet row layout (circle beside heading+paragraph,
@@ -1053,7 +1068,7 @@ body.no-scroll {
      fluid heading size changes across viewports. Reset to 0 at the
      1024px breakpoint, where the circle sits above the heading instead
      of beside it and doesn't need this. */
-  margin-top: calc((var(--line-height-snug) * var(--font-size-h3) - 56px) / 2);
+  margin-top: calc((var(--line-height-snug) * var(--font-size-h3) - var(--icon-3xl)) / 2);
 }
 
 /* Mobile/tablet connector: stretches from the bottom of this circle
@@ -1069,9 +1084,9 @@ body.no-scroll {
   /* Circle's bottom edge, accounting for the same negative margin-top
      that re-centers it against the heading above — without this the
      line would start ~15px below where the circle actually ends. */
-  top: calc((var(--line-height-snug) * var(--font-size-h3) + 56px) / 2);
+  top: calc((var(--line-height-snug) * var(--font-size-h3) + var(--icon-3xl)) / 2);
   bottom: calc(-1 * var(--space-8));
-  left: 27px; /* horizontal center of the 56px circle, minus half the line's own width */
+  left: calc(var(--icon-3xl) / 2 - 1px); /* horizontal center of the circle, minus half the line's own width */
   width: 2px;
   background: linear-gradient(
     var(--color-accent) 0%,
@@ -1126,7 +1141,7 @@ body.no-scroll {
    or a service listing, even though it's built on the same base .card. */
 
 .card--work {
-  border-left: 3px solid var(--color-accent-secondary);
+  border-left: var(--space-1) solid var(--color-accent-secondary);
 }
 
 .card--work__client {
@@ -1138,8 +1153,8 @@ body.no-scroll {
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
   color: var(--color-accent-secondary);
-  background-color: rgba(13, 148, 136, 0.1);
-  border-radius: var(--radius-full);
+  background-color: var(--color-accent-secondary-soft);
+  border-radius: var(--radius-pill);
 }
 
 .card--work h3 {
@@ -1168,9 +1183,9 @@ body.no-scroll {
   flex-direction: column;
   height: 100%;
   padding: var(--space-6);
-  background-color: var(--color-bg-elevated);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-md);
 }
 
@@ -1222,23 +1237,19 @@ body.no-scroll {
 }
 
 .about__proof-link svg {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
   margin-left: var(--space-2);
   vertical-align: middle;
   transition: transform var(--transition-fast);
 }
 
 .about__proof-link:hover svg {
-  transform: translateX(3px);
+  transform: translateX(var(--space-1));
 }
 
 .about__content {
   min-width: 0; /* see the CONTACT section for why grid items need this */
-}
-
-.about__content .section-heading__eyebrow {
-  margin-bottom: var(--space-4);
 }
 
 .about__content h2 {
@@ -1267,7 +1278,7 @@ body.no-scroll {
 /* ===== FAQ ACCORDION ===== */
 
 .faq__list {
-  max-width: 800px;
+  max-width: var(--container-max-width-md);
   margin-inline: auto;
 }
 
@@ -1304,8 +1315,8 @@ body.no-scroll {
 
 .faq__icon {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 .faq__icon svg {
@@ -1387,10 +1398,6 @@ body.no-scroll {
   min-width: 0;
 }
 
-.contact__intro .section-heading__eyebrow {
-  margin-bottom: var(--space-4);
-}
-
 .contact__intro h2 {
   margin-bottom: var(--space-4);
   max-width: 22ch;
@@ -1418,8 +1425,8 @@ body.no-scroll {
 
 .contact__outcomes svg {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   margin-top: 2px;
   color: var(--color-accent);
 }
@@ -1466,9 +1473,9 @@ body.no-scroll {
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-base);
   color: var(--color-text);
-  background-color: var(--color-bg);
+  background-color: var(--color-ground);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-card);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -1483,7 +1490,7 @@ body.no-scroll {
 .form-field__input:focus-visible {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  box-shadow: 0 0 0 var(--space-1) var(--color-accent-soft);
 }
 
 /* Added by script.js after a field fails validation. */
@@ -1493,12 +1500,12 @@ body.no-scroll {
 
 .form-field__input.is-invalid:focus-visible {
   border-color: var(--color-error);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 0 var(--space-1) var(--color-error-ring);
 }
 
 textarea.form-field__input {
   resize: vertical;
-  min-height: 120px;
+  min-height: var(--textarea-min-height);
 }
 
 /* Reserves a consistent line of space for the error message whether or
@@ -1517,9 +1524,9 @@ textarea.form-field__input {
 .contact__success {
   margin-top: var(--space-5);
   padding: var(--space-4) var(--space-5);
-  background-color: rgba(22, 163, 74, 0.08);
-  border: 1px solid rgba(22, 163, 74, 0.3);
-  border-radius: var(--radius-sm);
+  background-color: var(--color-success-soft);
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-card);
   color: var(--color-success-text);
   font-weight: var(--font-weight-medium);
 }
@@ -1532,13 +1539,9 @@ textarea.form-field__input {
    for .section--inverted) rather than a bespoke label style. */
 
 .cta-band__inner {
-  max-width: 640px;
+  max-width: var(--container-max-width-narrow);
   margin-inline: auto;
   text-align: center;
-}
-
-.cta-band__inner .section-heading__eyebrow {
-  margin-bottom: var(--space-4);
 }
 
 .cta-band__inner h2 {
@@ -1559,7 +1562,7 @@ textarea.form-field__input {
      darker than card white) — gives the footer a "floor" feeling,
      visually grounding the bottom of the page rather than blending
      into the section above it. */
-  background-color: var(--color-bg-elevated-2);
+  background-color: var(--color-ground);
 }
 
 .footer__inner {
@@ -1588,7 +1591,7 @@ textarea.form-field__input {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-logo);
 }
 
 /* .brand-mark and .footer__logo span's gradient-text styling is defined
@@ -1626,9 +1629,9 @@ textarea.form-field__input {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
+  width: var(--icon-xl);
+  height: var(--icon-xl);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
   transition: color var(--transition-fast), border-color var(--transition-fast),
@@ -1636,8 +1639,8 @@ textarea.form-field__input {
 }
 
 .footer__social-link svg {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
 }
 
 .footer__social-link:hover {

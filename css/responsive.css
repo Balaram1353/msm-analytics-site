@@ -72,8 +72,8 @@
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-1);
-    background-color: var(--color-bg-tint);
-    border-radius: var(--radius-full);
+    background-color: var(--color-ground-tint);
+    border-radius: var(--radius-pill);
     overflow: visible; /* undo the mobile collapse-animation hook so
       hover/focus states (pill highlight, focus rings) never clip */
   }
@@ -82,7 +82,7 @@
      highlight appearing never shifts layout. */
   .navbar__link {
     padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-pill);
   }
 
   .navbar__toggle {
@@ -90,17 +90,17 @@
   }
 }
 
-/* ===== HERO — more vertical breathing room at the BOTTOM once there's
-   height to spare; still a single left-aligned copy column over the
-   full-bleed video (see style.css — the graphic column this used to
-   balance against is gone). Top padding is intentionally NOT overridden
-   here — it stays the base rule's navbar-clearance + one --s12, so the
-   nav-to-eyebrow gap stays the same one unit at every breakpoint instead
-   of ballooning on wide viewports. ===== */
+/* ===== HERO — taller minimum height once there's viewport to spare, so
+   the video gets more room to breathe on desktop; still a single
+   left-aligned copy column over the full-bleed video (see style.css —
+   the graphic column this used to balance against is gone). Padding
+   itself is NOT overridden here anymore — top and bottom both already
+   come from style.css's base rule (nav-clearance + --space-8 on top,
+   --section-padding-y on bottom) and that's identical at every
+   breakpoint now, so there's nothing left for this query to add. ===== */
 @media (min-width: 1024px) {
   .hero {
-    padding-bottom: var(--space-12);
-    min-height: 680px;
+    min-height: var(--hero-min-height-lg);
   }
 }
 
@@ -118,7 +118,7 @@
 @media (min-width: 768px) {
   .transform__labels {
     display: grid;
-    grid-template-columns: 1fr 28px 1fr;
+    grid-template-columns: 1fr var(--icon-lg) 1fr;
     gap: var(--space-3);
     padding: var(--space-4) var(--space-6) 0;
   }
@@ -132,7 +132,7 @@
   }
 
   .transform__row {
-    grid-template-columns: 1fr 28px 1fr;
+    grid-template-columns: 1fr var(--icon-lg) 1fr;
   }
 
   .transform__arrow {
@@ -199,7 +199,7 @@
   .how-it-works__list::before {
     content: "";
     position: absolute;
-    top: 28px; /* vertical center of the 56px circle */
+    top: calc(var(--icon-3xl) / 2); /* vertical center of the circle */
     left: calc(100% / 6);
     right: calc(100% / 6);
     height: 2px;
