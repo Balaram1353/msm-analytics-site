@@ -619,12 +619,16 @@ body.no-scroll {
 /* ===== HERO ===== */
 
 .hero {
-  /* Top padding absorbs the navbar's height (now that body no longer
-     reserves that space globally) PLUS the section's own original
-     breathing room, so the hero's background still extends to the very
-     top of the page — behind the transparent navbar — while the H1
-     itself still clears the bar instead of rendering underneath it. */
-  padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-10)) var(--space-8);
+  /* Top padding clears the fixed navbar — its own top inset
+     (--navbar-offset-top) plus its height — then adds exactly one --s12
+     of breathing room below it, so the hero's background still extends
+     to the very top of the page (behind the transparent navbar) while
+     the eyebrow/H1 clear the bar with a single, consistent gap instead
+     of rendering underneath it. Built from the same tokens that size
+     the navbar so it stays correct if the navbar's height ever changes;
+     the desktop breakpoint below intentionally leaves this alone and
+     only adds extra room at the BOTTOM of the hero, not the top. */
+  padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) + var(--s12)) var(--space-8);
   overflow: hidden; /* keeps the video's object-fit:cover overflow and
     the cursor-glow from ever bleeding past the section's own edges */
   position: relative;

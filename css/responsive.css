@@ -90,13 +90,16 @@
   }
 }
 
-/* ===== HERO — more vertical breathing room once there's height to
-   spare; still a single left-aligned copy column over the full-bleed
-   video (see style.css — the graphic column this used to balance
-   against is gone). ===== */
+/* ===== HERO — more vertical breathing room at the BOTTOM once there's
+   height to spare; still a single left-aligned copy column over the
+   full-bleed video (see style.css — the graphic column this used to
+   balance against is gone). Top padding is intentionally NOT overridden
+   here — it stays the base rule's navbar-clearance + one --s12, so the
+   nav-to-eyebrow gap stays the same one unit at every breakpoint instead
+   of ballooning on wide viewports. ===== */
 @media (min-width: 1024px) {
   .hero {
-    padding-block: calc(var(--navbar-height) + var(--navbar-offset-top) * 2 + var(--space-16)) var(--space-12);
+    padding-bottom: var(--space-12);
     min-height: 680px;
   }
 }
