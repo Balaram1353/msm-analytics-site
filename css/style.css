@@ -194,7 +194,8 @@ p {
   display: inline-block;
   margin-bottom: var(--space-3);
   padding: var(--space-1) var(--space-3);
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
@@ -873,7 +874,8 @@ body.no-scroll {
 }
 
 .transform__label {
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
@@ -997,7 +999,7 @@ body.no-scroll {
   position: absolute;
   top: var(--space-5);
   right: var(--space-6);
-  font-family: var(--font-family-heading);
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-border-strong);
@@ -1088,6 +1090,7 @@ body.no-scroll {
   background-color: var(--color-accent-hover); /* same AA text-contrast fix
     as .btn--primary and .skip-link — see --color-accent-hover comment */
   color: var(--color-surface);
+  font-family: var(--font-family-mono);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   /* In the mobile/tablet row layout (circle beside heading+paragraph,
@@ -1181,7 +1184,8 @@ body.no-scroll {
   display: inline-block;
   margin-bottom: var(--space-4);
   padding: var(--space-1) var(--space-3);
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
@@ -1224,7 +1228,8 @@ body.no-scroll {
 
 .about__proof-eyebrow {
   margin-bottom: var(--space-5);
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
@@ -1238,11 +1243,16 @@ body.no-scroll {
 }
 
 .about__proof-value {
-  font-family: var(--font-family-heading);
+  /* Mono, not the heading face — these are read numerals (data), the
+     one place on the site the board's research maps directly. Tracking
+     reset to normal: --tracking-h3's negative value is tuned for
+     Space Grotesk's proportional letterforms and crowds monospace
+     digits, which already carry their own fixed, even spacing. */
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-stat);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--tracking-h3);
+  letter-spacing: normal;
   color: var(--color-accent-hover);
 }
 
