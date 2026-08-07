@@ -70,11 +70,16 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
   --shadow-lg: 0 4px 8px rgba(15, 23, 42, 0.04), 0 16px 40px rgba(15, 23, 42, 0.12);
   --shadow-drop-lg: 0 12px 28px rgba(15, 23, 42, 0.14);
 
-  /* Type — 2 families (unchanged; nothing to cut). 7-step static scale. */
+  /* Type — 3 families. Inter/Space Grotesk unchanged. --font-family-mono
+     is new and role-restricted: numerals, eyebrows, labels, metadata
+     only — never body copy or headings. 7-step static scale. h1/h2
+     ceilings raised — see "Audit notes" below. */
   --font-family-heading: "Space Grotesk", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
   --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
+    "Cascadia Mono", Menlo, Consolas, monospace;
 
   --font-size-xs: 0.8125rem;    /* 13px */
   --font-size-sm: 0.9375rem;    /* 15px */
@@ -84,10 +89,16 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
   --font-size-2xl: 1.5rem;      /* 24px — new step */
   --font-size-3xl: 1.75rem;     /* 28px — new step */
 
+  /* Same step as --font-size-xs — separate token because mono labels
+     are a distinct semantic role, not general small text, even though
+     the value coincides today. Pairs with --tracking-eyebrow at call
+     sites; no new tracking token. */
+  --font-size-mono-label: var(--font-size-xs);
+
   --font-size-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);   /* xl .. 2xl */
   --font-size-stat: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);  /* starts at 3xl */
-  --font-size-h2: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);  /* own display size, fluid */
-  --font-size-h1: clamp(2.25rem, 1.5rem + 2.4vw, 4rem);      /* own display size, fluid */
+  --font-size-h2: clamp(1.875rem, 1.5rem + 2.2vw, 3.5rem);   /* 30-56px, fluid, was 30-44px */
+  --font-size-h1: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);      /* 40-72px, fluid, was 36-64px */
 
   --line-height-tight: 1.1;
   --line-height-snug: 1.3;
@@ -177,6 +188,9 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
 - `--color-ground-tint` looked like a near-duplicate of `--color-ground` by hex value alone, but it's the `.section--tint` alternating-band background used across 4 of 9 sections — a deliberate rhythm device, not drift. Kept.
 - `--color-bg-elevated-2` (`#f1f5f9`, footer-only, single use, ~3-7 RGB points from `--color-ground`) had no comparable structural role — folded into `--color-ground`.
 - 5 different white-alpha overlays on dark backgrounds (0.04 / 0.1 / 0.12 / 0.3 / 0.35) turned out to be 4 different real roles (card surface, chip/hover background, border, border-hover, decorative shine) rather than one role drifting — kept as 4 named tokens instead of forcing one value that would flatten a real state distinction (e.g. hover no longer visibly brightening).
+- `--font-family-mono` (IBM Plex Mono) added per a competitive audit (`prototype/inspiration-board.md`) showing 7 of 11 surveyed data/AI sites use a dedicated mono face for numerals/eyebrows/labels. Scoped narrowly on purpose — mono is for data/metadata roles only, never body or headings, so it can't drift into a third display voice.
+- `--font-size-h1`'s ceiling went to 72px, not the 88px the same audit's raw range suggested. The audit also warned that oversized hero type over thin proof reads as "style covering for missing substance" unless real proof (logos, stats, a headline metric) sits in or just below the hero — and none of that exists as a ready-to-place element on this site yet. 72px is the type-only move; 88px is conditional on a separate, later task that actually surfaces proof near the hero.
+- `--font-size-mono-label` is a semantic alias for `--font-size-xs` (13px), not a new value — the mono-label role is distinct from general small text even though the number matches today.
 
 ## Known issues
 

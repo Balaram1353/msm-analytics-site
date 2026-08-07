@@ -101,18 +101,30 @@
   --shadow-drop-lg: 0 12px 28px rgba(15, 23, 42, 0.14);
 
   /* --------------------------------------------------------------------
-     TYPE — two families (Inter body, Space Grotesk heading — already
-     just 2, nothing to cut). 7-step static scale, snapped from the 10
-     distinct sizes the audit found (including one ad-hoc 1.25rem
-     literal on the navbar logo, now absorbed into --font-size-xl). The
-     4 existing fluid clamp() headings are kept — they're legitimately
-     responsive, not a redesign target — and their bounds now land
-     exactly on scale steps (h3: xl..2xl, stat starts at 3xl).
+     TYPE — three families. Inter (body) and Space Grotesk (heading) are
+     unchanged. The third, --font-family-mono, is new and deliberately
+     restricted in role: numerals, eyebrows, labels, and metadata only —
+     never body copy, never headings — so it reads as "this is data,"
+     not as a third competing display voice. Research basis: 7 of 11
+     sites surveyed in prototype/inspiration-board.md use a dedicated
+     mono face for exactly this role.
+
+     7-step static scale, snapped from the 10 distinct sizes the audit
+     found (including one ad-hoc 1.25rem literal on the navbar logo, now
+     absorbed into --font-size-xl). The 4 existing fluid clamp()
+     headings are kept — they're legitimately responsive, not a redesign
+     target — and their bounds land on scale steps (h3: xl..2xl, stat
+     starts at 3xl). h1/h2 ceilings raised per the inspiration board's
+     70-152px observed range — capped well under that range's top end;
+     see CLAUDE.md's audit notes for why 88px was rejected in favor of
+     72px this round.
      -------------------------------------------------------------------- */
   --font-family-heading: "Space Grotesk", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
   --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular,
+    "Cascadia Mono", Menlo, Consolas, monospace;
 
   --font-size-xs: 0.8125rem;    /* 13px */
   --font-size-sm: 0.9375rem;    /* 15px */
@@ -122,10 +134,17 @@
   --font-size-2xl: 1.5rem;      /* 24px — new step */
   --font-size-3xl: 1.75rem;     /* 28px — new step */
 
+  /* Same step as --font-size-xs (13px) — a separate token because mono
+     labels are a distinct semantic role (data/metadata), not general
+     small text, even though today's value happens to coincide. Pair
+     with the existing --tracking-eyebrow at call sites; no new tracking
+     token needed. */
+  --font-size-mono-label: var(--font-size-xs);
+
   --font-size-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);   /* xl .. 2xl */
   --font-size-stat: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);  /* starts at 3xl */
-  --font-size-h2: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);  /* own display size */
-  --font-size-h1: clamp(2.25rem, 1.5rem + 2.4vw, 4rem);      /* own display size */
+  --font-size-h2: clamp(1.875rem, 1.5rem + 2.2vw, 3.5rem);   /* 30px .. 56px, was 30-44px */
+  --font-size-h1: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);      /* 40px .. 72px, was 36-64px */
 
   --line-height-tight: 1.1;
   --line-height-snug: 1.3;
