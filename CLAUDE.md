@@ -177,3 +177,7 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
 - `--color-ground-tint` looked like a near-duplicate of `--color-ground` by hex value alone, but it's the `.section--tint` alternating-band background used across 4 of 9 sections — a deliberate rhythm device, not drift. Kept.
 - `--color-bg-elevated-2` (`#f1f5f9`, footer-only, single use, ~3-7 RGB points from `--color-ground`) had no comparable structural role — folded into `--color-ground`.
 - 5 different white-alpha overlays on dark backgrounds (0.04 / 0.1 / 0.12 / 0.3 / 0.35) turned out to be 4 different real roles (card surface, chip/hover background, border, border-hover, decorative shine) rather than one role drifting — kept as 4 named tokens instead of forcing one value that would flatten a real state distinction (e.g. hover no longer visibly brightening).
+
+## Known issues
+
+- **Navbar CLS (~0.001, pre-existing, not caused by the ASCII field work).** A full-page scroll-through with a `layout-shift` PerformanceObserver traces it to `navbar__nav` and `navbar__cta` — some navbar content shifts slightly after initial paint (font swap on the nav links/CTA button is the likely cause, unconfirmed). Small enough to not fail a CLS budget on its own, but real and worth root-causing separately. Do not bundle a fix into unrelated work — flagged here specifically so it doesn't get silently fixed as a side effect of something else.
