@@ -163,9 +163,19 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
   --hero-min-height-lg: 680px;   /* >=1024px */
   --textarea-min-height: 120px;
 
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
+  /* Duration only — no timing function baked in. CSS defaults to `ease`
+     automatically at any call site that doesn't append one; do not add
+     `ease` back after these. --ease-out-expo is the one timing-function
+     token — append it explicitly only where a call site wants that
+     specific curve. Never combine a token that already bundles a timing
+     function with an appended one (bare `ease` or --ease-out-expo) —
+     two timing-functions in one `transition` item is invalid shorthand
+     syntax, silently dropped to `all 0s ease 0s` with no warning. See
+     audit notes: this is exactly why .reveal and .stagger-word never
+     animated. */
+  --transition-fast: 150ms;
+  --transition-base: 250ms;
+  --transition-slow: 400ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   --z-navbar: 100;
@@ -191,7 +201,10 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
 - `--font-family-mono` (IBM Plex Mono) added per a competitive audit (`prototype/inspiration-board.md`) showing 7 of 11 surveyed data/AI sites use a dedicated mono face for numerals/eyebrows/labels. Scoped narrowly on purpose — mono is for data/metadata roles only, never body or headings, so it can't drift into a third display voice. Self-hosted like Inter/Space Grotesk, but static rather than variable (no variable build exists for this face): two weights only (600 SemiBold, 700 Bold — the only weights any mono-styled element actually uses), each subsetted to printable ASCII + en dash + curly apostrophe (`assets/fonts/ibm-plex-mono-{semibold,bold}.woff2`, ~4.6KB each vs ~140KB unsubsetted).
 - `--font-size-h1`'s ceiling went to 72px, not the 88px the same audit's raw range suggested. The audit also warned that oversized hero type over thin proof reads as "style covering for missing substance" unless real proof (logos, stats, a headline metric) sits in or just below the hero — and none of that exists as a ready-to-place element on this site yet. 72px is the type-only move; 88px is conditional on a separate, later task that actually surfaces proof near the hero.
 - `--font-size-mono-label` is a semantic alias for `--font-size-xs` (13px), not a new value — the mono-label role is distinct from general small text even though the number matches today.
+- **Found and fixed: `.reveal` (and everything that copied its pattern) never actually animated.** `transition: opacity var(--transition-slow) var(--ease-out-expo), ...` combined a token that already bundled a timing function (`--transition-slow` was `400ms ease`) with an appended second one — invalid shorthand syntax, silently dropped by the browser to `all 0s ease 0s`. Confirmed via `getComputedStyle().transitionDuration === "0s"` and real `transitionstart`/`transitionend` event timestamps (identical start/end times, not 400ms apart) on `.reveal` itself, not just the new `.stagger-word` that copied it. Six declarations were affected sitewide: `.reveal`, `.stagger-word`, `.navbar__scrim` (both rules), the mobile nav panel's `grid-template-rows` transition, and `.faq__panel`'s — meaning the mobile menu's open/close and the FAQ accordion's expand/collapse have also been snapping instantly, not animating, since they were built. Fixed at the token level, not per call site: `--transition-fast/base/slow` now hold duration only (see their contract note above); every already-valid call site (the ~19 that used a token alone) is unaffected, since CSS defaults to `ease` when no timing-function is given. Invisible in every screenshot taken across this entire project, because a 0-duration change still looks "changed" in a still frame — only real event-timestamp instrumentation caught it.
 
 ## Known issues
 
 - **Navbar CLS (~0.001, pre-existing, not caused by the ASCII field work).** A full-page scroll-through with a `layout-shift` PerformanceObserver traces it to `navbar__nav` and `navbar__cta` — some navbar content shifts slightly after initial paint (font swap on the nav links/CTA button is the likely cause, unconfirmed). Small enough to not fail a CLS budget on its own, but real and worth root-causing separately. Do not bundle a fix into unrelated work — flagged here specifically so it doesn't get silently fixed as a side effect of something else.
+- **Hero H1 word-stagger CLS: attribution corrected, not resolved.** Wrapping the hero H1's words in individual `.stagger-word` spans (per-word reveal) made an already-real reflow visible to CLS scoring for the first time — 6 of 8 cold 390px loads measured 0.054 (5.4x the 0.01 budget), traced via `PerformanceObserver` source attribution + `parentElement` chain to `hero > H1.hero__title`. Plain text reflow has no per-word element for the Layout Instability API to attribute a box-position change to, so the same underlying reflow was already happening pre-Step-4 and simply wasn't measurable — confirmed by disabling the word-wrapping entirely on disk (not just via CSS override) and reproducing the pre-existing ~0.00004 baseline exactly. The `document.fonts.ready` gate in `script.js` (word-wrapping doesn't run until the real font has settled, 2s safety-timeout fallback) makes this **attribution correction**, not a fix: 16/16 runs (8 cold-390, 4 warm-390, 4 cold-1440) back at baseline after the gate, but the gate only controls *when the CLS-sensitive span structure exists relative to the swap* — it does nothing to the swap itself.
+- **Space Grotesk preload: reflow reduced, separately from the above.** `index.html` preloads only `space-grotesk-variable.woff2` (the one display face used above the fold — not Inter, not IBM Plex Mono, to avoid early-bandwidth competition). Verified via direct geometric probing (a `Range`/span rect check on the word "can" in the hero H1, independent of CLS scoring): without preload, a genuine line-change reflow (different `left`, ~44px `top` delta — not the animation's own 8px `translateY`) reproduced in 1 of 6 cold runs; with preload, 0 of 10. This is a different claim from the gate above — the gate hides the reflow from CLS if it still happens after reveal; the preload actually shrinks the swap window that causes it. Both are real, independent effects; neither substitutes for the other.

@@ -25,6 +25,18 @@
        404 in the console). Swap for a real brand favicon later. -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><text x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
 
+  <!-- Preloads ONLY the display face used above the fold (the hero H1,
+       Space Grotesk) — not Inter, not IBM Plex Mono. Preloading every
+       self-hosted font would make them compete for early bandwidth and
+       lose the one that actually matters for first paint. This is what
+       actually shortens the fallback-to-webfont swap window (the root
+       cause); the document.fonts.ready gate in script.js is a separate
+       fix for a separate problem — it stops the swap's reflow from
+       being visible to layout-shift scoring if it still happens to land
+       after the hero has already revealed, it doesn't make the swap
+       itself faster. See CLAUDE.md. -->
+  <link rel="preload" href="assets/fonts/space-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin>
+
   <!-- Load order matters: reset first (neutralize browser defaults),
        then fonts (so variables.css can reference the families), then
        variables (design tokens), then base/layout styles, then

@@ -269,6 +269,103 @@ if (prefersReducedMotion) {
 }
 
 /* ==========================================================================
+   PER-WORD HEADING STAGGER
+   ==========================================================================
+   Every section-level heading (hero's H1 + every section's H2 — 10 total)
+   gets its words wrapped in individual spans, each with its own
+   transition-delay, so the heading resolves in word-by-word rather than
+   as one fade-up block. This only prepares the DOM — the actual reveal
+   is the SAME ".reveal.is-visible" mechanism above (see style.css); no
+   second observer, no new trigger.
+
+   Gated on document.fonts.ready — measured, not assumed: on a cold load,
+   wrapping words into individually-tracked <span> boxes made an
+   already-real font-swap reflow (Space Grotesk isn't preloaded, so it
+   swaps in over the fallback font) visible to the Layout Instability API
+   in a way plain text never was. Waiting for fonts avoids the API ever
+   seeing that reflow happen AFTER the spans exist — it does not remove
+   the reflow itself, only the window where the more sensitive span
+   structure is on screen while it happens. See CLAUDE.md.
+
+   Ordering risk: the hero's .reveal can fire (IntersectionObserver sees
+   it immediately, since it's in the first viewport) BEFORE fonts.ready
+   resolves on a slow connection. A span born into an already-.is-visible
+   ancestor would compute straight to its end state with no prior frame
+   to transition from, so the animation would silently never play —
+   content stays visible, but the effect is gone exactly where first
+   impressions matter most. Handled explicitly below: if that ancestor is
+   already revealed at wrap time, force the pre-reveal frame, flush it,
+   then hand back to the CSS cascade on the next frame so the transition
+   still fires.
+
+   Skipped entirely under prefers-reduced-motion — no spans are ever
+   created, so the heading's plain text renders exactly as authored, with
+   no animation and no exception to carve out.
+   ========================================================================== */
+
+if (!prefersReducedMotion) {
+  const staggerHeadings = document.querySelectorAll("main h1, main h2");
+  const WORD_DELAY_MS = 80; // same increment as .reveal-group's card stagger
+  const FONTS_READY_TIMEOUT_MS = 2000; // matches the hero video's existing fallback-timeout pattern
+
+  function wrapHeadingWords(heading) {
+    const words = heading.textContent.trim().split(/\s+/);
+    const fragment = document.createDocumentFragment();
+    const spans = [];
+
+    words.forEach((word, i) => {
+      const span = document.createElement("span");
+      span.className = "stagger-word";
+      span.textContent = word;
+      span.style.transitionDelay = `${i * WORD_DELAY_MS}ms`;
+      fragment.appendChild(span);
+      spans.push(span);
+      // Real space text node between words (skipped after the last one) —
+      // keeps line-wrapping identical to plain text. Spans with no
+      // separator between them would run words together with no
+      // breakable point for the browser's line-wrapping to use.
+      if (i < words.length - 1) {
+        fragment.appendChild(document.createTextNode(" "));
+      }
+    });
+
+    const alreadyRevealed = heading.closest(".reveal.is-visible");
+    if (alreadyRevealed) {
+      // Force the pre-reveal frame explicitly — see the ordering-risk
+      // note above.
+      spans.forEach((span) => {
+        span.style.opacity = "0";
+        span.style.transform = "translateY(var(--space-2))";
+      });
+    }
+
+    // Built off-DOM, then written in ONE swap (replaceChildren) — not a
+    // clear-then-loop-append. Two separate mutations (empty the heading,
+    // then rebuild it word by word) leaves a real intermediate
+    // empty-heading state that briefly changes the block's height, which
+    // is itself a genuine layout shift.
+    heading.replaceChildren(fragment);
+
+    if (alreadyRevealed) {
+      void heading.offsetHeight; // force layout so the forced frame above actually commits
+      requestAnimationFrame(() => {
+        spans.forEach((span) => {
+          span.style.opacity = "";
+          span.style.transform = "";
+        });
+      });
+    }
+  }
+
+  Promise.race([
+    document.fonts.ready,
+    new Promise((resolve) => setTimeout(resolve, FONTS_READY_TIMEOUT_MS)),
+  ]).then(() => {
+    staggerHeadings.forEach(wrapHeadingWords);
+  });
+}
+
+/* ==========================================================================
    FAQ ACCORDION
    ==========================================================================
    One click listener on the shared container (event delegation) instead

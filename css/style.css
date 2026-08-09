@@ -369,6 +369,25 @@ p {
   .reveal-group > *:nth-child(2) { transition-delay: 80ms; }
   .reveal-group > *:nth-child(3) { transition-delay: 160ms; }
   .reveal-group > *:nth-child(4) { transition-delay: 240ms; }
+
+  /* Per-word stagger on section-level headings (hero's H1 + every
+     section's H2 — script.js wraps each word in a .stagger-word span on
+     load and sets its own transition-delay; this block only defines the
+     before/after state). Same trigger as .reveal above — no second
+     observer — and the same two properties (opacity, transform): CLS is
+     a hard budget here, not a style preference, so nothing here ever
+     touches layout-affecting properties. */
+  .stagger-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(var(--space-2));
+    transition: opacity var(--transition-slow) var(--ease-out-expo), transform var(--transition-slow) var(--ease-out-expo);
+  }
+
+  .reveal.is-visible .stagger-word {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ===== NAVBAR ===== */

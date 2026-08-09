@@ -234,11 +234,27 @@
   --textarea-min-height: 120px;
 
   /* --------------------------------------------------------------------
-     TRANSITIONS
-     -------------------------------------------------------------------- */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
+     TRANSITIONS — contract: these three are DURATION ONLY. No timing
+     function baked in. CSS's own default (`ease`) applies automatically
+     at any call site that doesn't append one — `transition: opacity
+     var(--transition-base);` is already complete and valid, do not add
+     `ease` after it. --ease-out-expo is the one timing-function token;
+     append it explicitly ONLY where a call site wants that specific
+     curve instead of the default (`transition: opacity
+     var(--transition-slow) var(--ease-out-expo)`).
+
+     Do not reintroduce a timing function into --transition-fast/base/
+     slow's own value — combining a token that already bundles one with
+     an appended timing-function (bare `ease` or --ease-out-expo)
+     produces two timing-functions in one `transition` item, which is
+     invalid shorthand syntax. The browser doesn't warn; it silently
+     drops the whole declaration to `all 0s ease 0s`, so the element
+     never animates at all and nothing in a screenshot reveals it — this
+     exact mistake is why .reveal and .stagger-word never actually
+     animated until this was caught. See CLAUDE.md's audit notes. */
+  --transition-fast: 150ms;
+  --transition-base: 250ms;
+  --transition-slow: 400ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* --------------------------------------------------------------------
