@@ -1677,7 +1677,39 @@ textarea.form-field__input {
    the contact form. Reuses .section-heading__eyebrow (already themed
    for .section--inverted) rather than a bespoke label style. */
 
+/* A closing echo of the hero's own glow, not a second hero: static (no
+   mouse-tracking custom properties, unlike .hero::before), a tighter
+   falloff than the hero's spotlight, and --color-accent-glow instead of
+   --color-accent-soft — reuses --hero-spotlight-radius rather than a
+   new size token, letting the transparent-stop percentage do the work
+   of keeping it contained instead of a second radius value. That
+   percentage is relative to the same 500px circle at every width, so
+   it needed its own breakpoint: --hero-spotlight-radius is tuned as
+   atmosphere for a full-viewport hero, and at 390px width the same
+   circle is most of the section - transparent 40% (below) is the
+   desktop value, scoped to a min-width query in responsive.css; this
+   base/mobile value is deliberately tighter. */
+.cta-band {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    var(--hero-spotlight-radius) circle at 50% 20%,
+    var(--color-accent-glow),
+    transparent 18%
+  );
+  pointer-events: none;
+}
+
 .cta-band__inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--container-max-width-narrow);
   margin-inline: auto;
   text-align: center;

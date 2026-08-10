@@ -229,6 +229,22 @@
   }
 }
 
+/* ===== CTA BAND ===== */
+
+/* The mobile transparent-stop (18%, style.css) is tuned for --hero-
+   spotlight-radius's 500px circle against a ~390px section; at 768px+
+   the section is wide enough that the circle no longer dominates it,
+   so this restores the wider 40% falloff. */
+@media (min-width: 768px) {
+  .cta-band::before {
+    background: radial-gradient(
+      var(--hero-spotlight-radius) circle at 50% 20%,
+      var(--color-accent-glow),
+      transparent 40%
+    );
+  }
+}
+
 /* ===== CONTACT ===== */
 
 /* Job Title + Company side by side — this only needs the FORM COLUMN
