@@ -1184,9 +1184,10 @@ body.no-scroll {
   border-radius: var(--radius-pill);
   background-color: var(--color-accent-hover); /* same AA text-contrast fix
     as .btn--primary and .skip-link — see --color-accent-hover comment */
+  box-shadow: var(--shadow-md);
   color: var(--color-surface);
   font-family: var(--font-family-mono);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-extrabold);
   font-size: var(--font-size-lg);
   /* In the mobile/tablet row layout (circle beside heading+paragraph,
      align-items: flex-start), a plain top-align leaves the circle's
@@ -1200,6 +1201,21 @@ body.no-scroll {
      1024px breakpoint, where the circle sits above the heading instead
      of beside it and doesn't need this. */
   margin-top: calc((var(--line-height-snug) * var(--font-size-h3) - var(--icon-3xl)) / 2);
+}
+
+/* Soft halo behind the circle — same token the eyebrow badges use for
+   their own tint — so the numeral (the one thing unique to this section)
+   gets more presence without adding a surface behind the copy next to
+   it, which is exactly what the rest of this section deliberately
+   avoids. Sits behind the circle (z-index: -1 within .step-number's own
+   stacking context, established by its position: relative). */
+.step-number::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--space-2));
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-pill);
+  z-index: -1;
 }
 
 /* Mobile/tablet connector: stretches from the bottom of this circle
@@ -1217,8 +1233,8 @@ body.no-scroll {
      line would start ~15px below where the circle actually ends. */
   top: calc((var(--line-height-snug) * var(--font-size-h3) + var(--icon-3xl)) / 2);
   bottom: calc(-1 * var(--space-8));
-  left: calc(var(--icon-3xl) / 2 - 1px); /* horizontal center of the circle, minus half the line's own width */
-  width: 2px;
+  left: calc(var(--icon-3xl) / 2 - (var(--space-1) / 2)); /* horizontal center of the circle, minus half the line's own width */
+  width: var(--space-1);
   background: linear-gradient(
     var(--color-accent) 0%,
     var(--color-accent-secondary) 50%,
