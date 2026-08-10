@@ -394,19 +394,39 @@ p {
 
 .navbar {
   position: fixed;
-  top: var(--navbar-offset-top);
+  /* Flush with the viewport top — not inset like the sides/bottom corners
+     (see below). The inset used to run on all four sides, leaving a real
+     gap - full viewport width, y:0 to the pill's own top edge - with
+     nothing behind it, so scrolling content passed straight through
+     instead of disappearing behind the bar (reproduced: a heading's top
+     edge visible above the pill mid-scroll, confirmed via
+     getBoundingClientRect - not a z-index/stacking bug, the pill's own
+     rectangle occludes correctly, the exposure was purely the margin
+     outside it). A same-color backdrop element was tried first and
+     rejected: it read as a hard-edged white band cutting across the
+     hero's video at scroll 0. Going flush at the top removes the gap
+     entirely instead of covering it, which also removes that seam - the
+     pill's own background now starts exactly at y:0, so there's nothing
+     left to backdrop. Confirmed the video peeking through that top gap
+     at scroll 0 wasn't a deliberate detail worth preserving: stashing
+     this fix and checking scroll=300 showed the hero's own H1 leaking
+     through the same gap, so it was always this bug, just coincidentally
+     showing plain video texture instead of text at the exact top of the
+     page. Left/right/bottom insets are unaffected - much lower risk,
+     since .container's own padding + max-width already keeps text well
+     clear of the side edges at every width this site supports. */
+  top: 0;
   left: var(--navbar-offset-top);
   right: var(--navbar-offset-top);
   z-index: var(--z-navbar);
   height: var(--navbar-height);
   display: flex;
   align-items: center;
-  /* A solid, fully opaque floating rectangle — inset from the viewport
-     edges (rather than flush top/left/right) with a moderate corner
-     radius matching the site's own card system (--radius-card, same as
-     .card), rather than either sharp square corners or a full pill. */
   background-color: var(--color-surface);
-  border-radius: var(--radius-card);
+  /* Square top corners (flush with the viewport edge), rounded bottom
+     corners (--radius-card, matching the site's card system) — half a
+     pill instead of a full one, now that the top edge isn't floating. */
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   box-shadow: var(--shadow-md);
   transition: box-shadow var(--transition-base);
 }
