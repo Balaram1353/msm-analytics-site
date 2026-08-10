@@ -830,6 +830,45 @@ body.no-scroll {
   color: var(--color-text-inverted);
 }
 
+/* One number from About's stat band, duplicated for visitors who never
+   scroll that far — see .about__stats. Deliberately plain inline text,
+   not a chip: a badge reads as decoration, and the whole point is that
+   this number arrives with where-it-came-from attached, like a
+   citation would, not styled as another piece of hero chrome. */
+.hero__proof {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-inverted-muted);
+}
+
+.hero__proof-value {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+  /* --color-accent, not --color-accent-hover — the hover shade is tuned
+     for text on a light surface; against the hero's dark video it's the
+     brighter base accent that keeps enough contrast to read as a link. */
+  color: var(--color-accent);
+}
+
+.hero__proof svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  vertical-align: middle;
+  transition: transform var(--transition-fast);
+}
+
+.hero__proof:hover {
+  color: var(--color-text-inverted);
+}
+
+.hero__proof:hover svg {
+  transform: translateX(var(--space-1));
+}
+
 /* --------------------------------------------------------------------
    CARD COMPONENT
    --------------------------------------------------------------------

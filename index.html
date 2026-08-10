@@ -169,6 +169,18 @@
             <a href="#contact" class="btn btn--primary">Book a Strategy Call</a>
             <a href="#services" class="btn btn--secondary">Explore Services</a>
           </div>
+
+          <!-- A light duplicate of one number from About's stat band
+               (see .about__stats), for visitors who never scroll past
+               the hero. Reads as a citation (number + source), not a
+               badge — no chip background, no pill shape — and links to
+               the specific case study that earned the figure rather
+               than the section in general. -->
+          <a href="#case-study-zywave" class="hero__proof">
+            <span class="hero__proof-value">19&ndash;30% MAPE</span>
+            <span class="hero__proof-label">Zywave, segmented premium models</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
 
       </div>
@@ -417,7 +429,7 @@
             <p>Built a Bayesian model that scores each candidate cause — like excessive speed — behind a vehicle accident from pre-accident telemetry, replacing a single black-box verdict with an explainable probability breakdown.</p>
           </article>
 
-          <article class="card card--work reveal">
+          <article class="card card--work reveal" id="case-study-zywave">
             <span class="card--work__client">Zywave</span>
             <h3>Multi-State Insurance Premium Prediction</h3>
             <p>Built four segmented premium-prediction models — three state-specific plus one general — achieving 19–30% MAPE, with hands-on AWS SageMaker expertise to train and deploy models like this in production.</p>
