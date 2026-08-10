@@ -305,7 +305,13 @@ if (prefersReducedMotion) {
 
 if (!prefersReducedMotion) {
   const staggerHeadings = document.querySelectorAll("main h1, main h2");
-  const WORD_DELAY_MS = 80; // same increment as .reveal-group's card stagger
+  // Deliberately decoupled from .reveal-group's 80ms card stagger (style.css):
+  // a heading is one reading unit where delay blocks comprehension of the
+  // whole sentence, so longer headings (the hero's is 10 words) drag past
+  // 1s before the last word resolves. A card grid is a handful (<=4) of
+  // spatially distinct objects, so 80ms reads as a cascade, not a delay to
+  // legibility. See CLAUDE.md Known Issues / frame test.
+  const WORD_DELAY_MS = 40;
   const FONTS_READY_TIMEOUT_MS = 2000; // matches the hero video's existing fallback-timeout pattern
 
   function wrapHeadingWords(heading) {
