@@ -117,15 +117,12 @@
 }
 
 /* ===== PROBLEM (transformation list) — rows go from stacked
-   before/arrow/after to a single horizontal line, and the column
-   labels above the list become visible now that there's a genuine
-   2-column layout for them to label. ===== */
+   before/arrow/after to a single horizontal line, and the 2-column
+   label header (visible at every breakpoint now, see style.css) widens
+   to 3 columns to line up over the now-horizontal arrow column. ===== */
 @media (min-width: 768px) {
   .transform__labels {
-    display: grid;
     grid-template-columns: 1fr var(--icon-lg) 1fr;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-6) 0;
   }
 
   .transform__label--after {
@@ -133,7 +130,6 @@
                         (there's no label over the arrow column), so this
                         must be pinned explicitly or auto-placement would
                         put it in column 2, under the arrow. */
-    text-align: right;
   }
 
   .transform__row {
@@ -142,10 +138,6 @@
 
   .transform__arrow {
     transform: none;
-  }
-
-  .transform__after {
-    text-align: right;
   }
 }
 

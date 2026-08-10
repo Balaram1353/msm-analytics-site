@@ -889,7 +889,16 @@ body.no-scroll {
 }
 
 .transform__labels {
-  display: none; /* shown at the tablet+ breakpoint once rows go 2-column */
+  /* Visible at every breakpoint — this is the only explicit "before vs.
+     after" text in the section; without it, mobile had nothing but a
+     rotated arrow glyph and a font-weight difference to signal
+     direction. 2-column here; the tablet+ breakpoint (responsive.css)
+     widens this to 3 columns to line up with the arrow column once rows
+     go horizontal. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6) 0;
 }
 
 .transform__label {
@@ -903,6 +912,7 @@ body.no-scroll {
 
 .transform__label--after {
   color: var(--color-accent-hover);
+  text-align: right;
 }
 
 .transform__row {
@@ -919,11 +929,18 @@ body.no-scroll {
 
 .transform__before {
   color: var(--color-text-muted);
+  background-color: var(--color-ground);
+  border-radius: var(--radius-card);
+  padding: var(--space-3) var(--space-4);
 }
 
 .transform__after {
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-card);
+  padding: var(--space-3) var(--space-4);
 }
 
 .transform__arrow {
