@@ -229,27 +229,6 @@
   }
 }
 
-/* ===== ABOUT — asymmetric two-column layout: a narrower photo column
-   next to a wider content column. ===== */
-@media (min-width: 1024px) {
-  .about__inner {
-    grid-template-columns: 0.9fr 1.4fr;
-    gap: var(--space-12);
-  }
-
-  /* .about__content now comes FIRST in the DOM (so mobile/screen-reader
-     users hit the "About" heading before a bare stats card) — this
-     restores the original visual layout at desktop width: stat card
-     on the left (narrower column), content on the right (wider column). */
-  .about__proof {
-    order: 1;
-  }
-
-  .about__content {
-    order: 2;
-  }
-}
-
 /* ===== CONTACT ===== */
 
 /* Job Title + Company side by side — this only needs the FORM COLUMN

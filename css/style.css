@@ -1279,29 +1279,19 @@ body.no-scroll {
 
 /* ===== ABOUT ===== */
 
-.about__inner {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-8);
-  align-items: start;
-}
+/* Content is a plain full-width block now — no longer paired in a grid
+   row with the stats, which are their own section below (see
+   .about__stats). Stats used to be a sidebar card sized to match this
+   column's height via `height: 100%`; that height had nothing to do
+   with the stats' own content, so removing the pairing removed the
+   reason for it too. */
 
-.about__proof {
-  min-width: 0; /* see the CONTACT section for why grid items need this */
-}
-
-.about__proof-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--space-6);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-md);
+.about__stats {
+  margin-top: var(--space-10);
 }
 
 .about__proof-eyebrow {
+  display: block;
   margin-bottom: var(--space-5);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-mono-label);
@@ -1311,10 +1301,14 @@ body.no-scroll {
   color: var(--color-text-muted);
 }
 
-.about__proof-stat {
+.about__stat {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding: var(--space-6); /* the base .card's --space-8 is tuned for
+    icon + heading + paragraph content (Benefits); a numeral and one
+    label line don't need that much room, and the extra padding read as
+    the same "empty box" problem as the height:100% it replaces. */
 }
 
 .about__proof-value {
@@ -1334,11 +1328,6 @@ body.no-scroll {
 .about__proof-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-}
-
-.about__proof-divider {
-  margin-block: var(--space-4);
-  border-top: 1px solid var(--color-border);
 }
 
 .about__proof-link {
@@ -1364,10 +1353,6 @@ body.no-scroll {
 
 .about__proof-link:hover svg {
   transform: translateX(var(--space-1));
-}
-
-.about__content {
-  min-width: 0; /* see the CONTACT section for why grid items need this */
 }
 
 .about__content h2 {

@@ -443,13 +443,8 @@
          ABOUT — built in Step 7
          ==================================================================== -->
     <section id="about" class="about section section--tint">
-      <div class="container about__inner reveal-group">
+      <div class="container">
 
-        <!-- Content comes first in DOM (not just visually at desktop) so
-             mobile/screen-reader users hit the "About" heading and intro
-             BEFORE a bare stats card with no section context above it.
-             Desktop reflows this via CSS `order` in responsive.css so the
-             stat card still sits visually on the left. -->
         <div class="about__content reveal">
           <span class="section-heading__eyebrow">About</span>
           <h2>Hands-on AI expertise, without the jargon</h2>
@@ -471,24 +466,24 @@
         <!-- Real proof points instead of a placeholder team photo — an
              empty "photo coming soon" box undermines credibility more
              than not having a photo at all. Numbers are grounded in the
-             actual case studies below, not invented. -->
-        <div class="about__proof reveal">
-          <div class="about__proof-card">
-            <span class="about__proof-eyebrow">By the numbers</span>
+             actual case studies above, not invented. Its own full-width
+             row (not a sidebar card) so it reads as a claim of its own,
+             not an accessory to the bio. -->
+        <div class="about__stats reveal">
+          <span class="about__proof-eyebrow" id="about-stats-heading">By the numbers</span>
 
-            <div class="about__proof-stat">
+          <div class="grid-3 reveal-group" role="group" aria-labelledby="about-stats-heading">
+            <div class="card about__stat reveal">
               <span class="about__proof-value js-counter">3</span>
               <span class="about__proof-label">Industries served — insurance, risk &amp; analytics</span>
             </div>
-            <div class="about__proof-divider"></div>
 
-            <div class="about__proof-stat">
+            <div class="card about__stat reveal">
               <span class="about__proof-value js-counter">19&ndash;30%</span>
               <span class="about__proof-label">Prediction error (MAPE) on production models</span>
             </div>
-            <div class="about__proof-divider"></div>
 
-            <div class="about__proof-stat">
+            <div class="card about__stat reveal">
               <span class="about__proof-value js-counter">100%</span>
               <span class="about__proof-label">Explainable outputs — never a black box</span>
             </div>
