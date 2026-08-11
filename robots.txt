@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://balaram1353.github.io/msm-analytics-site/sitemap.xml
