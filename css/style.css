@@ -1860,3 +1860,204 @@ textarea.form-field__input {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+
+/* ===== CASE STUDY DETAIL PAGES =====
+   Shared across case-studies/*.html. Reuses existing components
+   wherever the meaning is actually the same, not just visually similar
+   — .card--work__client is reused verbatim below (same meaning: client
+   identity), rather than duplicated under a new class name the way the
+   link/checklist/tag components here are, which are new because
+   there's no existing free-standing (non-card-scoped) equivalent. */
+
+.case-study__header,
+.case-study__section,
+.case-study__cta {
+  max-width: var(--container-max-width-md);
+  margin-inline: auto;
+}
+
+.case-study__header {
+  padding-bottom: var(--space-8);
+}
+
+.case-study__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.case-study__back svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  transition: transform var(--transition-fast);
+}
+
+.case-study__back:hover {
+  color: var(--color-accent-hover);
+}
+
+.case-study__back:hover svg {
+  transform: translateX(calc(-1 * var(--space-1)));
+}
+
+.case-study__header h1 {
+  margin-bottom: var(--space-4);
+}
+
+.case-study__discipline {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+/* The result stat — mirrors .about__proof-value/-label's pairing (mono
+   eyebrow label + a value), but the value here is prose-weight, not
+   the mono numeral treatment: only Zywave's result is an actual number
+   (see CLAUDE.md's [CHECK] notes on the other two), so this has to
+   read well as a sentence first and a stat second, not the reverse. */
+.case-study__result {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--color-ground-tint);
+  border-radius: var(--radius-card);
+}
+
+.case-study__result-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--color-text-muted);
+}
+
+.case-study__result-value {
+  max-width: 48ch;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* Body sections — narrow reading measure, same as .faq__list, since
+   this is an article now, not a landing-page grid. */
+.case-study__section + .case-study__section {
+  margin-top: var(--space-10);
+}
+
+.case-study__section h2 {
+  margin-bottom: var(--space-5);
+}
+
+.case-study__section h3 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+.case-study__section p + p {
+  margin-top: var(--space-4);
+}
+
+/* Bold-lead-in bullet lists (e.g. "why this is explainable") — same
+   checkmark treatment as Services' .card--service__features, under a
+   new name since it isn't card-scoped here. */
+.case-study__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  /* p + p (above) only catches a paragraph following another paragraph
+     — the closing paragraph after this list needed its own top margin,
+     not this list's bottom margin technically, but this reads simpler
+     than adding a ul + p rule for one case. */
+  margin-bottom: var(--space-5);
+}
+
+.case-study__checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.case-study__checklist svg {
+  flex-shrink: 0;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  margin-top: 4px;
+  color: var(--color-accent);
+}
+
+/* Technologies — deliberately NOT the case-study teal
+   (--color-accent-secondary): that token means client/case identity
+   specifically (see CLAUDE.md), and a tech tag is metadata, not a case
+   marker. Neutral ground-tint + mono instead, the same role
+   --font-family-mono is already scoped for everywhere else. */
+.case-study__tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.case-study__tech-tag {
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-mono-label);
+  color: var(--color-text-muted);
+  background-color: var(--color-ground-tint);
+  border-radius: var(--radius-pill);
+}
+
+/* Generic arrow-link — same visual contract as .about__proof-link, new
+   name because it isn't About-scoped: used for "read the case study",
+   "back to case studies", and the closing CTA link. */
+.case-study__link {
+  display: inline-block;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-hover);
+}
+
+.case-study__link svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  margin-left: var(--space-2);
+  vertical-align: middle;
+  transition: transform var(--transition-fast);
+}
+
+.case-study__link:hover svg {
+  transform: translateX(var(--space-1));
+}
+
+.case-study__cta {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.case-study__cta .btn {
+  margin-top: var(--space-4);
+}
+
+/* "More case studies" — deliberately reuses .card.card--work verbatim
+   (see .grid-2 below) rather than a lighter teaser variant, so these
+   read as the exact same object as the homepage's case-study cards,
+   just two instead of three. */
+.case-study__more {
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-10);
+  margin-top: var(--space-12);
+}
+
+.case-study__more h2 {
+  margin-bottom: var(--space-6);
+  text-align: center;
+}

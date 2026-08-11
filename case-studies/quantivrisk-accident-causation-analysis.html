@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accident Causation Analysis Using Bayesian Modelling — MSM Analytics</title>
+  <meta name="description" content="How MSM Analytics built an explainable Bayesian model for QuantivRisk that outputs per-cause probability scores for vehicle accidents, replacing single-verdict classification.">
+
+  <meta name="robots" content="index, follow">
+
+  <!-- Tells the browser this page implements its OWN dark theme on
+       purpose. Without this, some browsers apply their own automatic
+       "dark mode" or contrast adjustments to pages that don't declare
+       a color-scheme, which can silently recolor text (most visibly on
+       headings) and produce exactly the low-contrast, washed-out look
+       we don't want — even though our CSS colors are unambiguous. -->
+  <meta name="color-scheme" content="light">
+
+  <!-- Simple inline SVG favicon (no external file needed yet, avoids a
+       404 in the console). Swap for a real brand favicon later. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233B82F6'/><text x='50' y='68' font-size='58' font-family='Arial, sans-serif' font-weight='bold' fill='white' text-anchor='middle'>M</text></svg>">
+
+  <!-- Preloads ONLY the display face used above the fold (this page's
+       H1, Space Grotesk) — see index.html and CLAUDE.md for the full
+       reasoning; identical logic applies here. -->
+  <link rel="preload" href="../assets/fonts/space-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/fonts.css">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ======================================================================
+       HEADER / NAVBAR — identical to index.html's, hrefs adjusted to
+       point back at the homepage's sections (see CLAUDE.md: this page
+       has no #services/#work/#about/#faq/#contact of its own). Hand-
+       duplicated per case-studies architecture decision — no templating
+       in this project, see the build plan.
+       ====================================================================== -->
+  <header class="navbar" id="navbar">
+    <div class="navbar__scrim" id="navbar-scrim"></div>
+
+    <div class="container navbar__inner">
+
+      <a href="../index.html#hero" class="navbar__logo">
+        <span class="brand-mark">MSM</span>
+        <span>Analytics</span>
+      </a>
+
+      <nav class="navbar__nav" id="navbar-nav" aria-label="Primary">
+        <ul class="navbar__links">
+          <li><a href="../index.html#services" class="navbar__link">Services</a></li>
+          <li><a href="../index.html#how-it-works" class="navbar__link">How It Works</a></li>
+          <li><a href="../index.html#work" class="navbar__link">Case Studies</a></li>
+          <li><a href="../index.html#about" class="navbar__link">About</a></li>
+          <li><a href="../index.html#faq" class="navbar__link">FAQ</a></li>
+          <li><a href="../index.html#contact" class="navbar__link">Contact</a></li>
+          <li class="navbar__links-cta">
+            <a href="../index.html#contact-name" class="btn btn--primary btn--sm navbar__menu-cta">Book a Strategy Call</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="navbar__actions">
+        <!-- TODO: replace href with real Calendly URL once available (same TODO as index.html) -->
+        <a href="../index.html#contact-name" class="btn btn--primary btn--sm navbar__cta">Book a Strategy Call</a>
+
+        <button
+          type="button"
+          class="navbar__toggle"
+          id="navbar-toggle"
+          aria-expanded="false"
+          aria-controls="navbar-nav"
+          aria-label="Toggle navigation menu"
+        >
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ====================================================================
+         PAGE HEADER
+         ==================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="case-study__header reveal">
+          <a href="../index.html#work" class="case-study__back">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 5 7 10l5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to case studies
+          </a>
+
+          <span class="card--work__client">QuantivRisk</span>
+
+          <h1>Accident Causation Analysis Using Bayesian Modelling</h1>
+          <p class="case-study__discipline">Probabilistic modelling, interpretable inference</p>
+
+          <div class="case-study__result">
+            <span class="case-study__result-label">Result</span>
+            <p class="case-study__result-value">Per-cause probability outputs replacing single-verdict classification</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         THE PROBLEM
+         ==================================================================== -->
+    <section class="section section--tint">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>The problem</h2>
+          <p>When a vehicle accident is analysed after the fact, the question that matters is <em>why it happened</em> — and the honest answer is rarely one thing.</p>
+          <p>Conventional classification models are built to give a single answer. Fed pre-accident conditions, they return one label: the cause. That is convenient and frequently misleading. Accidents are usually the product of several conditions arriving together, and a model that names one has discarded the others rather than weighed them.</p>
+          <p>Worse, a single-label output is difficult to challenge. If the model says "excessive speed," there is nothing to interrogate — no second candidate, no sense of how confident the verdict is, no visible reasoning. In a domain where the analysis may be reviewed by a claims team, a regulator, or opposing counsel, an unexplainable verdict is close to unusable.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         THE APPROACH
+         ==================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>The approach</h2>
+          <p><strong>Reframing the output.</strong> Rather than predicting <em>the</em> cause, the model estimates the probability that each of several candidate factors contributed to a given incident. Multiple simultaneous contributing factors can be quantified rather than collapsed into a winner.</p>
+          <p><strong>Feature engineering by threshold.</strong> Continuous pre-accident telemetry — speed and other measured conditions — was converted into binary risk indicators using rule-based thresholds. Speed at or above 80 km/h, for instance, flags as a high-speed condition present; below it, absent. Similar threshold rules were applied across the other relevant pre-accident variables.</p>
+          <p>This binarisation is the part of the work most people underestimate. The thresholds are not arbitrary — they have to be defensible, because every downstream probability inherits them. A threshold set carelessly produces a model that is internally consistent and externally indefensible.</p>
+          <p><strong>Probabilistic training.</strong> A Bayesian model was trained on the binarised dataset to learn the conditional relationships between flagged conditions and accident occurrence. The structure matters here: the model learns how these factors relate to each other, not just how each relates to the outcome in isolation.</p>
+          <p><strong>Inference.</strong> For any given accident record, the model returns a probability score per candidate cause. Not a ranking, not a label — a distribution.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         THE RESULT
+         ==================================================================== -->
+    <section class="section section--tint">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>The result</h2>
+          <p>Given the state of a vehicle immediately before an accident, the system outputs the probability that each of several factors contributed.</p>
+          <p>The practical difference: instead of "cause: excessive speed," the output reads as a breakdown — this factor at one probability, that factor at another, several factors present simultaneously with their relative weights visible.</p>
+          <p>That is a document a claims analyst can work from and a reviewer can challenge on specifics.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         WHY THIS IS EXPLAINABLE
+         ==================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>Why this is the clearest case for explainable modelling</h2>
+          <p>This engagement is the sharpest illustration of a principle applied across all our work: a model that cannot show its reasoning is a model whose output cannot be defended.</p>
+          <p>Three properties make this one inspectable end to end:</p>
+          <ul class="case-study__checklist">
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>The thresholds are stated.</strong> Anyone can see what counted as a high-speed condition and disagree with it.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>The output is a distribution, not a verdict.</strong> Uncertainty is visible rather than hidden behind a confident label.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>The relationships are learned, not asserted.</strong> The conditional structure between factors is derived from data and can be examined.</span>
+            </li>
+          </ul>
+          <p>None of that is available from a black-box classifier returning one word.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TECHNOLOGIES
+         ==================================================================== -->
+    <section class="section section--tint">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>Technologies</h2>
+          <ul class="case-study__tech-list">
+            <li class="case-study__tech-tag">Python</li>
+            <li class="case-study__tech-tag">pandas</li>
+            <li class="case-study__tech-tag">Bayesian probabilistic modelling</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         CLOSING CTA — deliberately not the homepage's CTA band (.cta-band):
+         that component's own comment marks it as the site's one closing
+         bookend ("instead of just trailing off after the contact form").
+         Reusing it here would dilute that meaning, same reasoning as
+         keeping --color-accent-secondary scoped to case-study identity
+         only. Lighter treatment instead: the whitepaper's own closing
+         paragraph plus a single button.
+         ==================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>What a similar engagement looks like</h2>
+          <p>If you currently make decisions from a model that outputs a single classification — fraud or not, high risk or low, approved or declined — the question worth asking is whether the people acting on that output can explain it when challenged.</p>
+          <p>Converting a classifier into a probabilistic model that shows its reasoning is usually less work than it sounds, and it changes what the output is usable for.</p>
+          <div class="case-study__cta">
+            <a href="../index.html#contact-name" class="btn btn--primary">Book a Strategy Call</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         MORE CASE STUDIES — kept per the build plan even though the
+         other two pages don't exist yet at time of writing (QuantivRisk
+         is being built first, complete, then reviewed before MSIG and
+         Zywave are transposed from it). These two links will 404 until
+         those pages land in the next pass.
+         ==================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="case-study__more">
+          <h2 class="reveal">More case studies</h2>
+          <div class="grid-2 reveal-group">
+
+            <article class="card card--work reveal">
+              <span class="card--work__client">MSIG</span>
+              <h3>Interactive Competitive Analysis Dashboard</h3>
+              <p>Built an interactive Power BI dashboard for exploring competitors, clusters, and product performance — dynamic slicers and auto-surfaced comparisons replaced hours of manual filtering with a self-serve tool.</p>
+              <a href="msig-competitive-analysis-dashboard.html" class="case-study__link">
+                Read the case study
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </article>
+
+            <article class="card card--work reveal">
+              <span class="card--work__client">Zywave</span>
+              <h3>Multi-State Insurance Premium Prediction</h3>
+              <p>Built four segmented premium-prediction models — three state-specific plus one general — achieving 19–30% MAPE, with hands-on AWS SageMaker expertise to train and deploy models like this in production.</p>
+              <a href="zywave-multi-state-premium-prediction.html" class="case-study__link">
+                Read the case study
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </article>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       FOOTER — identical to index.html's, hrefs adjusted to point back
+       at the homepage's sections.
+       ====================================================================== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+
+      <div class="footer__brand">
+        <a href="../index.html#hero" class="footer__logo">
+          <span class="brand-mark">MSM</span>
+          <span>Analytics</span>
+        </a>
+        <p class="footer__tagline">Practical AI and data science for businesses that want clarity, not more complexity.</p>
+
+        <div class="footer__meta">
+          <a href="mailto:hello@msmanalytics.com" class="footer__email">hello@msmanalytics.com</a>
+          <div class="footer__socials">
+            <!-- TODO: replace with real social profile URLs (same TODO as index.html) -->
+            <a href="#" class="footer__social-link" aria-label="MSM Analytics on LinkedIn">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/><path d="M7.5 11v6M11.5 17v-3.5c0-1.5 1-2.5 2.25-2.5s2.25 1 2.25 2.5V17" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="MSM Analytics on X">
+              <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <nav class="footer__nav" aria-label="Footer">
+        <h3 class="footer__nav-heading">Navigation</h3>
+        <ul>
+          <li><a href="../index.html#services">Services</a></li>
+          <li><a href="../index.html#how-it-works">How it works</a></li>
+          <li><a href="../index.html#work">Case Studies</a></li>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#faq">FAQ</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="footer__bottom">
+      <div class="container">
+        <p>&copy; <span id="footer-year"></span> MSM Analytics. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/script.js"></script>
+</body>
+</html>
