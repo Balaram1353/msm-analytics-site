@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accident Causation Analysis Using Bayesian Modelling — MSM Analytics</title>
-  <meta name="description" content="How MSM Analytics built an explainable Bayesian model for QuantivRisk that outputs per-cause probability scores for vehicle accidents, replacing single-verdict classification.">
+  <title>Interactive Competitive Analysis Dashboard — MSM Analytics</title>
+  <meta name="description" content="How MSM Analytics built an interactive Power BI dashboard for MSIG that lets a single selection reconfigure competitor, cluster, and product analysis automatically — replacing hours of manual filtering with a self-serve tool.">
 
   <meta name="robots" content="index, follow">
 
@@ -37,10 +37,9 @@
 
   <!-- ======================================================================
        HEADER / NAVBAR — identical to index.html's, hrefs adjusted to
-       point back at the homepage's sections (see CLAUDE.md: this page
-       has no #services/#work/#about/#faq/#contact of its own). Hand-
-       duplicated per case-studies architecture decision — no templating
-       in this project, see the build plan.
+       point back at the homepage's sections. Hand-duplicated per the
+       case-studies architecture decision — no templating in this
+       project, see the build plan.
        ====================================================================== -->
   <header class="navbar" id="navbar">
     <div class="navbar__scrim" id="navbar-scrim"></div>
@@ -100,14 +99,14 @@
             Back to case studies
           </a>
 
-          <span class="card--work__client">QuantivRisk</span>
+          <span class="card--work__client">MSIG</span>
 
-          <h1>Accident Causation Analysis Using Bayesian Modelling</h1>
-          <p class="case-study__discipline">Probabilistic modelling, interpretable inference</p>
+          <h1>Interactive Competitive Analysis Dashboard</h1>
+          <p class="case-study__discipline">Business intelligence, data modelling, interactive reporting</p>
 
           <div class="case-study__result">
             <span class="case-study__result-label">Result</span>
-            <p class="case-study__result-value">Per-cause probability outputs replacing single-verdict classification</p>
+            <p class="case-study__result-value">A Power BI dashboard that behaves like an application, not a report</p>
           </div>
         </div>
       </div>
@@ -120,9 +119,10 @@
       <div class="container">
         <div class="case-study__section reveal">
           <h2>The problem</h2>
-          <p>When a vehicle accident is analysed after the fact, the question that matters is <em>why it happened</em> — and the honest answer is rarely one thing.</p>
-          <p>Conventional classification models are built to give a single answer. Fed pre-accident conditions, they return one label: the cause. That is convenient and frequently misleading. Accidents are usually the product of several conditions arriving together, and a model that names one has discarded the others rather than weighed them.</p>
-          <p>Worse, a single-label output is difficult to challenge. If the model says "excessive speed," there is nothing to interrogate — no second candidate, no sense of how confident the verdict is, no visible reasoning. In a domain where the analysis may be reviewed by a claims team, a regulator, or opposing counsel, an unexplainable verdict is close to unusable.</p>
+          <p>Most competitive analysis reporting fails the same way. The data is present, the visuals are correct, and using it is exhausting — because answering any real question means manually reconfiguring filters.</p>
+          <p>Which companies compete with this one? Filter the competitor table by hand. Which companies sit in the same cluster? Filter again. How do their products compare within a category? Filter a third time, and hope the filter context across the three visuals still means what you think it means.</p>
+          <p>The result is a report people open once and stop using. Not because the analysis is wrong, but because extracting an answer costs more effort than the answer is worth.</p>
+          <p>MSIG needed a tool where selecting a company <em>asks the question for you</em>.</p>
         </div>
       </div>
     </section>
@@ -134,11 +134,53 @@
       <div class="container">
         <div class="case-study__section reveal">
           <h2>The approach</h2>
-          <p><strong>Reframing the output.</strong> Rather than predicting <em>the</em> cause, the model estimates the probability that each of several candidate factors contributed to a given incident. Multiple simultaneous contributing factors can be quantified rather than collapsed into a winner.</p>
-          <p><strong>Feature engineering by threshold.</strong> Continuous pre-accident telemetry — speed and other measured conditions — was converted into binary risk indicators using rule-based thresholds. Speed at or above 80 km/h, for instance, flags as a high-speed condition present; below it, absent. Similar threshold rules were applied across the other relevant pre-accident variables.</p>
-          <p>This binarisation is the part of the work most people underestimate. The thresholds are not arbitrary — they have to be defensible, because every downstream probability inherits them. A threshold set carelessly produces a model that is internally consistent and externally indefensible.</p>
-          <p><strong>Probabilistic training.</strong> A Bayesian model was trained on the binarised dataset to learn the conditional relationships between flagged conditions and accident occurrence. The structure matters here: the model learns how these factors relate to each other, not just how each relates to the outcome in isolation.</p>
-          <p><strong>Inference.</strong> For any given accident record, the model returns a probability score per candidate cause. Not a ranking, not a label — a distribution.</p>
+          <p><strong>Selection drives the analysis.</strong> The core design decision was that a single selection should reconfigure the surrounding context automatically:</p>
+          <ul class="case-study__checklist">
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Cluster-aware slicing</strong> — selecting a company surfaces every company in its cluster, without a second filter action.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Competitor discovery</strong> — selecting a company surfaces its competitors automatically, derived from modelled competitor relationships rather than manual tagging at query time.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Category-aware product filtering</strong> — selecting a product narrows the view to related products in the same category.</span>
+            </li>
+          </ul>
+          <p>Each of these is a slicer whose contents depend on another slicer's selection. That interdependence is the hard part, and it is where most dashboards of this kind give up and hand the work back to the user.</p>
+          <p><strong>Default plus optional comparison.</strong> Three companies display by default, with button-driven controls to add or remove optional comparators. This avoids the two standard failure modes — a chart so crowded it is unreadable, or an empty chart requiring five clicks before it shows anything.</p>
+          <p><strong>Visual encoding of comparison type.</strong> Default companies render as solid lines; optional comparators as dotted. The chart itself communicates which series are the baseline and which the user added, without a legend lookup.</p>
+          <p><strong>Dynamic ranking.</strong> Top-N analysis surfaces the leading products or companies by whichever metric is selected, recalculating rather than requiring a separate visual per metric.</p>
+          <p><strong>Simplified time filtering.</strong> Year-based slicers derived from full date fields — because a business user comparing annual performance should not have to navigate a date hierarchy to do it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         THE ENGINEERING UNDERNEATH
+         ==================================================================== -->
+    <section class="section section--tint">
+      <div class="container">
+        <div class="case-study__section reveal">
+          <h2>The engineering underneath</h2>
+          <p>The interactivity above rests on deliberate data modelling, not on visual configuration:</p>
+          <ul class="case-study__checklist">
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Star schema principles</strong> — lookup, fact, and bridge tables with one-to-many relationships, structured so filter context propagates predictably.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>DAX measures</strong> using <code>CALCULATE</code>, <code>FILTER</code>, <code>SELECTEDVALUE</code>, <code>ALL</code>, <code>RANKX</code>, and <code>SWITCH</code>, with variables and deliberate context transition.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><strong>Bookmarks and buttons</strong> for the state changes driving the add/remove comparison controls.</span>
+            </li>
+          </ul>
+          <p>The recurring challenge across all of it was managing filter context across multiple interacting visuals — ensuring that a selection in one place produced the intended effect everywhere, and no unintended effects anywhere.</p>
         </div>
       </div>
     </section>
@@ -146,41 +188,25 @@
     <!-- ====================================================================
          THE RESULT
          ==================================================================== -->
-    <section class="section section--tint">
+    <section class="section">
       <div class="container">
         <div class="case-study__section reveal">
           <h2>The result</h2>
-          <p>Given the state of a vehicle immediately before an accident, the system outputs the probability that each of several factors contributed.</p>
-          <p>The practical difference: instead of "cause: excessive speed," the output reads as a breakdown — this factor at one probability, that factor at another, several factors present simultaneously with their relative weights visible.</p>
-          <p>That is a document a claims analyst can work from and a reviewer can challenge on specifics.</p>
+          <p>A Power BI dashboard that operates as a lightweight BI application rather than a static report: users explore company relationships, competitor networks, and performance metrics interactively, and the manual filtering that made the previous approach unusable is largely eliminated.</p>
         </div>
       </div>
     </section>
 
     <!-- ====================================================================
-         WHY THIS IS EXPLAINABLE
+         WHY THIS COUNTS AS EXPLAINABLE WORK
          ==================================================================== -->
-    <section class="section">
+    <section class="section section--tint">
       <div class="container">
         <div class="case-study__section reveal">
-          <h2>Why this is the clearest case for explainable modelling</h2>
-          <p>This engagement is the sharpest illustration of a principle applied across all our work: a model that cannot show its reasoning is a model whose output cannot be defended.</p>
-          <p>Three properties make this one inspectable end to end:</p>
-          <ul class="case-study__checklist">
-            <li>
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><strong>The thresholds are stated.</strong> Anyone can see what counted as a high-speed condition and disagree with it.</span>
-            </li>
-            <li>
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><strong>The output is a distribution, not a verdict.</strong> Uncertainty is visible rather than hidden behind a confident label.</span>
-            </li>
-            <li>
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><strong>The relationships are learned, not asserted.</strong> The conditional structure between factors is derived from data and can be examined.</span>
-            </li>
-          </ul>
-          <p>None of that is available from a black-box classifier returning one word.</p>
+          <h2>Why this counts as explainable work</h2>
+          <p>Interactivity of this kind is often built with hidden logic — hardcoded relationships, opaque calculated columns, rules embedded where nobody can find them later.</p>
+          <p>This was built the other way. The competitor and cluster relationships live in the data model as explicit tables. The measures are DAX that can be read. Anyone maintaining this dashboard after handover can trace why a given company surfaced as a competitor, because the relationship is a row in a table rather than a rule buried in a query.</p>
+          <p>That matters more than it sounds. A dashboard nobody can modify is a dashboard with an expiry date.</p>
         </div>
       </div>
     </section>
@@ -188,14 +214,16 @@
     <!-- ====================================================================
          TECHNOLOGIES
          ==================================================================== -->
-    <section class="section section--tint">
+    <section class="section">
       <div class="container">
         <div class="case-study__section reveal">
           <h2>Technologies</h2>
           <ul class="case-study__tech-list">
-            <li class="case-study__tech-tag">Python</li>
-            <li class="case-study__tech-tag">pandas</li>
-            <li class="case-study__tech-tag">Bayesian probabilistic modelling</li>
+            <li class="case-study__tech-tag">Power BI Desktop</li>
+            <li class="case-study__tech-tag">DAX</li>
+            <li class="case-study__tech-tag">Power Query</li>
+            <li class="case-study__tech-tag">data modelling</li>
+            <li class="case-study__tech-tag">interactive visualisations</li>
           </ul>
         </div>
       </div>
@@ -210,12 +238,12 @@
          only. Lighter treatment instead: the whitepaper's own closing
          paragraph plus a single button.
          ==================================================================== -->
-    <section class="section">
+    <section class="section section--tint">
       <div class="container">
         <div class="case-study__section reveal">
           <h2>What a similar engagement looks like</h2>
-          <p>If you currently make decisions from a model that outputs a single classification — fraud or not, high risk or low, approved or declined — the question worth asking is whether the people acting on that output can explain it when challenged.</p>
-          <p>Converting a classifier into a probabilistic model that shows its reasoning is usually less work than it sounds, and it changes what the output is usable for.</p>
+          <p>If your team has reporting that is technically correct and rarely opened, the problem is usually not the data — it is that answering a question takes too many actions.</p>
+          <p>That is diagnosable quickly: watch someone try to answer a real question with the existing tool and count the clicks.</p>
           <div class="case-study__cta">
             <a href="../index.html#contact-name" class="btn btn--primary">Book a Strategy Call</a>
           </div>
@@ -233,10 +261,10 @@
           <div class="grid-2 reveal-group">
 
             <article class="card card--work reveal">
-              <span class="card--work__client">MSIG</span>
-              <h3>Interactive Competitive Analysis Dashboard</h3>
-              <p>Built an interactive Power BI dashboard for exploring competitors, clusters, and product performance — dynamic slicers and auto-surfaced comparisons replaced hours of manual filtering with a self-serve tool.</p>
-              <a href="msig-competitive-analysis-dashboard.html" class="case-study__link">
+              <span class="card--work__client">QuantivRisk</span>
+              <h3>Accident Causation Analysis Using Bayesian Modelling</h3>
+              <p>Built a Bayesian model that scores each candidate cause — like excessive speed — behind a vehicle accident from pre-accident telemetry, replacing a single black-box verdict with an explainable probability breakdown.</p>
+              <a href="quantivrisk-accident-causation-analysis.html" class="case-study__link">
                 Read the case study
                 <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </a>

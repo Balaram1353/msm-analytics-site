@@ -2013,6 +2013,24 @@ textarea.form-field__input {
   border-radius: var(--radius-pill);
 }
 
+/* Inline function/field names inside prose (MSIG's DAX measures list) —
+   without this, <code> falls back to the browser's default monospace,
+   not --font-family-mono, which is exactly the ad-hoc-value problem
+   CLAUDE.md's token contract exists to prevent. */
+.case-study__section code {
+  padding: 0 var(--space-2); /* zero vertical — keeps paragraph
+    line-height undisturbed, unlike the tech chips, which aren't
+    sitting inline inside a text line */
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background-color: var(--color-ground-tint);
+  /* --radius-pill, not a small ad-hoc radius — every value here has to
+     resolve to a token (see CLAUDE.md), and pill already reads cleanly
+     on .case-study__tech-tag's similarly short, tightly-padded chips. */
+  border-radius: var(--radius-pill);
+}
+
 /* Generic arrow-link — same visual contract as .about__proof-link, new
    name because it isn't About-scoped: used for "read the case study",
    "back to case studies", and the closing CTA link. */
