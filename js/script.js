@@ -382,21 +382,29 @@ if (!prefersReducedMotion) {
 
 const faqList = document.getElementById("faq-list");
 
-faqList.addEventListener("click", (event) => {
-  // event.target is whatever element was actually clicked — which could
-  // be the <button>, or the <span> or <svg> inside it. .closest() walks
-  // up from there to find the nearest ".faq__trigger" ancestor (or the
-  // element itself if it already matches), so the handler works no
-  // matter which inner element the click technically landed on.
-  const trigger = event.target.closest(".faq__trigger");
-  if (!trigger) return; // click was on the container but not a question
+// Guarded — #faq-list only exists on the homepage. Case-study detail
+// pages (case-studies/*.html) share this file but have no FAQ section;
+// without this check, addEventListener on null would throw and abort
+// every statement after it in the file (contact form validation, the
+// footer-year fix, hero setup — none of that is homepage-specific-safe
+// by accident, it's just downstream of this line).
+if (faqList) {
+  faqList.addEventListener("click", (event) => {
+    // event.target is whatever element was actually clicked — which could
+    // be the <button>, or the <span> or <svg> inside it. .closest() walks
+    // up from there to find the nearest ".faq__trigger" ancestor (or the
+    // element itself if it already matches), so the handler works no
+    // matter which inner element the click technically landed on.
+    const trigger = event.target.closest(".faq__trigger");
+    if (!trigger) return; // click was on the container but not a question
 
-  const item = trigger.closest(".faq__item");
-  const isCurrentlyOpen = item.classList.contains("is-open");
+    const item = trigger.closest(".faq__item");
+    const isCurrentlyOpen = item.classList.contains("is-open");
 
-  item.classList.toggle("is-open", !isCurrentlyOpen);
-  trigger.setAttribute("aria-expanded", String(!isCurrentlyOpen));
-});
+    item.classList.toggle("is-open", !isCurrentlyOpen);
+    trigger.setAttribute("aria-expanded", String(!isCurrentlyOpen));
+  });
+}
 
 /* ==========================================================================
    CONTACT FORM — client-side validation
@@ -411,13 +419,6 @@ faqList.addEventListener("click", (event) => {
 
 const contactForm = document.getElementById("contact-form");
 const contactSuccess = document.getElementById("contact-success");
-
-// Only the fields that actually have validation rules (required, or
-// type="email") — Job Title and Company are intentionally excluded,
-// since they're optional and never need an error state.
-const validatedFields = contactForm.querySelectorAll(
-  "#contact-name, #contact-email, #contact-message"
-);
 
 function getErrorMessage(field) {
   if (field.validity.valueMissing) {
@@ -446,53 +447,67 @@ function validateField(field) {
   return isValid;
 }
 
-validatedFields.forEach((field) => {
-  // Errors first appear on blur (leaving the field) — not while the
-  // user is still in the middle of typing into it for the first time.
-  field.addEventListener("blur", () => validateField(field));
-
-  // Once a field IS showing an error, re-validate on every keystroke so
-  // the error can clear the moment it's fixed — this only re-runs
-  // validation for fields already marked invalid, so it never makes an
-  // untouched field show an error just because the user typed elsewhere.
-  field.addEventListener("input", () => {
-    if (field.classList.contains("is-invalid")) {
-      validateField(field);
-    }
-  });
-});
-
-contactForm.addEventListener("submit", (event) => {
-  event.preventDefault(); // no backend yet — see the plan's assumptions
-
-  let isFormValid = true;
-  let firstInvalidField = null;
+// Guarded — #contact-form only exists on the homepage, same reasoning
+// as the FAQ guard above. getErrorMessage/validateField stay outside
+// this block: they're generic (take `field` as a parameter, never
+// touch contactForm/contactSuccess directly), so there's nothing
+// homepage-specific to guard in them.
+if (contactForm) {
+  // Only the fields that actually have validation rules (required, or
+  // type="email") — Job Title and Company are intentionally excluded,
+  // since they're optional and never need an error state.
+  const validatedFields = contactForm.querySelectorAll(
+    "#contact-name, #contact-email, #contact-message"
+  );
 
   validatedFields.forEach((field) => {
-    const fieldIsValid = validateField(field);
-    if (!fieldIsValid) {
-      isFormValid = false;
-      firstInvalidField = firstInvalidField || field;
+    // Errors first appear on blur (leaving the field) — not while the
+    // user is still in the middle of typing into it for the first time.
+    field.addEventListener("blur", () => validateField(field));
+
+    // Once a field IS showing an error, re-validate on every keystroke so
+    // the error can clear the moment it's fixed — this only re-runs
+    // validation for fields already marked invalid, so it never makes an
+    // untouched field show an error just because the user typed elsewhere.
+    field.addEventListener("input", () => {
+      if (field.classList.contains("is-invalid")) {
+        validateField(field);
+      }
+    });
+  });
+
+  contactForm.addEventListener("submit", (event) => {
+    event.preventDefault(); // no backend yet — see the plan's assumptions
+
+    let isFormValid = true;
+    let firstInvalidField = null;
+
+    validatedFields.forEach((field) => {
+      const fieldIsValid = validateField(field);
+      if (!fieldIsValid) {
+        isFormValid = false;
+        firstInvalidField = firstInvalidField || field;
+      }
+    });
+
+    if (!isFormValid) {
+      firstInvalidField.focus();
+      return;
     }
-  });
 
-  if (!isFormValid) {
-    firstInvalidField.focus();
-    return;
-  }
-
-  contactSuccess.hidden = false;
-  contactForm.reset();
-  // .reset() clears field VALUES but not our own .is-invalid classes or
-  // error text from any prior failed attempt — clear those explicitly
-  // so a fresh form doesn't still show old error messages.
-  validatedFields.forEach((field) => {
-    field.classList.remove("is-invalid");
-    field.removeAttribute("aria-invalid");
-    const errorEl = document.getElementById(field.getAttribute("aria-describedby"));
-    if (errorEl) errorEl.textContent = "";
+    contactSuccess.hidden = false;
+    contactForm.reset();
+    // .reset() clears field VALUES but not our own .is-invalid classes or
+    // error text from any prior failed attempt — clear those explicitly
+    // so a fresh form doesn't still show old error messages.
+    validatedFields.forEach((field) => {
+      field.classList.remove("is-invalid");
+      field.removeAttribute("aria-invalid");
+      const errorEl = document.getElementById(field.getAttribute("aria-describedby"));
+      if (errorEl) errorEl.textContent = "";
+    });
   });
-});
+}
 
 /* ==========================================================================
    FOOTER — copyright year
