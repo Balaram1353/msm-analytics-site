@@ -1329,7 +1329,25 @@ body.no-scroll {
    background - three different source treatments that would otherwise
    render as three different *kinds* of image next to each other. The
    chip's own background + border normalizes all three into one frame
-   without touching any of the source files. */
+   without touching any of the source files.
+
+   MSIG's chip specifically uses assets/logos/msig-mark.png, a derived
+   asset (not the original msig.webp) — a square crop of just the
+   diamond mark, pixel-measured from the original portrait mark+wordmark
+   lockup (diamond bbox: x 12-488, y 20-544 of the 500x760 source) with
+   even margin baked in. object-fit: cover with a live crop was tried
+   first but provably clips ~8% off the diamond's bottom point at any
+   padding great enough to give it the same breathing room the other two
+   chips have (cover always shows the full width of a portrait source in
+   a square box, which forces height to be the cropped dimension); and
+   object-fit: contain on the *original* lockup can't exclude the
+   wordmark at all, since contain never crops anything — the mismatch
+   is in the source's aspect ratio, not something object-fit's keywords
+   can route around. Pre-cropping to a square derived asset means the
+   base rule below (contain + the same padding as everyone else) just
+   works, no MSIG-only object-fit/padding override needed. The original
+   msig.webp is untouched and still used everywhere the full lockup
+   (mark + wordmark) is wanted. */
 .client-logo-chip {
   display: flex;
   align-items: center;
@@ -1348,6 +1366,21 @@ body.no-scroll {
   height: 100%;
   object-fit: contain;
   padding: var(--space-1);
+  /* Redundant clip, not decorative: WebKit was observed painting
+     zywave.jpg (unlike the other two source files) to a compositing
+     layer that skips the parent .client-logo-chip's overflow:hidden
+     clip entirely, rendering it as a full square. Reproduced only in
+     WebKit, only on that one file (byte-identical computed geometry to
+     the working QuantivRisk chip otherwise) — the two JPEGs differ
+     structurally (QuantivRisk carries an embedded ICC profile and 4:4:4
+     chroma sampling; Zywave has neither, at 4:2:0), which is consistent
+     with a known class of WebKit bug where certain image-decode paths
+     bypass an ancestor's clip. Giving the img its own border-radius is
+     the standard defensive fix — it clips regardless of which
+     compositing path WebKit takes, so it isn't relying on the parent's
+     overflow:hidden alone. Verified in WebKit 2336 (Playwright), on
+     the live deployed site, not just in isolation. */
+  border-radius: var(--radius-pill);
 }
 
 .client-logo-chip--lg {
@@ -1357,19 +1390,6 @@ body.no-scroll {
 
 .client-logo-chip--lg img {
   padding: var(--space-2);
-}
-
-/* MSIG only — its source file is a portrait mark+wordmark lockup, not
-   a square icon like the other two, and matching it to their optical
-   weight means showing just the mark. Cropped live via object-fit; the
-   source file itself is never touched. Fills the chip edge-to-edge
-   (no padding) since it's being cropped, not letterboxed like the
-   other two. Declared after --lg on purpose so this padding: 0 wins
-   over --lg's padding for MSIG's large header variant too. */
-.client-logo-chip--crop img {
-  object-fit: cover;
-  object-position: top;
-  padding: 0;
 }
 
 .card--work h3 {
