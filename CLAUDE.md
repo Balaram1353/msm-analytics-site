@@ -163,6 +163,11 @@ Consolidated from a full-site audit (every stylesheet, every color/font/spacing/
   --hero-min-height-lg: 680px;   /* >=1024px */
   --textarea-min-height: 120px;
 
+  /* Client logo chip — 40/88px don't fit the icon scale (tops out at
+     --icon-3xl, 56px); own two-value scale instead of a forced fit. */
+  --client-logo-chip-size: 40px;
+  --client-logo-chip-size-lg: 88px;
+
   /* Duration only — no timing function baked in. CSS defaults to `ease`
      automatically at any call site that doesn't append one; do not add
      `ease` back after these. --ease-out-expo is the one timing-function

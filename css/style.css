@@ -1305,6 +1305,73 @@ body.no-scroll {
   border-radius: var(--radius-pill);
 }
 
+/* Tag + logo chip, same row — used on the homepage case-study cards and
+   reused verbatim (just the --lg chip modifier) on the three detail-page
+   headers. The tag keeps its current margin-bottom when it isn't in this
+   wrapper (e.g. nowhere yet, but the rule stays generic); inside the
+   wrapper that spacing job moves to the wrapper itself. */
+.card--work__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.card--work__header .card--work__client {
+  margin-bottom: 0;
+}
+
+/* Client logo chip — a neutral white circle every logo sits inside,
+   regardless of what each source file actually is. That's the whole
+   point: MSIG's asset is genuinely transparent, QuantivRisk's JPEG has
+   a baked near-white background, Zywave's JPEG has a baked dark-navy
+   background - three different source treatments that would otherwise
+   render as three different *kinds* of image next to each other. The
+   chip's own background + border normalizes all three into one frame
+   without touching any of the source files. */
+.client-logo-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--client-logo-chip-size);
+  height: var(--client-logo-chip-size);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.client-logo-chip img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--space-1);
+}
+
+.client-logo-chip--lg {
+  width: var(--client-logo-chip-size-lg);
+  height: var(--client-logo-chip-size-lg);
+}
+
+.client-logo-chip--lg img {
+  padding: var(--space-2);
+}
+
+/* MSIG only — its source file is a portrait mark+wordmark lockup, not
+   a square icon like the other two, and matching it to their optical
+   weight means showing just the mark. Cropped live via object-fit; the
+   source file itself is never touched. Fills the chip edge-to-edge
+   (no padding) since it's being cropped, not letterboxed like the
+   other two. Declared after --lg on purpose so this padding: 0 wins
+   over --lg's padding for MSIG's large header variant too. */
+.client-logo-chip--crop img {
+  object-fit: cover;
+  object-position: top;
+  padding: 0;
+}
+
 .card--work h3 {
   margin-bottom: var(--space-3);
   /* Same fixed-line-count reservation as .benefits .card h3 — keeps the

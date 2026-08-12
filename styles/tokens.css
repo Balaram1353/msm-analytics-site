@@ -233,6 +233,14 @@
   --hero-min-height-lg: 680px;   /* >=1024px */
   --textarea-min-height: 120px;
 
+  /* Client logo chip — same reasoning: 40/88px don't fit the icon scale
+     (which tops out at --icon-3xl, 56px) or sit cleanly between its
+     named steps, so this is its own two-value scale rather than a
+     forced fit. Two sizes only: card context and detail-page-header
+     context — see the client-logo-chip component. */
+  --client-logo-chip-size: 40px;
+  --client-logo-chip-size-lg: 88px;
+
   /* --------------------------------------------------------------------
      TRANSITIONS — contract: these three are DURATION ONLY. No timing
      function baked in. CSS's own default (`ease`) applies automatically
