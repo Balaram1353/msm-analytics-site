@@ -103,7 +103,15 @@ method (Naive Bayes, Bayesian Network, or other) is unconfirmed. This
 document says "a Bayesian model" throughout, which a technical reader will
 notice. Naming it strengthens the paper considerably.*
 
-*[CHECK] Data source — the source documentation identifies the telemetry as
-Tesla pre-accident data. That detail is deliberately omitted here: naming
-your client's data source is a wider disclosure than naming your client, and
-should be confirmed with QuantivRisk before publication.*
+*Data source, resolved — the telemetry is QuantivRisk-supplied: standard
+client-provided data, not independently sourced or acquired by MSM. Tesla
+is not named anywhere on the site, and that's a permanent decision, not a
+placeholder pending confirmation. Naming Tesla would disclose QuantivRisk's
+own relationship with a third party — that's QuantivRisk's call to make,
+not MSM's to make unilaterally — and "Tesla telemetry" reads only
+marginally stronger than "vehicle telemetry," not enough of a gain to
+justify asking the client to clear it. This document's "pre-accident
+telemetry" / "vehicle accident" phrasing throughout is correct as written.
+How QuantivRisk itself originally obtained the data from Tesla remains
+unknown and is now moot, since Tesla isn't being named regardless of the
+answer. See docs/publication-checklist.md §1 (rows 2–3) and §3.*
