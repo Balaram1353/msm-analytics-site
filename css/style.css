@@ -1400,6 +1400,37 @@ body.no-scroll {
   min-height: calc(var(--line-height-snug) * 2em);
 }
 
+/* Client logo strip — closes #work, decoupled from .client-logo-chip
+   above (which stays unchanged). Full writeup: CLAUDE.md's "Client logo
+   strip" note. Short version: stacked (column) by default because a
+   single row needs more width than three marks — two of them ~4.4:1
+   wordmarks — can fit inside --container-max-width (1200px) at a
+   120-140px height with any real gap (verified: at 120px the three
+   marks' combined natural width alone is ~1139px, leaving under 15px
+   total for both gaps in a 1152px content area). Row layout, at a
+   reduced height, only turns on at the 1280px breakpoint in
+   responsive.css — the first point with room to fit all three on one
+   line with a real gap. Stacked mode has no such ceiling (only one
+   mark's width is ever measured against the container at a time), so it
+   carries the full requested height. */
+
+.work__logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-10);
+  padding-top: var(--space-10);
+  border-top: 1px solid var(--color-border);
+}
+
+.work__logos img {
+  height: var(--client-logo-strip-height);
+  width: auto;
+  max-width: 100%;
+  filter: grayscale(1);
+}
+
 /* ===== ABOUT ===== */
 
 /* Content is a plain full-width block now — no longer paired in a grid

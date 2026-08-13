@@ -241,6 +241,19 @@
   --client-logo-chip-size: 40px;
   --client-logo-chip-size-lg: 88px;
 
+  /* Client logo strip (.work__logos) — a separate, larger-format logo
+     treatment, decoupled from the chip above (which stays unchanged).
+     Two values, not one, because the two layout modes have different
+     width budgets: stacked (column) height-constrains one mark at a
+     time against the full container width, so it can run at the
+     requested ceiling; a single row has to fit all three marks' combined
+     natural width — two of which are ~4.4:1 wordmarks — inside this
+     project's own 1200px --container-max-width, which only has room at
+     a reduced height. See the width-budget comment on .work__logos in
+     style.css for the arithmetic. */
+  --client-logo-strip-height: 120px;      /* stacked, <1280px */
+  --client-logo-strip-height-row: 108px;  /* single row, >=1280px */
+
   /* --------------------------------------------------------------------
      TRANSITIONS — contract: these three are DURATION ONLY. No timing
      function baked in. CSS's own default (`ease`) applies automatically

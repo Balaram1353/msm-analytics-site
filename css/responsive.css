@@ -229,6 +229,25 @@
   }
 }
 
+/* ===== WORK — client logo strip: promote from stacked to a single row.
+   Deliberately the 1280px breakpoint, not the shared 768px/1024px ones
+   used everywhere else in this file — see the width-budget comment on
+   .work__logos in style.css. Below 1280px this is the ONLY thing that
+   changes; .work__logos img already renders at the full stacked height
+   with width:auto/max-width:100%, so there's nothing else to override
+   for phones or tablets. ===== */
+@media (min-width: 1280px) {
+  .work__logos {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-8);
+  }
+
+  .work__logos img {
+    height: var(--client-logo-strip-height-row);
+  }
+}
+
 /* ===== CTA BAND ===== */
 
 /* The mobile transparent-stop (18%, style.css) is tuned for --hero-
